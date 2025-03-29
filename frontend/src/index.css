@@ -45,3 +45,7 @@
   --color-ap-mint-800: #40ffc5;
   --color-ap-mint-900: #2cffbf;
 }
+
+body {
+  font-family: "Poppins", sans-serif;
+}
