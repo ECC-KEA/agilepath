@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: backend
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+      url: ${JDBC_DATABASE_URL}
+      username: ${JDBC_DATABASE_USERNAME}
+      password: ${JDBC_DATABASE_PASSWORD}
+
+  jpa:
+    show-sql: true
+
+  # Note: IntelliJ / VScode may show 'Cannot resolve' warnings here - should be fine.
+  logging:
+    level:
+      dev.ecckea.agilepath: DEBUG
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+
+  logging:
+    level:
+      dev.ecckea.agilepath: INFO
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
+
+  logging:
+    level:
+      dev.ecckea.agilpath: INFO
