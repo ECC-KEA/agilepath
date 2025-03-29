@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ap-cyan-50: #b1fbfb;
+  --color-ap-cyan-100: #9efafa;
+  --color-ap-cyan-200: #8bf9f9;
+  --color-ap-cyan-300: #77f8f8;
+  --color-ap-cyan-400: #64f7f7;
+  --color-ap-cyan-500: #51f6f6;
+  --color-ap-cyan-600: #3df5f5;
+  --color-ap-cyan-700: #2af4f4;
+  --color-ap-cyan-800: #16f3f3;
+  --color-ap-cyan-900: #0ce9e9;
+
+  --color-ap-blue-50: #c3f2fe;
+  --color-ap-blue-100: #afeefe;
+  --color-ap-blue-200: #9aeafe;
+  --color-ap-blue-300: #86e6fe;
+  --color-ap-blue-400: #72e2fe;
+  --color-ap-blue-500: #5dddfd;
+  --color-ap-blue-600: #49d9fd;
+  --color-ap-blue-700: #35d5fd;
+  --color-ap-blue-800: #21d1fd;
+  --color-ap-blue-900: #0dcdfd;
+
+  --color-ap-lavender-50: #e5ddf8;
+  --color-ap-lavender-100: #d8ccf5;
+  --color-ap-lavender-200: #cbbbf1;
+  --color-ap-lavender-300: #bfaaee;
+  --color-ap-lavender-400: #b299ea;
+  --color-ap-lavender-500: #a588e7;
+  --color-ap-lavender-600: #9878e3;
+  --color-ap-lavender-700: #8b67e0;
+  --color-ap-lavender-800: #7e56dc;
+  --color-ap-lavender-900: #7145d9;
+
+  --color-coral-50: #ffe5e0;
+  --color-coral-100: #ffd4cd;
+  --color-coral-200: #ffc2ba;
+  --color-coral-300: #ffb1a7;
+  --color-coral-400: #ff9f94;
+  --color-coral-500: #ff8e81;
+  --color-coral-600: #ff7c6e;
+  --color-coral-700: #ff6b5b;
+  --color-coral-800: #ff5948;
+  --color-coral-900: #ff4735;
+
+  --color-mint-50: #e0fff5;
+  --color-mint-100: #ccffef;
+  --color-mint-200: #b8ffe9;
+  --color-mint-300: #a4ffe3;
+  --color-mint-400: #90ffdd;
+  --color-mint-500: #7cffd7;
+  --color-mint-600: #68ffd1;
+  --color-mint-700: #54ffcb;
+  --color-mint-800: #40ffc5;
+  --color-mint-900: #2cffbf;
+}
