@@ -6,7 +6,7 @@ Dette dokument forklarer projektets arkitektoniske principper, package-struktur 
 
 AgilePath bygger på principper fra Clean Architecture og Ports and Adapters (også kendt som Hexagonal Architecture).
 
-Disse principper hjælper os med at skabe en modulær og testbar kodebase, hvor domænelogik holdes adskilt fra infrastruktur og rammeværk.
+Disse principper hjælper os med at skabe en modulær og testbar kodebase, hvor domænelogik holdes adskilt fra infrastruktur, frameworks og anden platformafhængig kode.
 
 ### Clean Architecture
 
