@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: ci
+
+  logging:
+    level:
+      dev.ecckea.agilepath: ${LOG_LEVEL}

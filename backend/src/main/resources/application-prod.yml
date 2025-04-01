@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  flyway:
+    clean-disabled: true
+
+  logging:
+    level:
+      dev.ecckea.agilepath: ${LOG_LEVEL}
