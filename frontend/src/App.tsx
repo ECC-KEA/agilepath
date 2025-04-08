@@ -1,15 +1,28 @@
-import LoadingSpinner from "./components/generic/loading/LoadingSpinner";
-import Logo from "./components/generic/Logo";
+import { BrowserRouter, Route, Routes } from "react-router";
+import Layout from "./components/generic/Layout";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import Login from "./views/Login";
 
 function App() {
   return (
-    <div className="h-screen flex flex-col items-center justify-center space-y-4">
-      <div className="flex items-center justify-center space-x-2 text-2xl">
-        <Logo size={50} />
-        <div className="text-3xl">AgilePath</div>
-      </div>
-      <LoadingSpinner size={25} />
-    </div>
+    <BrowserRouter>
+      <Layout>
+        <SignedOut>
+          <Routes>
+            <Route
+              index
+              path="*"
+              element={<Login />}
+            />
+          </Routes>
+        </SignedOut>
+        <SignedIn>
+          <Routes>
+            <Route index />
+          </Routes>
+        </SignedIn>
+      </Layout>
+    </BrowserRouter>
   );
 }
 

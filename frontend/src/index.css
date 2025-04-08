@@ -44,8 +44,20 @@
   --color-ap-mint-700: #54ffcb;
   --color-ap-mint-800: #40ffc5;
   --color-ap-mint-900: #2cffbf;
+
+  --color-ap-onyx-50: #c8cdd0;
+  --color-ap-onyx-100: #b3b9bd;
+  --color-ap-onyx-200: #9da5aa;
+  --color-ap-onyx-300: #879197;
+  --color-ap-onyx-400: #727c83;
+  --color-ap-onyx-500: #5f686d;
+  --color-ap-onyx-600: #555d62;
+  --color-ap-onyx-700: #42494c;
+  --color-ap-onyx-800: #2f3437;
+  --color-ap-onyx-900: #1c1f21;
 }
 
 body {
   font-family: "Poppins", sans-serif;
+  @apply text-ap-onyx-800;
 }

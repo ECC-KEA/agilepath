@@ -1,8 +1,8 @@
 import { createContext } from "react";
 
-interface ExampleContextType {
+interface IExampleContext {
   example: string;
   setExample: (example: string) => void;
 }
-const ExampleContext = createContext<ExampleContextType | undefined>(undefined);
+const ExampleContext = createContext<IExampleContext | undefined>(undefined);
 export default ExampleContext;
