@@ -4,7 +4,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 data class UserResponse(
-    val id: UUID,
+    val id: String,
     val email: String,
     val fullName: String?,
     val avatarUrl: String?,
