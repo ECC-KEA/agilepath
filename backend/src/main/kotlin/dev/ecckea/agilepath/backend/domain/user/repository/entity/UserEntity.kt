@@ -10,10 +10,7 @@ import java.util.*
 data class UserEntity(
 
     @Id
-    val id: UUID = UUID.randomUUID(),
-
-    @Column(name = "clerk_id", nullable = false, unique = true, length = 50)
-    val clerkId: String,
+    val id: String,
 
     @Column(name = "github_username", length = 100)
     val githubUsername: String? = null,
@@ -40,7 +37,6 @@ data class UserEntity(
 
 fun UserEntity.toModel(): User = User(
     id = id,
-    clerkId = clerkId,
     githubUsername = githubUsername,
     email = email,
     fullName = fullName,
