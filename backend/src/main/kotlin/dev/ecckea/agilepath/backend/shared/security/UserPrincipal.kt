@@ -10,7 +10,7 @@ import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
  * and auditing purposes.
  */
 data class UserPrincipal(
-    val clerkId: String,
+    val id: String,
     val email: String,
     val githubUsername: String?,
     val fullName: String?,
@@ -18,7 +18,7 @@ data class UserPrincipal(
 )
 
 fun UserPrincipal.toEntity() = UserEntity(
-    clerkId = clerkId,
+    id = id,
     githubUsername = githubUsername,
     email = email,
     fullName = fullName,
