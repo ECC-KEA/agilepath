@@ -17,5 +17,3 @@ fun now(): Instant = Instant.now()
 
 fun nowInZone(zone: ZoneId = defaultZone): ZonedDateTime =
     ZonedDateTime.now(zone)
-
-//TODO Create unit tests for these conversions
