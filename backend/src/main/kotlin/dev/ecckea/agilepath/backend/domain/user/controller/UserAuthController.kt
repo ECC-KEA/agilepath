@@ -33,7 +33,7 @@ class UserAuthController(
         ]
     )
     @GetMapping("/profile")
-    fun getProfile(): UserResponse {
+    suspend fun getProfile(): UserResponse {
         val user = userAuthApplication.getCurrentUser(currentUser())
         return user.toDTO()
     }
