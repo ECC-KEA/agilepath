@@ -6,15 +6,14 @@ import java.time.Instant
 import java.util.*
 
 data class User(
-    val id: UUID,
-    val clerkId: String,
+    val id: String,
     val githubUsername: String?,
     val email: String,
     val fullName: String?,
     val avatarUrl: String?,
     val createdAt: Instant,
     val modifiedAt: Instant?,
-    val modifiedBy: UUID?
+    val modifiedBy: String? // UserId
 )
 
 fun User.toDTO(): UserResponse = UserResponse(
