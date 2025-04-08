@@ -81,7 +81,7 @@ class SecurityConfig {
      */
     private fun jwtAuthentication(jwt: Jwt): AbstractAuthenticationToken {
         val userPrincipal = UserPrincipal(
-            clerkId = jwt.subject,
+            id = jwt.subject,
             email = jwt.getClaimAsString("email"),
             githubUsername = jwt.getClaimAsString("username"),
             fullName = jwt.getClaimAsString("name"),
