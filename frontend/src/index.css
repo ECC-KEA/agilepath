@@ -59,4 +59,5 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  @apply text-ap-onyx-800;
 }

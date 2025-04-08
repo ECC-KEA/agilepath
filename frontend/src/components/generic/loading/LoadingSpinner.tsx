@@ -1,7 +1,9 @@
-function LoadingSpinner({
-  size = 24,
-  color = "#7145d9"
-}: Readonly<{ size?: number; color?: string }>) {
+interface LoadingSpinnerProps {
+  size?: number;
+  color?: string;
+}
+
+function LoadingSpinner({ size = 24, color = "#7145d9" }: Readonly<LoadingSpinnerProps>) {
   return (
     <svg
       width={size}

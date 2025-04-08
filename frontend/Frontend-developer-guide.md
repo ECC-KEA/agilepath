@@ -48,26 +48,26 @@ Context bruges til at dele state og funktionalitet på tværs af komponenter. Ek
 
 ```tsx
 // filepath: src/hooks/example/ExampleContext.tsx
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, PropsWithChildren } from "react";
 
-interface ExampleContextType {
+interface IExampleContext {
   example: string | null;
   setToken: (example: string | null) => void;
 }
 
-const ExampleContext = createContext<ExampleContextType | undefined>(undefined);
+const ExampleContext = createContext<IExampleContext | undefined>(undefined);
 
 // filepath: src/hooks/example/ExampleProvider.tsx
-export const ExampleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function ExampleProvider({ children }: Readonly<PropsWithChildren>) {
   const [example, setExample] = useState<string | null>(null);
 
   return (
     <ExampleContext.Provider value={{ example, setExample }}>{children}</ExampleContext.Provider>
   );
-};
+}
 
 // filepath: src/hooks/example/useExample.tsx
-export const useExample = (): ExampleContextType => {
+export const useExample = (): IExampleContext => {
   const context = useContext(ExampleContext);
   if (!context) {
     throw new Error("useExample must be used within an ExampleProvider");
@@ -87,7 +87,7 @@ Hent context i en komponent med `useAuth`:
 import React from "react";
 import { useExample } from "../hooks/example/useExample";
 
-const ExampleComponent: React.FC = () => {
+function ExampleComponent() {
   const { example, setExample } = useExample();
 
   return (
@@ -96,7 +96,7 @@ const ExampleComponent: React.FC = () => {
       <button onClick={() => setExample("new-example")}>Set Example</button>
     </div>
   );
-};
+}
 
 export default ExampleComponent;
 ```
@@ -138,10 +138,10 @@ Eksempel på at bruge `fetchWithAuth` i et custom hook:
 
 ```tsx
 // filepath: src/hooks/useFetchExample.ts
-import { useEffect, useState } from "react";
+import { useEffect, useState, PropsWithChildren } from "react";
 import { useApi } from "./utils/useApi";
 
-export const ExampleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function ExampleProvider({ children }: Readonly<PropsWithChildren>) {
   const [example, setExample] = useState<string | null>(null);
 
   const { fetchWithAuth } = useApi();
@@ -159,7 +159,7 @@ export const ExampleProvider: React.FC<{ children: React.ReactNode }> = ({ child
   return (
     <ExampleContext.Provider value={{ example, setExample }}>{children}</ExampleContext.Provider>
   );
-};
+}
 ```
 
 ---
@@ -169,7 +169,7 @@ export const ExampleProvider: React.FC<{ children: React.ReactNode }> = ({ child
 - **Hooks:** Navngiv custom hooks med `use`-prefix, fx `useApi`, `useAuth`.
 - **Context:** Placer context i `hooks/<domæne-navn>/` og eksporter både provider og hook.
 - **API-kald:** Brug `fetchWithAuth` fra `useApi` for at sikre korrekt JWT-håndtering.
-- **TypeScript:** Brug interfaces til props og context-typer. Navngiv dem med `I`-prefix, fx `IExampleContext`.
+- **TypeScript:** Brug interfaces til props og context-typer. Navngiv dem med `I`-prefix, fx `IExampleContext`, hvis det er props navngiv dem med `Props`-suffix, fx `ExampleComponentProps`.
 - **Styling:** Brug tailwindcss til styling. Brug vores custom tailwind farver defineret i index.css.
 - **Komponenter:** Hold komponenter små og fokuserede. En komponent bør kun have én ansvarlighed. Hvis en komponent bliver for stor, overvej at bryde den op i mindre komponenter.
 - **Props:** Brug `function` til at definere komponenter. Definér props som interfaces og brug dem i komponenten.
