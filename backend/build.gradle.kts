@@ -19,51 +19,57 @@ repositories {
     mavenCentral()
 }
 
+val jacksonVersion = "2.18.3"
+val coroutinesVersion = "1.7.3"
+val coroutinesTestVersion = "1.7.3"
+val dotenvVersion = "6.5.1"
+val openAiVersion = "4.0.1"
+val ktorVersion = "2.3.9"
+val openApiVersion = "2.8.6"
+val mockkVersion = "1.13.8"
+
+
 dependencies {
-    // Spring Boot starters
+    // --- Spring Boot Starters ---
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-
-    // JWT Resource Server support
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-
-    // JSON & Kotlin support
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-
-    // dotenv
-    implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
-
-    // OpenAPI / Swagger UI
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
-
-    // OpenAI-Client for Kotlin
-    implementation("com.aallam.openai:openai-client:4.0.1")
-    implementation("io.ktor:ktor-client-cio:2.3.9")
-
-    // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-    // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    // --- Kotlin & JSON ---
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
-    // Database driver
+    // --- Dotenv ---
+    implementation("io.github.cdimascio:dotenv-kotlin:$dotenvVersion")
+
+    // --- Coroutines ---
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesTestVersion")
+
+    // --- OpenAI / HTTP Client ---
+    implementation("com.aallam.openai:openai-client:$openAiVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+
+    // --- OpenAPI / Swagger ---
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$openApiVersion")
+
+    // --- Database ---
     runtimeOnly("org.postgresql:postgresql")
-
-    // Flyway Migration
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
-    // Test dependencies
+    // --- Tests ---
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("io.mockk:mockk:$mockkVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("io.mockk:mockk:1.13.8")
 }
+
+
 
 kotlin {
     compilerOptions {
