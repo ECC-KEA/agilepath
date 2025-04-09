@@ -11,8 +11,5 @@ import org.springframework.boot.runApplication
 class BackendApplication
 
 fun main(args: Array<String>) {
-    if (System.getenv("SPRING_PROFILES_ACTIVE") == "dev") {
-        loadEnv()
-    }
     runApplication<BackendApplication>(*args)
 }

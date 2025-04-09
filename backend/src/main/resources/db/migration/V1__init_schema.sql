@@ -31,7 +31,7 @@ CREATE TABLE users_projects
     user_id    VARCHAR(50) NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     project_id UUID        NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
     role       VARCHAR(50),
-    PRIMARY KEY (user_id, project_id)
+    PRIMARY KEY (user_id, project_id),
     CHECK (role IN ('OWNER', 'ADMIN', 'CONTRIBUTOR'))
 );
 
@@ -82,7 +82,7 @@ CREATE TABLE tasks
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     modified_at     TIMESTAMP,
     CHECK ( estimate_tshirt IS NULL OR estimate_tshirt IN ('XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE') ),
-    CHECK ( estimate_points IS NULL OR estimate_points IN (1, 2, 3, 5, 8, 13, 21) ),
+    CHECK ( estimate_points IS NULL OR estimate_points IN (1, 2, 3, 5, 8, 13, 21) )
 );
 
 -- task_assignees
