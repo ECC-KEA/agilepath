@@ -32,7 +32,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred")
+        errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
 
     private fun errorResponse(status: HttpStatus, message: String?): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(

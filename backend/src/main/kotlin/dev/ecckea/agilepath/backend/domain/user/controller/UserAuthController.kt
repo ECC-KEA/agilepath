@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -33,8 +34,8 @@ class UserAuthController(
         ]
     )
     @GetMapping("/profile")
-    suspend fun getProfile(): UserResponse {
+    fun getProfile(): ResponseEntity<UserResponse> {
         val user = userAuthApplication.getCurrentUser(currentUser())
-        return user.toDTO()
+        return ResponseEntity.ok(user.toDTO())
     }
 }
