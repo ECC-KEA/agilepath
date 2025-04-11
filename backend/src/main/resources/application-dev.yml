@@ -3,6 +3,12 @@ spring:
     activate:
       on-profile: dev
 
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
   jpa:
     show-sql: true
 
@@ -11,3 +17,4 @@ spring:
       dev.ecckea.agilepath: DEBUG
       org.hibernate.SQL: DEBUG
       org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+      org.flyway.core: DEBUG
