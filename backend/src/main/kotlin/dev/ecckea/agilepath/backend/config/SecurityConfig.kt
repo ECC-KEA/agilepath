@@ -1,6 +1,7 @@
 package dev.ecckea.agilepath.backend.config
 
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AbstractAuthenticationToken
@@ -57,9 +58,9 @@ class SecurityConfig {
      * @return a configured `JwtDecoder` that fetches Clerk's JWKs
      */
     @Bean
-    fun jwtDecoder(): JwtDecoder {
-        val issuer = System.getenv("CLERK_ISSUER")
-            ?: throw IllegalStateException("CLERK_ISSUER environment variable is not set")
+    fun jwtDecoder(
+        @Value("\${CLERK_ISSUER}") issuer: String
+    ): JwtDecoder {
         return NimbusJwtDecoder.withJwkSetUri("$issuer/.well-known/jwks.json").build()
     }
 
