@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: agilepath_db
+    environment:
+      POSTGRES_USER: ${JDBC_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${JDBC_DATABASE_PASSWORD}
+      POSTGRES_DB: agilepath
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    command: ${REDIS_COMMAND}
+    ports:
+      - "6379:6379"
+
+  backend:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: agilepath_backend
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8080:8080"
+    profiles:
+      - dev
+      - ci
+      - prod
+    volumes:
+      - backend-gradle-cache:/home/gradle/.gradle
+
+  frontend:
+    container_name: agilepath_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+    command: npm run dev -- --host
+    environment:
+      - PROFILE=dev
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./frontend/package.json
+    profiles:
+      - dev
+
+  frontend_static:
+    container_name: agilepath_frontend_static
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.nginx
+      args:
+        VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+
+    env_file:
+      - .env
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    profiles:
+      - ci
+      - prod
+
+volumes:
+  postgres_data:
+  backend-gradle-cache:
+  frontend-node-modules:
