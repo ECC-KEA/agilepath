@@ -1,6 +1,7 @@
 package dev.ecckea.agilepath.backend.shared.exceptions
 
 import dev.ecckea.agilepath.backend.shared.dto.ErrorResponse
+import dev.ecckea.agilepath.backend.shared.utils.nowInZone
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -32,13 +33,13 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred")
+        errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.message)
 
     private fun errorResponse(status: HttpStatus, message: String?): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = status.value(),
             message = message ?: "An error occurred",
-            timestamp = Instant.now()
+            timestamp = nowInZone()
         )
         return ResponseEntity.status(status).body(error)
     }

@@ -41,6 +41,7 @@ dependencies {
     // --- Kotlin & JSON ---
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     // --- Dotenv ---
     implementation("io.github.cdimascio:dotenv-kotlin:$dotenvVersion")
