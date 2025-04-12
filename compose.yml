@@ -18,6 +18,20 @@ services:
     ports:
       - "6379:6379"
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redis_ui
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+    profiles:
+      - dev
+    environment:
+      - REDISINSIGHT_REDIS_HOST=${REDISINSIGHT_REDIS_HOST}
+      - REDISINSIGHT_REDIS_PORT=${REDISINSIGHT_REDIS_PORT}
+      - REDISINSIGHT_REDIS_PASSWORD=${REDISINSIGHT_REDIS_PASSWORD}
+
   backend:
     env_file:
       - .env
@@ -48,9 +62,6 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     stdin_open: true
     tty: true
-    volumes:
-      - ./frontend:/app
-      - frontend-node-modules:/app/node_modules
     command: npm run dev -- --host
     environment:
       - PROFILE=dev
