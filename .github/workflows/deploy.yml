@@ -48,10 +48,10 @@ jobs:
 
             # Start Docker services for production
             echo "Starting Docker services for production..."
-            docker compose --profile prod down
-            docker compose --profile prod up --build -d
+            sudo docker compose --profile prod down
+            sudo docker compose --profile prod up --build -d
           EOF
 
       - name: clean up unused images
         run: |
-          docker image prune -f
+          sudo docker image prune -f
