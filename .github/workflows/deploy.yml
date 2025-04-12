@@ -17,7 +17,6 @@ jobs:
 
       - name: Deploy to Azure VM
         run: |
-
           # SSH into the Azure VM and deploy
           ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_VM_USER }}@${{ secrets.AZURE_VM_IP }} << EOF
             cd /home/azureuser/agilepath || exit
@@ -28,28 +27,26 @@ jobs:
             git pull origin 4-docker
             git switch 4-docker
 
-            # Set environment variables directly in OS (no need for .env)
-            export JDBC_DATABASE_URL="${{ secrets.JDBC_DATABASE_URL }}"
-            export JDBC_DATABASE_USERNAME="${{ secrets.JDBC_DATABASE_USERNAME }}"
-            export JDBC_DATABASE_PASSWORD="${{ secrets.JDBC_DATABASE_PASSWORD }}"
-            export REDIS_HOST="${{ secrets.REDIS_HOST }}"
-            export REDIS_PORT="${{ secrets.REDIS_PORT }}"
-            export CORS_ENABLED="${{ secrets.CORS_ENABLED }}"
-            export CORS_ALLOWED_ORIGINS="${{ secrets.CORS_ALLOWED_ORIGINS }}"
-            export CORS_ALLOWED_METHODS="${{ secrets.CORS_ALLOWED_METHODS }}"
-            export CORS_ALLOWED_HEADERS="${{ secrets.CORS_ALLOWED_HEADERS }}"
-            export CORS_ALLOW_CREDENTIALS="${{ secrets.CORS_ALLOW_CREDENTIALS }}"
-            export CLERK_ISSUER="${{ secrets.CLERK_ISSUER }}"
-            export SERVER_PORT="${{ secrets.SERVER_PORT }}"
-            export VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}"
-            export VITE_CLERK_PUBLISHABLE_KEY="${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}"
-            export SPRING_PROFILES_ACTIVE="prod"
-            export LOG_LEVEL="INFO"
-
-            # Start Docker services for production
+            # Start Docker services for production with environment variables
             echo "Starting Docker services for production..."
             sudo docker compose --profile prod down
-            sudo docker compose --profile prod up --build -d
+            sudo docker compose --profile prod up -d \
+              -e JDBC_DATABASE_URL="${{ secrets.JDBC_DATABASE_URL }}" \
+              -e JDBC_DATABASE_USERNAME="${{ secrets.JDBC_DATABASE_USERNAME }}" \
+              -e JDBC_DATABASE_PASSWORD="${{ secrets.JDBC_DATABASE_PASSWORD }}" \
+              -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
+              -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
+              -e CORS_ENABLED="${{ secrets.CORS_ENABLED }}" \
+              -e CORS_ALLOWED_ORIGINS="${{ secrets.CORS_ALLOWED_ORIGINS }}" \
+              -e CORS_ALLOWED_METHODS="${{ secrets.CORS_ALLOWED_METHODS }}" \
+              -e CORS_ALLOWED_HEADERS="${{ secrets.CORS_ALLOWED_HEADERS }}" \
+              -e CORS_ALLOW_CREDENTIALS="${{ secrets.CORS_ALLOW_CREDENTIALS }}" \
+              -e CLERK_ISSUER="${{ secrets.CLERK_ISSUER }}" \
+              -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+              -e VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}" \
+              -e VITE_CLERK_PUBLISHABLE_KEY="${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" \
+              -e SPRING_PROFILES_ACTIVE="prod" \
+              -e LOG_LEVEL="INFO"
           EOF
 
       - name: clean up unused images
