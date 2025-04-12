@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class UserAuthApplication (
     private val userService: UserService,
 ) {
-    suspend fun getCurrentUser(principal: UserPrincipal): User {
+    fun getCurrentUser(principal: UserPrincipal): User {
         return userService.getOrCreate(principal)
     }
 }

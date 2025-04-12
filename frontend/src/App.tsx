@@ -20,7 +20,10 @@ function App() {
         </SignedOut>
         <SignedIn>
           <Routes>
-            <Route index />
+            <Route
+              index
+              element={<div></div>}
+            />
           </Routes>
         </SignedIn>
       </Layout>

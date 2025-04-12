@@ -14,8 +14,8 @@ data class User(
     val email: String,
     val fullName: String?,
     val avatarUrl: String?,
-    val createdAt: Instant,
-    val modifiedAt: Instant?,
+    val createdAt: Instant = Instant.now(),
+    val modifiedAt: Instant? = null,
     val modifiedBy: String? // UserId
 )
 

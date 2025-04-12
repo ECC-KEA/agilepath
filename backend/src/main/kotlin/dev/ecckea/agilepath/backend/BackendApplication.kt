@@ -1,7 +1,6 @@
 package dev.ecckea.agilepath.backend
 
 import dev.ecckea.agilepath.backend.config.CorsProperties
-import dev.ecckea.agilepath.backend.config.loadEnv
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication

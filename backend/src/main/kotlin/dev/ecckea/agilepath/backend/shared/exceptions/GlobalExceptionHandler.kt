@@ -2,12 +2,12 @@ package dev.ecckea.agilepath.backend.shared.exceptions
 
 import dev.ecckea.agilepath.backend.shared.dto.ErrorResponse
 import dev.ecckea.agilepath.backend.shared.logging.Logged
+import dev.ecckea.agilepath.backend.shared.utils.nowInZone
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
-import java.time.ZonedDateTime
 
 @RestControllerAdvice
 class GlobalExceptionHandler : Logged() {
@@ -41,7 +41,7 @@ class GlobalExceptionHandler : Logged() {
         val error = ErrorResponse(
             status = status.value(),
             message = message ?: "An error occurred",
-            timestamp = ZonedDateTime.now()
+            timestamp = nowInZone()
         )
         return ResponseEntity.status(status).body(error)
     }
