@@ -36,6 +36,7 @@ class SecurityConfig {
     fun filterChain(http: HttpSecurity, jwtDecoder: JwtDecoder): SecurityFilterChain {
         http
             .csrf { it.disable() }
+            .cors { }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"
