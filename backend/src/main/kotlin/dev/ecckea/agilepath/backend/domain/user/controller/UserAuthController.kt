@@ -3,6 +3,7 @@ package dev.ecckea.agilepath.backend.domain.user.controller
 import dev.ecckea.agilepath.backend.domain.user.application.UserAuthApplication
 import dev.ecckea.agilepath.backend.domain.user.dto.UserResponse
 import dev.ecckea.agilepath.backend.domain.user.model.toDTO
+import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Authentication", description = "Endpoints related to authentication and current user")
 class UserAuthController(
     private val userAuthApplication: UserAuthApplication
-) {
+) : Logged() {
     @Operation(
         summary = "Get current user",
         description = "Returns the authenticated user. Creates a new one if this is the first login.",
@@ -34,6 +35,7 @@ class UserAuthController(
     )
     @GetMapping("/profile")
     suspend fun getProfile(): UserResponse {
+        log.info("GET /auth/profile - Get current user")
         val user = userAuthApplication.getCurrentUser(currentUser())
         return user.toDTO()
     }
