@@ -32,5 +32,4 @@ class UserService(
         }
         userRepository.findOneById(principal.id)?.toModel() ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
     }
-
 }
