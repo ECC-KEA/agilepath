@@ -13,17 +13,10 @@ data class User(
     val email: String,
     val fullName: String?,
     val avatarUrl: String?,
-    @JsonSerialize(using = InstantSerializer::class)
     val createdAt: Instant = Instant.now(),
-    @JsonSerialize(using = InstantSerializer::class)
     val modifiedAt: Instant? = null,
-    val modifiedBy: String? // UserId
-) {
-    constructor() : this("", null, "", null, null, Instant.now(), null, null) {
-        // Default constructor for JPA
-    }
-    
-}
+    val modifiedBy: String?
+)
 
 fun User.toDTO(): UserResponse = UserResponse(
     id = id,

@@ -1,9 +1,9 @@
 package dev.ecckea.agilepath.backend.shared.dto
 
-import java.time.Instant
+import java.time.ZonedDateTime
 
 data class ErrorResponse(
     val status: Int,
     val message: String,
-    val timestamp: Instant
+    val timestamp: ZonedDateTime
 )
