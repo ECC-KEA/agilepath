@@ -1,10 +1,13 @@
 package dev.ecckea.agilepath.backend.domain.user.model
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import dev.ecckea.agilepath.backend.domain.user.dto.UserResponse
 import dev.ecckea.agilepath.backend.shared.utils.toZonedDateTime
 import java.time.Instant
-import java.util.*
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeName("dev.ecckea.agilepath.backend.domain.user.model.User")
 data class User(
     val id: String,
     val githubUsername: String?,
