@@ -30,7 +30,7 @@ jobs:
             # Start Docker services for production with environment variables
             echo "Starting Docker services for production..."
             sudo docker compose --profile prod down
-            sudo docker compose --profile prod up -d \
+            sudo docker compose --profile prod run -d \
               -e JDBC_DATABASE_URL="${{ secrets.JDBC_DATABASE_URL }}" \
               -e JDBC_DATABASE_USERNAME="${{ secrets.JDBC_DATABASE_USERNAME }}" \
               -e JDBC_DATABASE_PASSWORD="${{ secrets.JDBC_DATABASE_PASSWORD }}" \
