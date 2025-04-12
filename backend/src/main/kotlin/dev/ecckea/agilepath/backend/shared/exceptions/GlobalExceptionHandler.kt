@@ -1,14 +1,16 @@
 package dev.ecckea.agilepath.backend.shared.exceptions
 
 import dev.ecckea.agilepath.backend.shared.dto.ErrorResponse
+import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.time.Instant
+import org.springframework.web.context.request.WebRequest
+import java.time.ZonedDateTime
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler : Logged() {
 
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleNotFound(ex: ResourceNotFoundException): ResponseEntity<ErrorResponse> =
@@ -31,14 +33,15 @@ class GlobalExceptionHandler {
         errorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.message)
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneric(ex: Exception): ResponseEntity<ErrorResponse> =
+    fun handleGeneric(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> =
         errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred")
+            .also { log.error("Unexpected error occurred at ${request.getDescription(false)}: ${ex.message}", ex) }
 
     private fun errorResponse(status: HttpStatus, message: String?): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = status.value(),
             message = message ?: "An error occurred",
-            timestamp = Instant.now()
+            timestamp = ZonedDateTime.now()
         )
         return ResponseEntity.status(status).body(error)
     }
