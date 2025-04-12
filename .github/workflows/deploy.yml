@@ -29,24 +29,24 @@ jobs:
 
             # Start Docker services for production with environment variables
             echo "Starting Docker services for production..."
-            sudo docker compose --profile prod down
-            sudo docker compose --profile prod run -d \
-              -e JDBC_DATABASE_URL="${{ secrets.JDBC_DATABASE_URL }}" \
-              -e JDBC_DATABASE_USERNAME="${{ secrets.JDBC_DATABASE_USERNAME }}" \
-              -e JDBC_DATABASE_PASSWORD="${{ secrets.JDBC_DATABASE_PASSWORD }}" \
-              -e REDIS_HOST="${{ secrets.REDIS_HOST }}" \
-              -e REDIS_PORT="${{ secrets.REDIS_PORT }}" \
-              -e CORS_ENABLED="${{ secrets.CORS_ENABLED }}" \
-              -e CORS_ALLOWED_ORIGINS="${{ secrets.CORS_ALLOWED_ORIGINS }}" \
-              -e CORS_ALLOWED_METHODS="${{ secrets.CORS_ALLOWED_METHODS }}" \
-              -e CORS_ALLOWED_HEADERS="${{ secrets.CORS_ALLOWED_HEADERS }}" \
-              -e CORS_ALLOW_CREDENTIALS="${{ secrets.CORS_ALLOW_CREDENTIALS }}" \
-              -e CLERK_ISSUER="${{ secrets.CLERK_ISSUER }}" \
-              -e SERVER_PORT="${{ secrets.SERVER_PORT }}" \
-              -e VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}" \
-              -e VITE_CLERK_PUBLISHABLE_KEY="${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" \
-              -e SPRING_PROFILES_ACTIVE="prod" \
-              -e LOG_LEVEL="INFO"
+            sudo docker compose --profile prod down && \
+            JDBC_DATABASE_URL="${{ secrets.JDBC_DATABASE_URL }}" \
+            JDBC_DATABASE_USERNAME="${{ secrets.JDBC_DATABASE_USERNAME }}" \
+            JDBC_DATABASE_PASSWORD="${{ secrets.JDBC_DATABASE_PASSWORD }}" \
+            REDIS_HOST="${{ secrets.REDIS_HOST }}" \
+            REDIS_PORT="${{ secrets.REDIS_PORT }}" \
+            CORS_ENABLED="${{ secrets.CORS_ENABLED }}" \
+            CORS_ALLOWED_ORIGINS="${{ secrets.CORS_ALLOWED_ORIGINS }}" \
+            CORS_ALLOWED_METHODS="${{ secrets.CORS_ALLOWED_METHODS }}" \
+            CORS_ALLOWED_HEADERS="${{ secrets.CORS_ALLOWED_HEADERS }}" \
+            CORS_ALLOW_CREDENTIALS="${{ secrets.CORS_ALLOW_CREDENTIALS }}" \
+            CLERK_ISSUER="${{ secrets.CLERK_ISSUER }}" \
+            SERVER_PORT="${{ secrets.SERVER_PORT }}" \
+            VITE_BACKEND_URL="${{ secrets.VITE_BACKEND_URL }}" \
+            VITE_CLERK_PUBLISHABLE_KEY="${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" \
+            SPRING_PROFILES_ACTIVE="prod" \
+            LOG_LEVEL="INFO" \
+            sudo docker compose --profile prod up -d
           EOF
 
       - name: clean up unused images
