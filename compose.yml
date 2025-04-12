@@ -19,8 +19,21 @@ services:
       - "6379:6379"
 
   backend:
-    env_file:
-      - .env
+    environment:
+      JDBC_DATABASE_URL: ${JDBC_DATABASE_URL}
+      JDBC_DATABASE_USERNAME: ${JDBC_DATABASE_USERNAME}
+      JDBC_DATABASE_PASSWORD: ${JDBC_DATABASE_PASSWORD}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      CORS_ENABLED: ${CORS_ENABLED}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS}
+      CORS_ALLOWED_HEADERS: ${CORS_ALLOWED_HEADERS}
+      CORS_ALLOW_CREDENTIALS: ${CORS_ALLOW_CREDENTIALS}
+      CLERK_ISSUER: ${CLERK_ISSUER}
+      SERVER_PORT: ${SERVER_PORT}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      LOG_LEVEL: ${LOG_LEVEL}
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -42,15 +55,15 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    env_file:
-      - .env
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     stdin_open: true
     tty: true
     command: npm run dev -- --host
     environment:
-      - PROFILE=dev
+      PROFILE: dev
+      VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     develop:
       watch:
         - action: sync
@@ -72,8 +85,9 @@ services:
         VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
         VITE_BACKEND_URL: ${VITE_BACKEND_URL}
 
-    env_file:
-      - .env
+    environment:
+      VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     profiles:
