@@ -48,9 +48,6 @@ services:
       - "${FRONTEND_PORT:-3000}:3000"
     stdin_open: true
     tty: true
-    volumes:
-      - ./frontend:/app
-      - frontend-node-modules:/app/node_modules
     command: npm run dev -- --host
     environment:
       - PROFILE=dev

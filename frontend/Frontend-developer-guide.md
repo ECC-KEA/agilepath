@@ -162,6 +162,25 @@ export function ExampleProvider({ children }: Readonly<PropsWithChildren>) {
 }
 ```
 
+### Brug af `useMe` til at hente brugeroplysninger
+
+For at hente brugeroplysninger på den bruger der er logget ind, kan du bruge `useMe`.
+
+```tsx
+const { me } = useMe();
+
+// me er en IUser
+export interface IUser {
+  id: string;
+  email: string;
+  fullName?: string;
+  avatarUrl?: string;
+  githubUsername?: string;
+  githubProfileUrl?: string;
+  createdAt: string;
+}
+```
+
 ---
 
 ## ✅ Konventioner

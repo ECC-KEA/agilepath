@@ -1,13 +1,18 @@
 package dev.ecckea.agilepath.backend.domain.user.repository.entity
 
 import dev.ecckea.agilepath.backend.domain.user.model.User
+import dev.ecckea.agilepath.backend.shared.utils.nowInZone
 import jakarta.persistence.*
 import java.time.Instant
+import java.time.ZonedDateTime
 import java.util.*
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 
 @Entity
 @Table(name = "users")
-data class UserEntity(
+class UserEntity(
 
     @Id
     val id: String,
@@ -24,9 +29,11 @@ data class UserEntity(
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     val avatarUrl: String? = null,
 
+    // @JsonSerialize(using = InstantSerializer::class)
     @Column(name = "created_at", nullable = false)
     val createdAt: Instant = Instant.now(),
 
+    // @JsonSerialize(using = InstantSerializer::class)
     @Column(name = "modified_at")
     var modifiedAt: Instant? = null,
 

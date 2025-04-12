@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
-import ExampleProvider from "./example/ExampleProvider";
 import { ClerkProvider } from "@clerk/clerk-react";
+import MeProvider from "./me/MeProvider";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -11,7 +11,7 @@ if (!PUBLISHABLE_KEY) {
 export default function GlobalContextProviderWrapper({ children }: Readonly<PropsWithChildren>) {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <ExampleProvider>{children}</ExampleProvider>
+      <MeProvider>{children}</MeProvider>
     </ClerkProvider>
   );
 }
