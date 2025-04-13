@@ -50,9 +50,6 @@ jobs:
             echo "SPRING_PROFILES_ACTIVE=prod" >> .env
             echo "LOG_LEVEL=INFO" >> .env
 
-            export VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-            export VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
-
             # Start Docker services for production
             echo "Starting Docker services for production..."
             sudo docker compose --profile prod down

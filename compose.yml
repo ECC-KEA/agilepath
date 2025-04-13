@@ -77,6 +77,9 @@ services:
       - dev
 
   frontend_static:
+    environment:
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
+      - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     container_name: agilepath_frontend_static
     build:
       context: ./frontend
