@@ -56,7 +56,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "${FRONTEND_PORT:-3000}:3000"
+      - "${FRONTEND_PORT:3000}:3000"
     stdin_open: true
     tty: true
     command: npm run dev -- --host
@@ -89,7 +89,7 @@ services:
       - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     ports:
-      - "${FRONTEND_PORT:-3000}:80"
+      - "80:80"
     profiles:
       - ci
       - prod
