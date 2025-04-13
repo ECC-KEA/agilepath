@@ -31,7 +31,7 @@ jobs:
             echo "Deleting existing .env file if it exists..."
             rm -f .env
 
-            # Create a new .env file line by line
+            # Create a new .env file
             echo "Creating new .env file..."
             echo "JDBC_DATABASE_URL=${{ secrets.JDBC_DATABASE_URL }}" >> .env
             echo "JDBC_DATABASE_USERNAME=${{ secrets.JDBC_DATABASE_USERNAME }}" >> .env
@@ -49,6 +49,9 @@ jobs:
             echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" >> .env
             echo "SPRING_PROFILES_ACTIVE=prod" >> .env
             echo "LOG_LEVEL=INFO" >> .env
+
+            export VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+            export VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}
 
             # Start Docker services for production
             echo "Starting Docker services for production..."
