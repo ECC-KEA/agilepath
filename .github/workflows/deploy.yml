@@ -52,7 +52,7 @@ jobs:
             # Start Docker services for production
             echo "Starting Docker services for production..."
             sudo docker compose --profile prod down
-            sudo docker compose --profile prod --env-file .env up -d
+            sudo docker compose --profile prod up --build -d
           EOF
 
       - name: clean up unused images
