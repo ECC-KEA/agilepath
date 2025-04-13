@@ -37,6 +37,7 @@ class SecurityConfig {
         http
             .cors { }
             .csrf { it.disable() }
+            .cors { }
             .authorizeHttpRequests {
                 it.requestMatchers(
                     "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**"

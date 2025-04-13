@@ -27,6 +27,7 @@ val openAiVersion = "4.0.1"
 val ktorVersion = "2.3.9"
 val openApiVersion = "2.8.6"
 val mockkVersion = "1.13.8"
+val hibernateValidatorVersion = "8.0.2.Final"
 
 
 dependencies {
@@ -41,13 +42,14 @@ dependencies {
     // --- Kotlin & JSON ---
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // --- Dotenv ---
     implementation("io.github.cdimascio:dotenv-kotlin:$dotenvVersion")
 
     // --- Coroutines ---
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$coroutinesVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesTestVersion")
 
     // --- OpenAI / HTTP Client ---
@@ -61,6 +63,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+
+    // --- Hibernate ---
+    implementation("org.hibernate.validator:hibernate-validator:$hibernateValidatorVersion")
 
     // --- Development ---
     developmentOnly("org.springframework.boot:spring-boot-devtools")

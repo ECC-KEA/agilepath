@@ -24,13 +24,13 @@ class UserService(
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Cacheable("users", key = "#principal.id")
-    fun getOrCreate(principal: UserPrincipal): User {
+    suspend fun getOrCreate(principal: UserPrincipal): User = withIO {
         val exists = userRepository.existsById(principal.id)
         if (!exists) {
             log.info("User with id ${principal.id} does not exist, creating it")
-            return userRepository.save(principal.toEntity()).toModel()
+            userRepository.save(principal.toEntity()).toModel()
         }
-        return userRepository.findOneById(principal.id)?.toModel() ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+        userRepository.findOneById(principal.id)?.toModel()
+            ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
     }
-
 }

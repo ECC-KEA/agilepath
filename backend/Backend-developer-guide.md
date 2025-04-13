@@ -269,47 +269,399 @@ fun showMessage(result: LoginResult): String = when (result) {
     else -> "Error"
 }
 ```
-
 ---
 
-## 🔁 Kotlin Coroutines
+# 🔁 Kotlin Coroutines
 
-Vi anvender **Kotlin Coroutines** til at skrive asynkron kode med en synkron struktur. Det giver os mulighed for at håndtere IO-tunge operationer (som databasekald, netværkskald og caching) uden at blokere tråde – og uden kompleksiteten fra reactive streams.
+## Hvad er Kotlin Coroutines?
 
-### Fordele ved Coroutines
-- Nem at læse og forstå (frem for callback- eller reactive-baserede løsninger)
-- Let at teste og debugge
-- Understøttes bredt i Kotlin-økosystemet (Spring, OpenAI SDK, HTTP-klienter, m.fl.)
+Kotlin Coroutines er et kraftfuldt værktøj til asynkron programmering, der gør det muligt at skrive ikke-blokerende kode
+i en sekventiel, letlæselig form. Coroutines fungerer som letvægts-tråde, der kan suspenderes og genoptages uden at
+blokere den underliggende tråd. Det gør dem ideelle til IO-operationer og langvarige opgaver som f.eks. database- eller
+netværkskald.
 
-### Anvendelse i AgilePath
-- Alle repository- og servicefunktioner der udfører IO-operationer er markeret med `suspend`
-- Vi bruger `runBlocking` eller `coroutineScope` i test og bootstrapping hvor nødvendigt
+## På overfladen: Sekventiel syntax for asynkron kode
 
-Eksempel:
+Det unikke ved coroutines er, at asynkron kode kan skrives som synkron kode. I stedet for komplekse callback-kæder,
+Futures eller reactive streams, kan vi skrive ren, sekventiel kode:
+
 ```kotlin
-suspend fun getUserProfile(userId: UUID): UserProfile {
-    val user = userRepository.findById(userId)
+suspend fun getUserProfile(userId: String): UserProfile {
+    val user = userRepository.findOneById(userId) ?: throw ResourceNotFoundException("User not found")
     val stats = statsService.fetchStats(userId)
-    return UserProfile(user, stats)
+    val preferences = preferencesService.getPreferences(userId)
+
+    return UserProfile(user.toModel(), stats, preferences)
 }
 ```
 
-Spring Boot 3 understøtter Coroutines direkte i Web-kontrollere og services via WebFlux eller Servlet-stacken.
+Selvom denne kode involverer potentielt langvarige operationer, blokerer den ikke nogen tråde. Når en suspend-funktion
+rammer en IO-operation, suspenderes den, og tråden kan arbejde videre med andre coroutines. Når resultatet er klar,
+genoptages funktionen fra det sted, den blev suspenderet.
+
+### Nøgleelementer i coroutines:
+
+1. **`suspend`**: Markerer en funktion som værende i stand til at suspendere sin udførelse uden at blokere tråden.
+
+2. **Coroutine Builders**: Funktioner som `launch`, `async`, og `runBlocking`, der starter coroutines.
+
+3. **Coroutine Context og Dispatchers**: Definerer i hvilken kontekst og på hvilke tråde coroutines skal køres.
+
+4. **Coroutine Scope**: Definerer levetiden for coroutines og sikrer, at de ryddes op korrekt.
+
+## Under motorhjelmen: Hvordan coroutines virker
+
+Når en `suspend`-funktion kaldes, genererer Kotlin-kompilatoren en state machine, der holder styr på, hvor i funktionen
+udførelsen befinder sig. Denne state machine gør det muligt at gemme funktionens tilstand, når den suspenderes, og
+genoptage udførelsen fra samme punkt senere.
+
+### Konceptuelt eksempel:
+
+```kotlin
+// Hvad vi skriver:
+suspend fun fetchUserData(userId: String): UserData {
+    val basicInfo = userService.getBasicInfo(userId)
+    val extendedInfo = userService.getExtendedInfo(userId)
+    return UserData(basicInfo, extendedInfo)
+}
+
+// Hvad kompilatoren (konceptuelt) genererer:
+fun fetchUserData(userId: String, continuation: Continuation<UserData>): Any {
+    // State machine for at holde styr på, hvor vi er i funktionen
+    val stateMachine = continuation as? FetchUserDataStateMachine ?: FetchUserDataStateMachine(userId, continuation)
+
+    when (stateMachine.label) {
+        0 -> { // Start
+            stateMachine.label = 1
+            return userService.getBasicInfo(userId, stateMachine)
+        }
+        1 -> { // Efter getBasicInfo
+            val basicInfo = stateMachine.result as BasicInfo
+            stateMachine.label = 2
+            return userService.getExtendedInfo(userId, stateMachine)
+        }
+        2 -> { // Efter getExtendedInfo
+            val extendedInfo = stateMachine.result as ExtendedInfo
+            val basicInfo = stateMachine.basicInfo
+            return UserData(basicInfo, extendedInfo)
+        }
+    }
+}
+```
+
+Dette er naturligvis en simplificeret version, men den illustrerer kernekonceptet. Coroutines bygger på *
+*continuation-passing style (CPS)**, hvor hver funktion tager en "continuation" som argument, der repræsenterer "hvad
+der skal ske bagefter".
+
+### Dispatchers: Styring af tråde
+
+Dispatchers bestemmer, hvilke tråde coroutines kører på:
+
+- **Dispatchers.Default**: Optimeret til CPU-intensive opgaver.
+- **Dispatchers.IO**: Optimeret til IO-operationer (netværk, disk, database).
+- **Dispatchers.Main**: Bruges i UI-applikationer (fx Android).
+
+I AgilePath bruger vi `withIO` utility-funktionen til at sikre, at IO-operationer kører på den rigtige dispatcher:
+
+```kotlin
+suspend fun <T> withIO(block: suspend CoroutineScope.() -> T): T =
+    withContext(Dispatchers.IO, block)
+```
+
+## Hvorfor coroutines er smarte
+
+### 1. Ressourceeffektivitet
+
+Coroutines bruger meget få systemressourcer. Hvor en tråd typisk kræver 1 MB stack-memory, kan tusindvis af coroutines
+dele en håndfuld tråde.
+
+### 2. Fejlhåndtering med struktur
+
+Coroutines bruger structured concurrency. Det betyder, at fejl i én coroutine kan håndteres centralt, og scopes sikrer
+korrekt oprydning:
+
+```kotlin
+coroutineScope {
+    try {
+        val user = async { userRepository.findOneById(userId) }
+        val stats = async { statsService.fetchStats(userId) }
+        UserProfile(user.await(), stats.await())
+    } catch (e: Exception) {
+        log.error("Failed to fetch user profile", e)
+        throw e
+    }
+}
+```
+
+### 3. Testbarhed
+
+Coroutines er simple at teste, fx med runTest:
+
+```kotlin
+@Test
+fun `should fetch user profile`() = runTest {
+        val userId = "123"
+        val mockUser = User("123", "user@example.com")
+        val mockStats = UserStats(5, 10)
+
+        coEvery { userRepository.findOneById(userId) } returns mockUser
+        coEvery { statsService.fetchStats(userId) } returns mockStats
+
+        val result = userService.getUserProfile(userId)
+
+        assertEquals("user@example.com", result.email)
+        assertEquals(5, result.stats.points)
+    }
+
+```
+
+### 4. Sekventiel læsbarhed
+
+Asynkrone flows kan ofte blive uoverskuelige i callbacks eller flatMap()-kæder. Coroutines bevarer en lineær struktur,
+hvilket gør koden mere vedligeholdelsesvenlig og intuitiv.
+
+## Hvornår er coroutines særligt vigtige?
+
+### 1. Høj samtidighed
+
+Når applikationen skal håndtere mange samtidige anmodninger, giver coroutines en meget mere skalerbar løsning end
+tråd-per-anmodning-modellen.
+
+### 2. IO-tunge applikationer
+
+De fleste backends, inkl. AgilePath, bruger mange database- og netværkskald. Coroutines sikrer, at disse operationer
+ikke blokerer ressourcer unødigt.
+
+```kotlin
+// Uden coroutines ville dette blokere tråde under ventetiden
+suspend fun getOrCreate(principal: UserPrincipal): User = withIO {
+        val exists = userRepository.existsById(principal.id)
+        if (!exists) {
+            userRepository.save(principal.toEntity())
+        }
+        userRepository.findOneById(principal.id)?.toModel() ?: throw ResourceNotFoundException("User not found")
+    }
+```
+
+### 3. Kompleks logik med flere async steps
+
+Coroutines gør det let at koordinere flere asynkrone operationer uden callback hell:
+
+```kotlin
+suspend fun processOrder(orderId: String) {
+    val order = orderRepository.findById(orderId) ?: throw NotFoundException()
+    val paymentStatus = paymentService.verifyPayment(order.paymentId)
+
+    if (paymentStatus.isConfirmed) {
+        val inventory = inventoryService.checkAvailability(order.items)
+        if (inventory.allAvailable) {
+            val shippingDetails = shippingService.createShipment(order)
+            orderRepository.updateStatus(orderId, OrderStatus.PROCESSING)
+            notificationService.notifyCustomer(order.customerId, shippingDetails)
+        }
+    }
+}
+```
+
+## Coroutines i Spring Boot
+
+Spring Boot 3+ understøtter `suspend` direkte i controllere og services — også i Servlet stack:
+
+```kotlin
+@RestController
+@RequestMapping("/auth")
+class UserAuthController(private val userAuthApplication: UserAuthApplication) {
+
+    @GetMapping("/profile")
+    suspend fun getProfile(): UserResponse {
+        val user = userAuthApplication.getCurrentUser(currentUser())
+        return user.toDTO()
+    }
+}
+```
+
+## Best Practices i AgilePath
+
+1. **Marker alle IO-funktioner med `suspend`**
+   Alle funktioner, der involverer database-operationer, netværkskald, filsystemadgang eller andre potentielt langvarige
+   operationer, skal markeres med `suspend`.
+
+2. **Brug `withIO` til eksplicitte IO-operationer**
+   For at sikre at IO-operationer ikke blokerer tråde, pakkes de ind i vores `withIO`-funktion, der sikrer korrekt
+   dispatcher-brug.
+
+3. **Udnyt struktureret concurrency**
+   Brug `coroutineScope` og `supervisorScope` til at håndtere relaterede coroutines som en enhed.
+
+4. **Brug timeout og cancellation**
+   Implementer timeouts for langvarige operationer for at undgå at blokere ressourcer for længe:
+   ```kotlin
+   withTimeout(5000L) {
+       service.longRunningOperation()
+   }
+   ```
 
 ---
 
-## 🧠 Caching med Redis
+## 🧠 Redis Caching i Spring Boot med Kotlin
 
-Vi bruger Redis som cachelag for performance-intensive data, der er kostbare at hente eller beregne, men ikke ændrer sig ofte. Eksempler inkluderer statistik, brugerdata og leaderboard-elementer.
+### Introduktion
 
-### Brug
-- Spring Cache abstraction anvendes med `@EnableCaching`
-- Brug af `@Cacheable`, `@CacheEvict`, `@CachePut` styres direkte på metodeniveau
+Redis er en in-memory datastrukturlager, der kan anvendes som cache, database eller message broker. I Spring Boot
+anvendes Redis ofte som et cachelag for at forbedre applikationsydelsen ved at gemme resultater af dyre operationer og
+beregninger.
 
-### Eksempel: Cache XP-sum
+### Nøglekomponenter i implementeringen
+
+#### ***1. CacheConfig Klasse***
+
+Dette er hovedkonfigurationsklassen, der opsætter Redis som cachebackend:
+
 ```kotlin
-@Cacheable("userXp")
-suspend fun getTotalXp(userId: UUID): Int = xpRepository.findTotalXp(userId)
+@Configuration
+@EnableCaching
+class CacheConfig : Logged() {
+    // Konfiguration her
+}
+```
+
+#### Centrale elementer i konfigurationen:
+
+- **@EnableCaching**: Aktiverer Springs caching-infrastruktur
+- **customObjectMapper()**: Konfigurerer en ObjectMapper til korrekt serialisering/deserialisering af komplekse objekter
+- **cacheManager()**: Opsætter Redis som cache med standardindstillinger:
+    - 15 minutters Time-To-Live (TTL) for cache-indgange
+    - StringRedisSerializer til nøgler
+    - GenericJackson2JsonRedisSerializer til værdier
+- **cacheErrorHandler()**: Håndterer fejl ved cacheoperationer med detaljeret logning
+- **redisTemplate()**: Giver direkte adgang til Redis gennem et template
+
+#### ***2. RedisCacheService***
+
+En wrapper-service, der forenkler direkte Redis-operationer:
+
+```kotlin
+@Component
+class RedisCacheService(
+    private val redisTemplate: RedisTemplate<String, Any>
+) {
+    fun get(key: String): Any? = redisTemplate.opsForValue().get(key)
+    fun set(key: String, value: Any, ttlMinutes: Long = 15) {
+        redisTemplate.opsForValue().set(key, value, ttlMinutes, TimeUnit.MINUTES)
+    }
+    fun delete(key: String) = redisTemplate.delete(key)
+}
+```
+
+#### ***3. Model klasser og JSON-serialisering***
+
+For at cache-objekter kan serialiseres/deserialiseres korrekt, skal model-klasserne annoteres:
+
+```kotlin
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeName("dev.ecckea.agilepath.backend.domain.user.model.User")
+data class User(
+    val id: String,
+    val email: String,
+    // Andre felter
+)
+```
+
+## Anvendelsesmetoder
+
+Der er to primære måder at bruge Redis-caching på i implementeringen:
+
+#### ***1. Annotations-baseret caching (deklarativ)***
+
+Spring Cache abstraktion anvendes med `@EnableCaching` og annotations på metodeniveau:
+
+```kotlin
+@Cacheable("users", key = "#principal.id")
+fun getOrCreate(principal: UserPrincipal): User {
+    // Implementeringslogik
+}
+```
+
+Andre nyttige annotations:
+
+- `@CacheEvict`: Fjerner indgange fra cachen
+- `@CachePut`: Opdaterer cache uden at påvirke metodens udførelse
+
+#### ***2. Direkte cache-manipulation (imperativ)***
+
+Gennem RedisCacheService for mere kontrol:
+
+```kotlin
+// Gemme i cache
+cacheService.set("user:${userId}", user)
+
+// Hente fra cache
+val user = cacheService.get("user:${userId}") as User?
+
+// Fjerne fra cache
+cacheService.delete("user:${userId}")
+```
+
+### Typiske Use Cases
+
+- **Brugerdata**: Cache brugerprofiler for at reducere databaseforespørgsler
+- **Konfigurationsdata**: Cache af sjældent ændret konfiguration
+- **Beregningstunge resultater**: Resultater af komplekse beregninger eller aggregeringer
+- **Leaderboards og statistikker**: Hyppigt læste, men sjældent ændrede data
+- **API-svar**: Cache af data fra eksterne API'er
+
+### Serialisering og Type-håndtering
+
+En kritisk del af Redis-caching er korrekt serialisering/deserialisering, især for Kotlin data classes:
+
+1. **Type Information**: ObjectMapper konfigureres med `activateDefaultTyping` for at bevare typeoplysninger
+2. **Moduler**:
+
+- `JavaTimeModule`: Understøtter moderne dato/tid-typer
+- `KotlinModule`: Forbedrer Kotlin-kompatibilitet (data classes, nullability, default values)
+
+3. **Type Validation**: Begrænser deserialisering til sikre pakker via `BasicPolymorphicTypeValidator`
+
+### Fejlhåndtering
+
+Implementeringen inkluderer robust fejlhåndtering:
+
+```kotlin
+@Bean
+fun cacheErrorHandler(): CacheErrorHandler {
+    return object : SimpleCacheErrorHandler() {
+        override fun handleCacheGetError(/* parametre */) {
+            log.error("Cache get error for key $key in cache ${cache.name}", exception)
+            super.handleCacheGetError(exception, cache, key)
+        }
+        // Andre fejlhåndteringsmetoder
+    }
+}
+```
+
+### Bedste Praksis
+
+1. **Definer passende TTL**: Balancer mellem friskhed og performance (standard: 15 minutter)
+2. **Brug nøglenavnekonventioner**: Strukturerede cachenøgler for bedre organisering (fx "users:123")
+
+### Eksempel: Caching af brugerdata
+
+```kotlin
+@Service
+class UserService(
+    private val userRepository: UserRepository,
+) : Logged() {
+    @Cacheable("users", key = "#principal.id")
+    fun getOrCreate(principal: UserPrincipal): User {
+        val exists = userRepository.existsById(principal.id)
+        if (!exists) {
+            log.info("Bruger med id ${principal.id} findes ikke, opretter den")
+            userRepository.save(principal.toEntity())
+        }
+        return userRepository.findOneById(principal.id)?.toModel()
+            ?: throw ResourceNotFoundException("Bruger med id ${principal.id} ikke fundet")
+    }
+}
 ```
 ---
 
