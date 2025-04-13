@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 4-docker
 
 jobs:
   deploy:
@@ -23,9 +22,9 @@ jobs:
 
             # Pull the latest changes from the main branch
             echo "Pulling latest changes from main branch..."
-            git fetch origin 4-docker
-            git pull origin 4-docker
-            git switch 4-docker
+            git fetch origin main
+            git pull origin main
+            git switch main
 
             # Delete existing .env file if it exists
             echo "Deleting existing .env file if it exists..."
