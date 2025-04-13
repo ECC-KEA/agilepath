@@ -56,7 +56,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "${FRONTEND_PORT:3000}:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     stdin_open: true
     tty: true
     command: npm run dev -- --host
