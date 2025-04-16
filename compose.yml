@@ -134,14 +134,13 @@ services:
       - ci
       - prod
 
-  # certbot:
-  #   restart: always
-  #   container_name: certbot
-  #   image: certbot/certbot
-  #   volumes:
-  #     - ./certbot/conf:/etc/letsencrypt
-  #     - ./certbot/www:/var/www/certbot
-  #   command: certonly --webroot -w /var/www/certbot --non-interactive --keep-until-expiring -d agilepath.dk -d www.agilepath.dk --agree-tos --dry-run -m emilvnielsen@hotmail.com
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --non-interactive --keep-until-expiring --email emilvnielsen@hotmail.com -d agilepath.dk --agree-tos
 
 volumes:
   postgres_data:
