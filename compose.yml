@@ -22,7 +22,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt:/etc/letsencrypt
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
       - ./logs/nginx:/var/log/nginx
     depends_on:
       - frontend_static
@@ -132,6 +133,15 @@ services:
     profiles:
       - ci
       - prod
+
+  certbot:
+    restart: always
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal -d agilepath.dk --agree-tos
 
 volumes:
   postgres_data:
