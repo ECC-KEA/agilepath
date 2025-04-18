@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
-@RequestMapping("/project")
+@RequestMapping("/projects")
 @Tag(name = "Project", description = "Endpoints related to project management")
 class ProjectController(
     private val projectApplication: ProjectApplication

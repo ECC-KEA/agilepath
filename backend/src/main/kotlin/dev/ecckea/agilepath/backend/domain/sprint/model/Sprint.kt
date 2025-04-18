@@ -2,7 +2,6 @@ package dev.ecckea.agilepath.backend.domain.sprint.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import dev.ecckea.agilepath.backend.domain.sprint.dto.SprintResponse
-import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import java.time.Instant
 import java.time.LocalDate
 

@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/sprint")
+@RequestMapping("/sprints")
 @Tag(name = "Sprint", description = "Endpoints related to sprint management")
 class SprintController(
     private val sprintApplication: SprintApplication
