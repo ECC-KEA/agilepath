@@ -1,6 +1,8 @@
 package dev.ecckea.agilepath.backend.domain.sprint.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import dev.ecckea.agilepath.backend.domain.sprint.dto.SprintResponse
+import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import java.time.Instant
 import java.time.LocalDate
 
@@ -15,4 +17,14 @@ data class Sprint(
     val createdBy: String, // UserId
     val createdAt: Instant = Instant.now(),
     val modifiedAt: Instant? = null,
+)
+
+fun Sprint.toDTO() = SprintResponse(
+    id = id,
+    projectId = projectId,
+    name = name,
+    goal = goal,
+    startDate = startDate.toString(),
+    endDate = endDate.toString(),
+    createdBy = createdBy,
 )
