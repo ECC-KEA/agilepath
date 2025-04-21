@@ -71,10 +71,15 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // --- Tests ---
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-test")
     runtimeOnly("com.h2database:h2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
