@@ -7,7 +7,7 @@ import dev.ecckea.agilepath.backend.domain.project.model.toDTO
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/project")
@@ -39,6 +39,4 @@ class ProjectController(
         log.info("PUT /project/{id} - Update project")
         return projectApplication.updateProject(id, project.toModel()).toDTO()
     }
-
-
 }
