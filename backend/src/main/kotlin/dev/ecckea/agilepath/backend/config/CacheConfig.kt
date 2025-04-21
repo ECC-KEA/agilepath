@@ -1,11 +1,6 @@
 package dev.ecckea.agilepath.backend.config
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
@@ -28,42 +23,11 @@ import java.time.Duration
  */
 @Configuration
 @EnableCaching
-class CacheConfig : Logged() {
+class CacheConfig(
+    private val customObjectMapper: ObjectMapper,
+) : Logged() {
 
-    /**
-     * Creates and configures a reusable [ObjectMapper] for use with Redis caching.
-     *
-     * This mapper is enhanced with modules and type handling needed for proper serialization
-     * and deserialization of Kotlin data classes, especially when using
-     * [GenericJackson2JsonRedisSerializer] as a cache value serializer.
-     *
-     * Key configurations:
-     * - Registers [JavaTimeModule] for support of Java 8+ date/time types like [Instant], [ZonedDateTime], etc.
-     * - Registers [KotlinModule] to improve Kotlin compatibility, e.g., handling `data class`, nullability, and default values.
-     * - Enables [activateDefaultTyping] with a [BasicPolymorphicTypeValidator] that restricts polymorphic deserialization
-     *   to types in the `dev.ecckea.agilepath` package. This ensures type information is included in serialized JSON
-     *   and supports deserialization of interface or base class references (e.g. sealed classes or value types).
-     *
-     * This configuration is essential when using a shared [ObjectMapper] with Redis,
-     * where the cache may store heterogeneous types that must retain their identity across serialization boundaries.
-     *
-     * @return a properly configured [ObjectMapper] instance for use in Redis serializers.
-     */
-    private fun customObjectMapper(): ObjectMapper {
-        val ptv = BasicPolymorphicTypeValidator.builder()
-            .allowIfBaseType(Any::class.java)
-            .allowIfSubType("dev.ecckea.agilepath")
-            .allowIfSubType("java.util")
-            .allowIfSubType("java.time")
-            .build()
 
-        return ObjectMapper()
-            .registerModule(JavaTimeModule())
-            .registerModule(KotlinModule.Builder().build())
-            .findAndRegisterModules()
-            .activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
 
     /**
      * Configures the primary CacheManager bean using Redis as the backing store.
@@ -78,8 +42,7 @@ class CacheConfig : Logged() {
      */
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
-        val mapper = customObjectMapper()
-        val serializer = GenericJackson2JsonRedisSerializer(mapper)
+        val serializer = GenericJackson2JsonRedisSerializer(customObjectMapper)
 
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(15))
@@ -150,8 +113,7 @@ class CacheConfig : Logged() {
     @Bean
     fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
         val template = RedisTemplate<String, Any>()
-        val mapper = customObjectMapper()
-        val serializer = GenericJackson2JsonRedisSerializer(mapper)
+        val serializer = GenericJackson2JsonRedisSerializer(customObjectMapper)
 
         template.connectionFactory = connectionFactory
         template.keySerializer = StringRedisSerializer()
