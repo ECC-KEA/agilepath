@@ -9,8 +9,6 @@ import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.security.toEntity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.*
@@ -26,21 +24,21 @@ class ProjectService(
             ?: throw ResourceNotFoundException("Project with id $id not found")
     }
 
-    suspend fun createProject(project: Project): Project = withContext(Dispatchers.IO) {
+    suspend fun createProject(project: Project): Project = withIO {
         log.info("Creating project with name ${project.name}")
         val entity = project.toEntity(currentUser().toEntity())
         projectRepository.save(entity)
         entity.toModel()
     }
 
-    suspend fun deleteProject(id: String) = withContext(Dispatchers.IO) {
+    suspend fun deleteProject(id: String) = withIO {
         log.info("Deleting project with id $id")
         val project = projectRepository.findOneById(id)
             ?: throw ResourceNotFoundException("Project with id $id not found")
         projectRepository.delete(project)
     }
 
-    suspend fun updateProject(id: String, project: Project): Project = withContext(Dispatchers.IO) {
+    suspend fun updateProject(id: String, project: Project): Project = withIO {
         log.info("Updating project with id $id")
         val existingProject = projectRepository.findOneById(id)
             ?: throw ResourceNotFoundException("Project with id $id not found")
