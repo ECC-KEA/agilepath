@@ -2,11 +2,8 @@ package dev.ecckea.agilepath.backend.domain.project.application
 
 import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.project.service.ProjectService
-import dev.ecckea.agilepath.backend.domain.user.model.User
-import dev.ecckea.agilepath.backend.domain.user.service.UserService
-import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class ProjectApplication (
