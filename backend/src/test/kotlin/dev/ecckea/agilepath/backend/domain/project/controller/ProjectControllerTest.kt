@@ -1,85 +1,69 @@
 package dev.ecckea.agilepath.backend.domain.project.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import dev.ecckea.agilepath.backend.domain.project.application.ProjectApplication
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
-import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.project.type.Framework
-import io.mockk.coEvery
-import io.mockk.mockk
-import kotlinx.coroutines.test.runTest
+import dev.ecckea.agilepath.backend.shared.utils.nowInZone
+import dev.ecckea.agilepath.backend.support.*
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Import
-import org.springframework.http.MediaType
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.post
-import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
-@WebMvcTest(ProjectController::class)
-@Import(ProjectControllerTest.TestConfig::class)
-class ProjectControllerTest {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
-    @Autowired
-    private lateinit var projectApplication: ProjectApplication
+class ProjectControllerTest : IntegrationTestBase() {
 
     @Test
-    fun `should create project and return 200`() = runTest {
-        // Arrange
+    fun `should create, fetch, update and delete a project`() {
+        // 1. Create
         val request = ProjectResponse(
             id = UUID.randomUUID().toString(),
-            name = "Test Project",
-            description = "A sample project",
+            name = "AgilePath",
+            description = "A Kanban app for agile learners",
             framework = Framework.SCRUM,
-            createdBy = "user123",
-            createdAt = ZonedDateTime.now()
+            createdBy = "user-id",
+            createdAt = nowInZone()
         )
 
-        val projectModel = Project(
-            id = request.id,
-            name = request.name,
-            description = request.description,
-            framework = request.framework,
-            createdBy = request.createdBy,
-            createdAt = request.createdAt.toInstant()
-        )
+        val created = webTestClient
+            .webPost("/project", request)
+            .exchange()
+            .expectStatus().isOk
+            .parseBody<ProjectResponse>()
 
-        coEvery { projectApplication.createProject(any()) } returns projectModel
+        assertEquals(request.name, created.name)
+        assertEquals(request.description, created.description)
+        assertEquals(request.framework, created.framework)
+        assertNotNull(created.id)
 
-        // Mock JWT token with claims from SecurityConfig
-        val jwt = SecurityMockMvcRequestPostProcessors.jwt()
-            .jwt {
-                it.claim("sub", "user123")
-                it.claim("email", "user@example.com")
-            }
+        // 2. Fetch
+        val fetched = webTestClient
+            .webGetWithAuth("/project/${created.id}")
+            .exchange()
+            .expectStatus().isOk
+            .parseBody<ProjectResponse>()
 
-        // Act & Assert
-        mockMvc.post("/project") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(request)
-            with(jwt)
-            header("Origin", "http://localhost") // Mock CORS
-        }.andExpect {
-            status { isOk() } // Expect 200 OK
-            content { contentType(MediaType.APPLICATION_JSON) }
-            content { json(objectMapper.writeValueAsString(request)) }
-        }
-    }
+        assertEquals(created.id, fetched.id)
 
-    @Configuration
-    class TestConfig {
-        @Bean
-        fun projectApplication(): ProjectApplication = mockk()
+        // 3. Update
+        val updatedRequest = created.copy(name = "AgilePath++")
+
+        val updated = webTestClient
+            .webPut("/project/${created.id}", updatedRequest)
+            .exchange()
+            .expectStatus().isOk
+            .parseBody<ProjectResponse>()
+
+        assertEquals("AgilePath++", updated.name)
+
+        // 4. Delete
+        webTestClient
+            .webDelete("/project/${created.id}")
+            .exchange()
+            .expectStatus().isOk
+
+        // 5. Verify deletion
+        webTestClient
+            .webGetWithAuth("/project/${created.id}")
+            .exchange()
+            .expectStatus().isNotFound
     }
 }
