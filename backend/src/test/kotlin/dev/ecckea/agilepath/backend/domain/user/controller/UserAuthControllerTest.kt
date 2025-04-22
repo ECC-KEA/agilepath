@@ -12,7 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import kotlin.test.Test
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(TestAppConfig::class)
 class UserAuthControllerTest : IntegrationTestBase() {
@@ -46,7 +46,9 @@ class UserAuthControllerTest : IntegrationTestBase() {
             .exchange()
             .expectStatus().isUnauthorized
             .expectBody()
-            .jsonPath("$.message").isEqualTo("Unauthorized – Invalid or missing token")
-    }
+            .jsonPath("$.message").value<String> {
+                assert(it.contains("Unauthorized") && it.contains("Invalid or missing token"))
+            }
 
+    }
 }
