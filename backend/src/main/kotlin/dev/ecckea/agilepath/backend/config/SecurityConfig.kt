@@ -26,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain
  */
 @Configuration
 @EnableMethodSecurity
+@Profile("!test")
 class SecurityConfig {
 
     /**
