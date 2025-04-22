@@ -1,30 +1,32 @@
 package dev.ecckea.agilepath.backend.domain.column.application
 
+import dev.ecckea.agilepath.backend.domain.column.model.NewSprintColumn
 import dev.ecckea.agilepath.backend.domain.column.model.SprintColumn
 import dev.ecckea.agilepath.backend.domain.column.service.SprintColumnService
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class SprintColumnApplication(
     private val sprintColumnService: SprintColumnService,
 ) {
-    suspend fun getSprintColumns(sprintId: String): List<SprintColumn> {
+    fun getSprintColumns(sprintId: UUID): List<SprintColumn> {
         return sprintColumnService.getSprintColumns(sprintId)
     }
 
-    suspend fun getSprintColumn(id: String): SprintColumn {
+    fun getSprintColumn(id: UUID): SprintColumn {
         return sprintColumnService.getSprintColumn(id)
     }
 
-    suspend fun createSprintColumn(sprintColumn: SprintColumn): SprintColumn {
+    fun createSprintColumn(sprintColumn: NewSprintColumn): SprintColumn {
         return sprintColumnService.createSprintColumn(sprintColumn)
     }
 
-    suspend fun deleteSprintColumn(id: String) {
+    fun deleteSprintColumn(id: UUID) {
         sprintColumnService.deleteSprintColumn(id)
     }
 
-    suspend fun updateSprintColumn(id: String, sprintColumn: SprintColumn): SprintColumn {
+    fun updateSprintColumn(id: UUID, sprintColumn: NewSprintColumn): SprintColumn {
         return sprintColumnService.updateSprintColumn(id, sprintColumn)
     }
 }

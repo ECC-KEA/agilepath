@@ -1,4 +1,4 @@
-package dev.ecckea.agilepath.backend.domain.column.type
+package dev.ecckea.agilepath.backend.domain.column.model
 
 enum class SprintColumnStatus {
     TODO,
