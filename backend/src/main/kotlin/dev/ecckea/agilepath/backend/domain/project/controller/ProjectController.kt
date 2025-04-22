@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("/project")
+@RequestMapping("/projects")
 @Tag(name = "Project", description = "Endpoints related to project management")
 class ProjectController(
     private val projectApplication: ProjectApplication
