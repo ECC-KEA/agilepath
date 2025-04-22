@@ -1,16 +1,18 @@
 package dev.ecckea.agilepath.backend.domain.project.service
 
+import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
+import dev.ecckea.agilepath.backend.domain.project.model.toEntity
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
-import dev.ecckea.agilepath.backend.domain.project.repository.entity.toEntity
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.toModel
-import dev.ecckea.agilepath.backend.shared.coroutines.withIO
+import dev.ecckea.agilepath.backend.domain.project.repository.entity.updatedWith
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.security.toEntity
+
 import org.springframework.stereotype.Service
-import java.time.Instant
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -18,43 +20,41 @@ class ProjectService(
     private val projectRepository: ProjectRepository,
 ) : Logged() {
 
-    suspend fun getProject(id: UUID): Project = withIO {
+    @Transactional(readOnly = true)
+    fun getProject(id: UUID): Project {
         log.info("Fetching project with id $id")
-        projectRepository.findOneById(id.toString())?.toModel()
+        return projectRepository.findOneById(id)?.toModel()
             ?: throw ResourceNotFoundException("Project with id $id not found")
     }
 
-    suspend fun createProject(project: Project): Project = withIO {
+    @Transactional
+    fun createProject(project: NewProject): Project {
         log.info("Creating project with name ${project.name}")
-        val entity = project.toEntity(currentUser().toEntity())
-        projectRepository.save(entity)
-        entity.toModel()
+        val user = currentUser().toEntity()
+        val entity = project.toEntity(createdBy = user)
+        val saved = projectRepository.save(entity)
+        return saved.toModel()
     }
 
-    suspend fun deleteProject(id: String) = withIO {
+    @Transactional
+    fun deleteProject(id: UUID) {
         log.info("Deleting project with id $id")
         val project = projectRepository.findOneById(id)
             ?: throw ResourceNotFoundException("Project with id $id not found")
-        projectRepository.delete(project)
+        return projectRepository.delete(project)
     }
 
-    suspend fun updateProject(id: String, project: Project): Project = withIO {
+    @Transactional
+    fun updateProject(id: UUID, updated: NewProject): Project {
         log.info("Updating project with id $id")
-        val existingProject = projectRepository.findOneById(id)
-            ?: throw ResourceNotFoundException("Project with id $id not found")
-        val projectModel = existingProject.toModel()
 
-        val updatedProject = projectModel.copy(
-            name = project.name,
-            description = project.description,
-            framework = project.framework,
-            modifiedAt = Instant.now(),
-        )
-        val updatedEntity = updatedProject.toEntity(
-            createdBy = existingProject.createdBy,
-            modifiedBy = currentUser().toEntity(),
-        )
-        projectRepository.save(updatedEntity)
-        updatedEntity.toModel()
+        val existing = projectRepository.findOneById(id)
+            ?: throw ResourceNotFoundException("Project with id $id not found")
+
+        val current = currentUser().toEntity()
+
+        val updatedEntity = existing.updatedWith(updated, current)
+        val saved = projectRepository.save(updatedEntity)
+        return saved.toModel()
     }
 }

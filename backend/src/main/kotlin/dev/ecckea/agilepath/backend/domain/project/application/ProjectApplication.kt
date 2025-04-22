@@ -1,5 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.project.application
 
+import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.project.service.ProjectService
 import org.springframework.stereotype.Service
@@ -9,19 +10,19 @@ import java.util.*
 class ProjectApplication (
     private val projectService: ProjectService,
 ) {
-    suspend fun getProject(id: UUID): Project {
+    fun getProject(id: UUID): Project {
         return projectService.getProject(id)
     }
 
-    suspend fun createProject(project: Project): Project {
+    fun createProject(project: NewProject): Project {
         return projectService.createProject(project)
     }
 
-    suspend fun deleteProject(id: String) {
+    fun deleteProject(id: UUID) {
         projectService.deleteProject(id)
     }
 
-    suspend fun updateProject(id: String, project: Project): Project {
+    fun updateProject(id: UUID, project: NewProject): Project {
         return projectService.updateProject(id, project)
     }
 }
