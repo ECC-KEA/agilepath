@@ -11,7 +11,7 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration, classpath:db/dummy/h2
     baseline-on-migrate: true
     validate-on-migrate: true
 
