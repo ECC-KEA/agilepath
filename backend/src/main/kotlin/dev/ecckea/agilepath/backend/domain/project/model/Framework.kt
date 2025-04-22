@@ -1,4 +1,4 @@
-package dev.ecckea.agilepath.backend.domain.project.type
+package dev.ecckea.agilepath.backend.domain.project.model
 
 enum class Framework {
     SCRUM,
