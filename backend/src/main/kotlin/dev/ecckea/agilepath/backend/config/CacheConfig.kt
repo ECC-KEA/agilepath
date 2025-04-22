@@ -28,9 +28,6 @@ import java.time.Duration
 class CacheConfig(
     private val customObjectMapper: ObjectMapper,
 ) : Logged() {
-
-
-
     /**
      * Configures the primary CacheManager bean using Redis as the backing store.
      *
