@@ -1,18 +1,18 @@
 package dev.ecckea.agilepath.backend.domain.sprint.repository.entity
 
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
-import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import jakarta.persistence.*
 import java.time.Instant
 import java.time.LocalDate
+import java.util.*
 
 @Entity
 @Table(name = "sprints")
 class SprintEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: String,
+    val id: UUID? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
@@ -43,34 +43,4 @@ class SprintEntity (
 
     @Column(name = "modified_at")
     val modifiedAt: Instant? = null,
-)
-
-fun SprintEntity.toModel(): Sprint = Sprint(
-    id = id,
-    projectId = project.id,
-    name = name,
-    goal = goal,
-    startDate = startDate,
-    endDate = endDate,
-    createdBy = createdBy.id,
-    createdAt = createdAt,
-    modifiedAt = modifiedAt,
-)
-
-
-fun Sprint.toEntity(
-    project: ProjectEntity,
-    createdBy: UserEntity,
-    modifiedBy: UserEntity? = null
-): SprintEntity = SprintEntity(
-    id = id,
-    project = project,
-    name = name,
-    goal = goal,
-    startDate = startDate?: LocalDate.now(),
-    endDate = endDate?: LocalDate.now(),
-    createdBy = createdBy,
-    modifiedBy = modifiedBy,
-    createdAt = createdAt,
-    modifiedAt = modifiedAt,
 )

@@ -1,9 +1,9 @@
-package dev.ecckea.agilepath.backend.domain.sprint.dto
+package dev.ecckea.agilepath.backend.domain.sprint.model
 
 import java.time.LocalDate
 import java.util.*
 
-data class SprintRequest(
+data class NewSprint(
     val projectId: UUID,
     val name: String,
     val goal: String? = null,
