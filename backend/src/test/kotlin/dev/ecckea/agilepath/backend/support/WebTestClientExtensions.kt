@@ -23,7 +23,21 @@ inline fun <reified T> WebTestClient.ResponseSpec.parseListBody(): List<T> {
     val result = this.expectBody().returnResult()
     val bytes = result.responseBody
         ?: error("\"Expected response body but got null. Status: ${result.status}\"")
-    return json.readValue(bytes)
+    return try {
+        json.readValue(bytes)
+    } catch (e: Exception) {
+        // If standard parsing fails, try to handle the special format
+        val content = String(bytes)
+        if (content.contains("[\"java.util.ArrayList\",[")) {
+            // Extract the actual array part
+            val startIndex = content.indexOf(",[") + 1
+            val endIndex = content.lastIndexOf("]")
+            val arrayContent = content.substring(startIndex, endIndex + 1)
+            json.readValue(arrayContent.toByteArray())
+        } else {
+            throw e
+        }
+    }
 }
 
 inline fun <reified T> WebTestClient.ResponseSpec.parseBodyOrNull(): T? {
