@@ -1,8 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.project.repository.entity
 
 import dev.ecckea.agilepath.backend.domain.project.model.Framework
-import dev.ecckea.agilepath.backend.domain.project.model.NewProject
-import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import dev.ecckea.agilepath.backend.shared.utils.now
 import jakarta.persistence.*
@@ -39,36 +37,4 @@ class ProjectEntity(
 
     @Column(name = "modified_at")
     val modifiedAt: Instant? = null,
-
-    @Version
-    @Column(name = "version", nullable = false)
-    var version: Long = 0,
 )
-
-fun ProjectEntity.toModel(): Project {
-    return id?.let {
-        Project(
-            id = it,
-            name = name,
-            description = description,
-            framework = framework,
-            createdBy = createdBy.id,
-            createdAt = createdAt,
-            modifiedBy = modifiedBy?.id,
-            modifiedAt = modifiedAt,
-        )
-    } ?: throw IllegalStateException("Cannot convert ProjectEntity to Project model without an ID")
-}
-
-fun ProjectEntity.updatedWith(update: NewProject, modifiedBy: UserEntity): ProjectEntity =
-    ProjectEntity(
-        id = this.id,
-        name = update.name,
-        description = update.description,
-        framework = update.framework,
-        createdBy = this.createdBy,
-        modifiedBy = modifiedBy,
-        createdAt = this.createdAt,
-        modifiedAt = now(),
-        version = this.version,
-    )

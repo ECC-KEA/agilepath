@@ -2,10 +2,10 @@ package dev.ecckea.agilepath.backend.domain.project.service
 
 import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
-import dev.ecckea.agilepath.backend.domain.project.model.toEntity
+import dev.ecckea.agilepath.backend.domain.project.model.mapper.toEntity
+import dev.ecckea.agilepath.backend.domain.project.model.mapper.toModel
+import dev.ecckea.agilepath.backend.domain.project.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
-import dev.ecckea.agilepath.backend.domain.project.repository.entity.toModel
-import dev.ecckea.agilepath.backend.domain.project.repository.entity.updatedWith
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser

@@ -3,8 +3,8 @@ package dev.ecckea.agilepath.backend.domain.project.controller
 import dev.ecckea.agilepath.backend.domain.project.application.ProjectApplication
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectRequest
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
-import dev.ecckea.agilepath.backend.domain.project.dto.toModel
-import dev.ecckea.agilepath.backend.domain.project.model.toDTO
+import dev.ecckea.agilepath.backend.domain.project.model.mapper.toDTO
+import dev.ecckea.agilepath.backend.domain.project.model.mapper.toModel
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import io.swagger.v3.oas.annotations.Operation
@@ -41,7 +41,7 @@ class ProjectController(
     )
     @GetMapping("/{id}")
     fun getProject(@PathVariable id: UUID): ProjectResponse {
-        log.info("GET /project/{id} - Get project")
+        log.info("GET /projects/{id} - Get project")
         return projectApplication.getProject(id).toDTO()
     }
 
@@ -64,7 +64,7 @@ class ProjectController(
     )
     @PostMapping
     fun createProject(@RequestBody project: ProjectRequest): ProjectResponse {
-        log.info("POST /project/ - Create project")
+        log.info("POST /projects/ - Create project")
         return projectApplication.createProject(project.toModel(currentUser().id)).toDTO()
     }
 
@@ -87,7 +87,7 @@ class ProjectController(
     )
     @DeleteMapping("/{id}")
     fun deleteProject(@PathVariable id: UUID) {
-        log.info("DELETE /project/{id} - Delete project")
+        log.info("DELETE /projects/{id} - Delete project")
         projectApplication.deleteProject(id)
     }
 
@@ -111,7 +111,7 @@ class ProjectController(
     )
     @PutMapping("/{id}")
     fun updateProject(@PathVariable id: UUID, @RequestBody project: ProjectRequest): ProjectResponse {
-        log.info("PUT /project/{id} - Update project")
+        log.info("PUT /projects/{id} - Update project")
         return projectApplication.updateProject(id, project.toModel(currentUser().id)).toDTO()
     }
 }

@@ -1,8 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.project.model
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
-import dev.ecckea.agilepath.backend.shared.utils.toZonedDateTime
 import java.time.Instant
 import java.util.*
 
@@ -18,12 +16,3 @@ data class Project(
     val modifiedAt: Instant? = null,
 
     )
-
-fun Project.toDTO(): ProjectResponse = ProjectResponse(
-    id = id,
-    name = name,
-    description = description,
-    framework = framework,
-    createdBy = createdBy,
-    createdAt = toZonedDateTime(createdAt)
-)
