@@ -1,8 +1,8 @@
 package dev.ecckea.agilepath.backend.domain.user.service
 
 import dev.ecckea.agilepath.backend.domain.user.model.User
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
-import dev.ecckea.agilepath.backend.domain.user.repository.entity.toModel
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal

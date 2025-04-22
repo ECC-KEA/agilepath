@@ -2,7 +2,7 @@ package dev.ecckea.agilepath.backend.domain.user.controller
 
 import dev.ecckea.agilepath.backend.domain.user.application.UserAuthApplication
 import dev.ecckea.agilepath.backend.domain.user.dto.UserResponse
-import dev.ecckea.agilepath.backend.domain.user.model.toDTO
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toDTO
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import io.swagger.v3.oas.annotations.Operation
