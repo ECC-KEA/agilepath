@@ -49,9 +49,25 @@ fun WebTestClient.webGet(uri: String) = this
     .uri(uri)
     .accept(MediaType.APPLICATION_JSON)
 
+fun WebTestClient.webPostWithAuth(uri: String, body: Any, token: String = "test-token") = this
+    .post()
+    .uri(uri)
+    .header("Authorization", "Bearer $token")
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+
 fun WebTestClient.webPost(uri: String, body: Any) = this
     .post()
     .uri(uri)
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .bodyValue(body)
+
+fun WebTestClient.webPutWithAuth(uri: String, body: Any, token: String = "test-token") = this
+    .put()
+    .uri(uri)
+    .header("Authorization", "Bearer $token")
     .contentType(MediaType.APPLICATION_JSON)
     .accept(MediaType.APPLICATION_JSON)
     .bodyValue(body)
@@ -62,6 +78,12 @@ fun WebTestClient.webPut(uri: String, body: Any) = this
     .contentType(MediaType.APPLICATION_JSON)
     .accept(MediaType.APPLICATION_JSON)
     .bodyValue(body)
+
+fun WebTestClient.webDeleteWithAuth(uri: String, token: String = "test-token") = this
+    .delete()
+    .uri(uri)
+    .header("Authorization", "Bearer $token")
+    .accept(MediaType.APPLICATION_JSON)
 
 fun WebTestClient.webDelete(uri: String) = this
     .delete()
