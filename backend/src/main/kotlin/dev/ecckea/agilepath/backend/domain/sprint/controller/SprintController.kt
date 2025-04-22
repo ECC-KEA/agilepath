@@ -38,7 +38,7 @@ class SprintController(
     )
     @GetMapping("/projects/{projectId}/sprints")
     fun getSprints(@PathVariable projectId: UUID): List<SprintResponse> {
-        log.info("GET /sprint/{projectId} - Get sprints for project")
+        log.info("GET /projects/{}/sprints - Get sprints for project", projectId)
         return sprintApplication.getSprints(projectId).map { it.toDTO() }
     }
 
@@ -61,7 +61,7 @@ class SprintController(
     )
     @GetMapping("/sprints/{id}")
     fun getSprint(@PathVariable id: UUID): SprintResponse {
-        log.info("GET /sprint/{sprintId} - Get sprint by ID")
+        log.info("GET /sprints/{} - Get sprint by ID", id)
         return sprintApplication.getSprint(id).toDTO()
     }
 
@@ -84,7 +84,7 @@ class SprintController(
     )
     @PostMapping("/sprints")
     fun createSprint(@RequestBody sprint: SprintRequest): SprintResponse {
-        log.info("POST /sprint - Create sprint")
+        log.info("POST /sprints - Create sprint")
         return sprintApplication.createSprint(sprint.toModel()).toDTO()
     }
 
@@ -108,7 +108,7 @@ class SprintController(
     )
     @PutMapping("/sprints/{id}")
     fun updateSprint(@PathVariable id: UUID, @RequestBody sprint: SprintRequest): SprintResponse {
-        log.info("PUT /sprint/{id} - Update sprint")
+        log.info("PUT /sprints/{} - Update sprint", id)
         return sprintApplication.updateSprint(id, sprint.toModel()).toDTO()
     }
 }

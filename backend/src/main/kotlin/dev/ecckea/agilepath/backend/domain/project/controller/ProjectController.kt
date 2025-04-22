@@ -41,7 +41,7 @@ class ProjectController(
     )
     @GetMapping("/{id}")
     fun getProject(@PathVariable id: UUID): ProjectResponse {
-        log.info("GET /projects/{id} - Get project")
+        log.info("GET /projects/{} - Get project", id)
         return projectApplication.getProject(id).toDTO()
     }
 
@@ -87,7 +87,7 @@ class ProjectController(
     )
     @DeleteMapping("/{id}")
     fun deleteProject(@PathVariable id: UUID) {
-        log.info("DELETE /projects/{id} - Delete project")
+        log.info("DELETE /projects/{} - Delete project", id)
         projectApplication.deleteProject(id)
     }
 
@@ -111,7 +111,7 @@ class ProjectController(
     )
     @PutMapping("/{id}")
     fun updateProject(@PathVariable id: UUID, @RequestBody project: ProjectRequest): ProjectResponse {
-        log.info("PUT /projects/{id} - Update project")
+        log.info("PUT /projects/{} - Update project", id)
         return projectApplication.updateProject(id, project.toModel(currentUser().id)).toDTO()
     }
 }
