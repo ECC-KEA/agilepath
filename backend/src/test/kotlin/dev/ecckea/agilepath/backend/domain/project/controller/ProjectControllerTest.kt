@@ -1,40 +1,61 @@
 package dev.ecckea.agilepath.backend.domain.project.controller
 
+import dev.ecckea.agilepath.backend.config.TestAppConfig
+import dev.ecckea.agilepath.backend.domain.project.dto.ProjectRequest
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
-import dev.ecckea.agilepath.backend.domain.project.type.Framework
-import dev.ecckea.agilepath.backend.shared.utils.nowInZone
+import dev.ecckea.agilepath.backend.domain.project.model.Framework
 import dev.ecckea.agilepath.backend.support.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+@Import(TestAppConfig::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProjectControllerTest : IntegrationTestBase() {
 
+    private fun createProjectRequest(name: String = "AgilePath-${UUID.randomUUID()}") = ProjectRequest(
+        name = name,
+        description = "A Kanban app for agile learners",
+        framework = Framework.SCRUM
+    )
+
+    private fun createProject(): ProjectResponse {
+        return webTestClient
+            .webPostWithAuth("/project", createProjectRequest())
+            .exchange()
+            .expectStatus().isOk
+            .parseBody()
+    }
+
     @Test
-    fun `should create, fetch, update and delete a project`() {
-        // 1. Create
-        val request = ProjectResponse(
-            id = UUID.randomUUID().toString(),
-            name = "AgilePath",
-            description = "A Kanban app for agile learners",
-            framework = Framework.SCRUM,
-            createdBy = "user-id",
-            createdAt = nowInZone()
-        )
+    fun `should create a project`() {
+        val request = createProjectRequest()
 
         val created = webTestClient
-            .webPost("/project", request)
+            .webPostWithAuth("/project", request)
             .exchange()
             .expectStatus().isOk
             .parseBody<ProjectResponse>()
 
+        assertNotNull(created.id)
         assertEquals(request.name, created.name)
         assertEquals(request.description, created.description)
         assertEquals(request.framework, created.framework)
-        assertNotNull(created.id)
+        assertNotNull(created.createdBy)
+        assertNotNull(created.createdAt)
+    }
 
-        // 2. Fetch
+    @Test
+    fun `should fetch a project by id`() {
+        val created = createProject()
+
         val fetched = webTestClient
             .webGetWithAuth("/project/${created.id}")
             .exchange()
@@ -42,25 +63,38 @@ class ProjectControllerTest : IntegrationTestBase() {
             .parseBody<ProjectResponse>()
 
         assertEquals(created.id, fetched.id)
+        assertEquals(created.name, fetched.name)
+    }
 
-        // 3. Update
-        val updatedRequest = created.copy(name = "AgilePath++")
+    @Test
+    fun `should update a project`() {
+        val created = createProject()
+
+        val updatedRequest = ProjectRequest(
+            name = "AgilePath++",
+            description = created.description,
+            framework = created.framework
+        )
 
         val updated = webTestClient
-            .webPut("/project/${created.id}", updatedRequest)
+            .webPutWithAuth("/project/${created.id}", updatedRequest)
             .exchange()
             .expectStatus().isOk
             .parseBody<ProjectResponse>()
 
         assertEquals("AgilePath++", updated.name)
+        assertEquals(created.id, updated.id)
+    }
 
-        // 4. Delete
+    @Test
+    fun `should delete a project`() {
+        val created = createProject()
+
         webTestClient
-            .webDelete("/project/${created.id}")
+            .webDeleteWithAuth("/project/${created.id}")
             .exchange()
             .expectStatus().isOk
 
-        // 5. Verify deletion
         webTestClient
             .webGetWithAuth("/project/${created.id}")
             .exchange()
