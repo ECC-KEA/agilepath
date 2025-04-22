@@ -34,7 +34,7 @@ class UserAuthController(
         ]
     )
     @GetMapping("/profile")
-    suspend fun getProfile(): UserResponse {
+    fun getProfile(): UserResponse {
         log.info("GET /auth/profile - Get current user")
         val user = userAuthApplication.getCurrentUser(currentUser())
         return user.toDTO()
