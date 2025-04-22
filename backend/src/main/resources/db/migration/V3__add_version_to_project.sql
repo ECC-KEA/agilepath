@@ -1,2 +1,0 @@
-ALTER TABLE projects
-    ADD COLUMN version BIGINT DEFAULT 0 NOT NULL;
