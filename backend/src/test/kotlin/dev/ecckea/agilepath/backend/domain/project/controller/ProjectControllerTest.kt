@@ -20,15 +20,19 @@ import kotlin.test.assertNotNull
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProjectControllerTest : IntegrationTestBase() {
 
-    private fun createProjectRequest(name: String = "AgilePath-${UUID.randomUUID()}") = ProjectRequest(
+    private fun createProjectRequest(
+        name: String = "AgilePath-${UUID.randomUUID()}",
+        description: String = "A Kanban app for agile learners",
+        framework: Framework = Framework.SCRUM
+    ) = ProjectRequest(
         name = name,
-        description = "A Kanban app for agile learners",
-        framework = Framework.SCRUM
+        description = description,
+        framework = framework
     )
 
-    private fun createProject(): ProjectResponse {
+    private fun createProject(request: ProjectRequest = createProjectRequest()): ProjectResponse {
         return webTestClient
-            .webPostWithAuth("/project", createProjectRequest())
+            .webPostWithAuth("/projects", request)
             .exchange()
             .expectStatus().isOk
             .parseBody()
@@ -39,7 +43,7 @@ class ProjectControllerTest : IntegrationTestBase() {
         val request = createProjectRequest()
 
         val created = webTestClient
-            .webPostWithAuth("/project", request)
+            .webPostWithAuth("/projects", request)
             .exchange()
             .expectStatus().isOk
             .parseBody<ProjectResponse>()
@@ -53,17 +57,44 @@ class ProjectControllerTest : IntegrationTestBase() {
     }
 
     @Test
+    fun `should create projects with different frameworks`() {
+        val scrumProject = createProject(createProjectRequest(framework = Framework.SCRUM))
+        assertEquals(Framework.SCRUM, scrumProject.framework)
+
+        val kanbanProject = createProject(createProjectRequest(framework = Framework.XP))
+        assertEquals(Framework.XP, kanbanProject.framework)
+
+        val xpProject = createProject(createProjectRequest(framework = Framework.XP))
+        assertEquals(Framework.XP, xpProject.framework)
+    }
+
+    @Test
     fun `should fetch a project by id`() {
         val created = createProject()
 
         val fetched = webTestClient
-            .webGetWithAuth("/project/${created.id}")
+            .webGetWithAuth("/projects/${created.id}")
             .exchange()
             .expectStatus().isOk
             .parseBody<ProjectResponse>()
 
         assertEquals(created.id, fetched.id)
         assertEquals(created.name, fetched.name)
+        assertEquals(created.description, fetched.description)
+        assertEquals(created.framework, fetched.framework)
+        assertEquals(created.createdBy, fetched.createdBy)
+        // Time precision might differ slightly, so just check it exists
+        assertNotNull(fetched.createdAt)
+    }
+
+    @Test
+    fun `should return 404 for non-existent project`() {
+        val nonExistentId = UUID.randomUUID()
+
+        webTestClient
+            .webGetWithAuth("/projects/$nonExistentId")
+            .exchange()
+            .expectStatus().isNotFound
     }
 
     @Test
@@ -72,18 +103,24 @@ class ProjectControllerTest : IntegrationTestBase() {
 
         val updatedRequest = ProjectRequest(
             name = "AgilePath++",
-            description = created.description,
-            framework = created.framework
+            description = "Updated description",
+            framework = Framework.XP
         )
 
         val updated = webTestClient
-            .webPutWithAuth("/project/${created.id}", updatedRequest)
+            .webPutWithAuth("/projects/${created.id}", updatedRequest)
             .exchange()
             .expectStatus().isOk
             .parseBody<ProjectResponse>()
 
         assertEquals("AgilePath++", updated.name)
+        assertEquals("Updated description", updated.description)
+        assertEquals(Framework.XP, updated.framework)
         assertEquals(created.id, updated.id)
+        assertEquals(created.createdBy, updated.createdBy)
+        // Should have a modified timestamp
+//        assertNotNull(updated.modifiedAt)
+//        assertNotNull(updated.modifiedBy)
     }
 
     @Test
@@ -91,12 +128,22 @@ class ProjectControllerTest : IntegrationTestBase() {
         val created = createProject()
 
         webTestClient
-            .webDeleteWithAuth("/project/${created.id}")
+            .webDeleteWithAuth("/projects/${created.id}")
             .exchange()
             .expectStatus().isOk
 
         webTestClient
-            .webGetWithAuth("/project/${created.id}")
+            .webGetWithAuth("/projects/${created.id}")
+            .exchange()
+            .expectStatus().isNotFound
+    }
+
+    @Test
+    fun `should return 404 when deleting non-existent project`() {
+        val nonExistentId = UUID.randomUUID()
+
+        webTestClient
+            .webDeleteWithAuth("/projects/$nonExistentId")
             .exchange()
             .expectStatus().isNotFound
     }
