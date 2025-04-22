@@ -3,7 +3,6 @@ package dev.ecckea.agilepath.backend.domain.user.service
 import dev.ecckea.agilepath.backend.domain.user.model.User
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.toModel
-import dev.ecckea.agilepath.backend.shared.coroutines.withIO
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
@@ -24,13 +23,13 @@ class UserService(
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Cacheable("users", key = "#principal.id")
-    suspend fun getOrCreate(principal: UserPrincipal): User = withIO {
+    fun getOrCreate(principal: UserPrincipal): User {
         val exists = userRepository.existsById(principal.id)
         if (!exists) {
             log.info("User with id ${principal.id} does not exist, creating it")
-            userRepository.save(principal.toEntity()).toModel()
+            return userRepository.save(principal.toEntity()).toModel()
         }
-        userRepository.findOneById(principal.id)?.toModel()
+        return userRepository.findOneById(principal.id)?.toModel()
             ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
     }
 }
