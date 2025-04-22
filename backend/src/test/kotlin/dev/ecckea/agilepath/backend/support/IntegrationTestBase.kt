@@ -17,10 +17,15 @@ abstract class IntegrationTestBase {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+    @Autowired
+    lateinit var testDataSeeder: TestDataSeeder
+
     protected lateinit var webTestClient: WebTestClient
 
+
     @BeforeEach
-    fun setUpClient() {
+    fun setUpClientAndSeedData() {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc).build()
+        testDataSeeder.ensureTestUserExists()
     }
 }
