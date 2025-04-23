@@ -64,7 +64,7 @@ class ProjectController(
     @GetMapping
     fun getProjects(): List<ProjectResponse> {
         log.info("GET /projects/ - Get projects")
-        return projectApplication.getProjects(currentUser()).map { it.toDTO() }
+        return projectApplication.getProjects().map { it.toDTO() }
     }
 
     @Operation(
