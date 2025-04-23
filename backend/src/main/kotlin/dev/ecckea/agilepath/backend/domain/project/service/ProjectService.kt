@@ -6,16 +6,15 @@ import dev.ecckea.agilepath.backend.domain.project.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.project.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.project.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
+import dev.ecckea.agilepath.backend.domain.user.model.User
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
-import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.security.toEntity
-
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import kotlin.collections.List
 
 @Service
 class ProjectService(
@@ -30,9 +29,9 @@ class ProjectService(
     }
 
     @Transactional(readOnly = true)
-    fun getProjects(userPrincipal: UserPrincipal): List<Project> {
-        log.info("Fetching projects for user with id ${userPrincipal.id}")
-        return projectRepository.findAllByCreatedBy(userPrincipal.toEntity())
+    fun getProjects(user: User): List<Project> {
+        log.info("Fetching projects for user with id {}", user.id)
+        return projectRepository.findAllByCreatedBy(user.toEntity())
             .map { it.toModel() }
     }
 
