@@ -1,9 +1,11 @@
 package dev.ecckea.agilepath.backend.config
 
+import dev.ecckea.agilepath.backend.shared.security.CustomAuthenticationEntryPoint
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -24,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain
  */
 @Configuration
 @EnableMethodSecurity
+@Profile("!test")
 class SecurityConfig {
 
     /**
@@ -33,7 +36,11 @@ class SecurityConfig {
      * - Uses OAuth2 Resource Server integration for JWT handling
      */
     @Bean
-    fun filterChain(http: HttpSecurity, jwtDecoder: JwtDecoder): SecurityFilterChain {
+    fun filterChain(
+        http: HttpSecurity,
+        jwtDecoder: JwtDecoder,
+        customAuthenticationEntryPoint: CustomAuthenticationEntryPoint
+    ): SecurityFilterChain {
         http
             .cors { }
             .csrf { it.disable() }
@@ -48,6 +55,7 @@ class SecurityConfig {
                 it.jwt { config ->
                     config.jwtAuthenticationConverter(::jwtAuthentication)
                 }
+                it.authenticationEntryPoint(customAuthenticationEntryPoint)
             }
 
         return http.build()
@@ -60,6 +68,7 @@ class SecurityConfig {
      * @return a configured `JwtDecoder` that fetches Clerk's JWKs
      */
     @Bean
+    @Profile("!test")
     fun jwtDecoder(
         @Value("\${CLERK_ISSUER}") issuer: String
     ): JwtDecoder {

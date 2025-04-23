@@ -43,6 +43,7 @@ services:
       - JDBC_DATABASE_PASSWORD=${JDBC_DATABASE_PASSWORD}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - CORS_ENABLED=${CORS_ENABLED}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - CORS_ALLOWED_METHODS=${CORS_ALLOWED_METHODS}
@@ -142,6 +143,8 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --non-interactive --keep-until-expiring --email ${CERTBOT_EMAIL} -d agilepath.dk --agree-tos
+    profiles:
+      - prod
 
 volumes:
   postgres_data:

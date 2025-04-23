@@ -10,7 +10,10 @@ spring:
       ddl-auto: none
 
   flyway:
-    enabled: false
+    enabled: true
+    locations: classpath:db/migration, classpath:db/dummy/h2
+    baseline-on-migrate: true
+    validate-on-migrate: true
 
   data:
     redis:
@@ -24,3 +27,5 @@ cors:
   allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
   allowed-headers: "*"
   enabled: true
+
+CLERK_ISSUER: http://mock-issuer-for-tests
