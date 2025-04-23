@@ -46,6 +46,28 @@ class ProjectController(
     }
 
     @Operation(
+        summary = "Get projects for current user",
+        description = "Returns a list of project details for the user that is currently authenticated",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully returned project details"),
+            ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+            ApiResponse(
+                responseCode = "403",
+                description = "Forbidden – Authenticated but not allowed to access this project"
+            ),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    @GetMapping
+    fun getProjects(): List<ProjectResponse> {
+        log.info("GET /projects/ - Get projects")
+        return projectApplication.getProjects(currentUser()).map { it.toDTO() }
+    }
+
+    @Operation(
         summary = "Create new project",
         description = "Creates a new project with the current authenticated user as owner",
         security = [SecurityRequirement(name = "bearerAuth")]

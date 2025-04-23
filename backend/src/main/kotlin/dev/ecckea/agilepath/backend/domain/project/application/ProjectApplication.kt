@@ -3,8 +3,10 @@ package dev.ecckea.agilepath.backend.domain.project.application
 import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.project.service.ProjectService
+import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.collections.List
 
 @Service
 class ProjectApplication (
@@ -12,6 +14,10 @@ class ProjectApplication (
 ) {
     fun getProject(id: UUID): Project {
         return projectService.getProject(id)
+    }
+
+    fun getProjects(userPrincipal: UserPrincipal): List<Project> {
+        return projectService.getProjects(userPrincipal)
     }
 
     fun createProject(project: NewProject): Project {
