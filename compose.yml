@@ -143,6 +143,8 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --non-interactive --keep-until-expiring --email ${CERTBOT_EMAIL} -d agilepath.dk --agree-tos
+    profiles:
+      - prod
 
 volumes:
   postgres_data:
