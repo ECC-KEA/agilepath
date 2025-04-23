@@ -11,7 +11,9 @@ if (!PUBLISHABLE_KEY) {
 export default function GlobalContextProviderWrapper({ children }: Readonly<PropsWithChildren>) {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <MeProvider>{children}</MeProvider>
+      <MeProvider>
+        {children}
+      </MeProvider>
     </ClerkProvider>
   );
 }

@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import Layout from "./components/generic/Layout";
 import { SignedIn, SignedOut, useAuth } from "@clerk/clerk-react";
 import Login from "./views/Login";
+import SprintBoard from "./views/SprintBoard";
 
 function App() {
   console.log(useAuth());
@@ -23,6 +24,10 @@ function App() {
             <Route
               index
               element={<div></div>}
+            />
+            <Route
+              path="/sprintboard/:sprintId"
+              element={<SprintBoard />}
             />
           </Routes>
         </SignedIn>
