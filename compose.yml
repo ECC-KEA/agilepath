@@ -1,5 +1,6 @@
 services:
   postgres:
+    restart: always
     image: postgres:15
     container_name: agilepath_db
     environment:
@@ -12,6 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
+    restart: always
     image: redis:7-alpine
     container_name: redis_cache
     command: ${REDIS_COMMAND}
@@ -19,6 +21,7 @@ services:
       - "6379:6379"
 
   redisinsight:
+    restart: always
     image: redis/redisinsight:latest
     container_name: redis_ui
     ports:
@@ -33,6 +36,7 @@ services:
       - REDISINSIGHT_REDIS_PASSWORD=${REDISINSIGHT_REDIS_PASSWORD}
 
   backend:
+    restart: always
     environment:
       - JDBC_DATABASE_URL=${JDBC_DATABASE_URL}
       - JDBC_DATABASE_USERNAME=${JDBC_DATABASE_USERNAME}
@@ -66,6 +70,7 @@ services:
       - backend-gradle-cache:/home/gradle/.gradle
 
   frontend:
+    restart: always
     container_name: agilepath_frontend
     build:
       context: ./frontend
@@ -92,6 +97,7 @@ services:
       - dev
 
   frontend_static:
+    restart: always
     environment:
       - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
@@ -104,10 +110,39 @@ services:
         VITE_BACKEND_URL: ${VITE_BACKEND_URL}
 
     ports:
-      - "80:80"
+      - "3000:80"
     profiles:
       - ci
       - prod
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - frontend_static
+      - backend
+    profiles:
+      - ci
+      - prod
+
+  certbot:
+    environment:
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --non-interactive --keep-until-expiring --email ${CERTBOT_EMAIL} -d agilepath.dk --agree-tos
 
 volumes:
   postgres_data:
