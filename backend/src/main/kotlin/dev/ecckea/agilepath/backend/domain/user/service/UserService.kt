@@ -32,4 +32,10 @@ class UserService(
         return userRepository.findOneById(principal.id)?.toModel()
             ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
     }
+
+    @Cacheable("users", key = "#principal.id")
+    fun get(principal: UserPrincipal): User {
+        return userRepository.findOneById(principal.id)?.toModel()
+            ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+    }
 }
