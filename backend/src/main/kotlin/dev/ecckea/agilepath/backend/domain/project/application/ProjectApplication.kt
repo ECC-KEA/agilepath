@@ -3,21 +3,23 @@ package dev.ecckea.agilepath.backend.domain.project.application
 import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
 import dev.ecckea.agilepath.backend.domain.project.service.ProjectService
-import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
+import dev.ecckea.agilepath.backend.domain.user.service.UserService
+import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
 import java.util.*
-import kotlin.collections.List
 
 @Service
 class ProjectApplication (
     private val projectService: ProjectService,
+    private val userService: UserService,
 ) {
     fun getProject(id: UUID): Project {
         return projectService.getProject(id)
     }
 
-    fun getProjects(userPrincipal: UserPrincipal): List<Project> {
-        return projectService.getProjects(userPrincipal)
+    fun getProjects(): List<Project> {
+        val user = userService.get(currentUser())
+        return projectService.getProjects(user)
     }
 
     fun createProject(project: NewProject): Project {
