@@ -1,6 +1,8 @@
 package dev.ecckea.agilepath.backend.domain.story.repository.entity
 
 import dev.ecckea.agilepath.backend.domain.column.repository.entity.SprintColumnEntity
+import dev.ecckea.agilepath.backend.domain.story.model.PointEstimate
+import dev.ecckea.agilepath.backend.domain.story.model.TshirtEstimate
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import jakarta.persistence.*
 import java.time.Instant
@@ -25,9 +27,11 @@ data class TaskEntity(
 
     val description: String? = null,
 
-    val estimateTshirt: String? = null,
+    @Enumerated(EnumType.STRING)
+    val estimateTshirt: TshirtEstimate? = null,
 
-    val estimatePoints: Int? = null,
+    @Enumerated(EnumType.STRING)
+    val estimatePoints: PointEstimate? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
