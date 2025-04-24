@@ -1,6 +1,6 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
 import { ISprint } from "../../types/sprint.types";
-import { IColumn, INewColumn } from "../../types/column.types";
+import { IColumn } from "../../types/column.types";
 import { useApi } from "../utils/useApi";
 import SprintContext from "./SprintContext";
 
