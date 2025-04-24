@@ -1,5 +1,6 @@
-package dev.ecckea.agilepath.backend.domain.subtask.repository.entity
+package dev.ecckea.agilepath.backend.domain.story.repository.entity
 
+import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import jakarta.persistence.*
 import java.time.Instant
 import java.util.*
