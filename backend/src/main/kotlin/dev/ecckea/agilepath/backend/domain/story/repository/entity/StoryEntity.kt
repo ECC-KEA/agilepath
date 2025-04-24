@@ -1,7 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.story.repository.entity
 
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
-import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import jakarta.persistence.*
 import java.time.Instant
@@ -16,10 +15,6 @@ data class StoryEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     val project: ProjectEntity,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sprint_id")
-    val sprint: SprintEntity? = null,
 
     @Column(nullable = false)
     val title: String,
