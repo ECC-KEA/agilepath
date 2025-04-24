@@ -1,3 +1,7 @@
+-- This file contains SQL commands to seed the database with dummy data.
+-- Please ensure that the database is empty before running this script.
+-- This script is intended for development purposes only as test has its own via FlyWay.
+
 -- === Insert users ===
 INSERT INTO users (id, github_username, email, full_name, avatar_url)
 VALUES ('dummy-user-1', 'gh-dummy-1', 'test1@example.com', 'Dummy User',
