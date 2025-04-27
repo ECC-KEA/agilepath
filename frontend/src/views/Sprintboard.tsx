@@ -1,14 +1,19 @@
 import useSprint from "../hooks/sprint/useSprint";
+import useColumn from "../hooks/column/useColumn";
 import SprintProvider from "../hooks/sprint/SprintProvider";
+import ColumnProvider from "../hooks/column/ColumnProvider";
 import Column from "../components/sprintboard/Column";
+import { IColumn } from "../types/column.types";
+import { TiDelete } from "react-icons/ti";
+import Modal from "../components/generic/Modal";
+import CreateColumnModal from "../components/sprintboard/CreateColumnModal";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import LoadingSpinner from "../components/generic/loading/LoadingSpinner";
+import { useState } from "react";
 
 function SprintBoard() {
   const { sprintId } = useParams<{ sprintId: string }>();
-
-  console.log("SprintBoard", sprintId);
 
   if (!sprintId) {
     return <div>Invalid sprint ID</div>;
@@ -16,15 +21,17 @@ function SprintBoard() {
 
   return (
     <SprintProvider sprintId={sprintId}>
-      <SprintBoardContent />
+      <ColumnProvider sprintId={sprintId}>
+          <SprintBoardContent />
+      </ColumnProvider>
     </SprintProvider>
   );
 }
 
 function SprintBoardContent() {
-  const { sprint, columns } = useSprint();
-  console.log("SprintBoardContent", sprint);
-  console.log("Column", columns);
+  const { sprint } = useSprint();
+  const { columns } = useColumn();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (!sprint) {
     return <LoadingSpinner size={24} color="#7145d9" />;
@@ -37,10 +44,8 @@ function SprintBoardContent() {
   return (
     <div className="sprint-board w-full h-[80vh] ">
       <Header sprintName={sprint.name} />
-
       <div className="flex flex-row w-full h-full">
         <Sidebar />
-
       <div className="flex flex-col w-full h-full p-4 gap-4 border-ap-onyx-200 border">
         <input className="w-72 h-8 ml-4 pl-4 border border-ap-onyx-200 rounded-md" placeholder="Search..."/>
         <div className="flex flex-row justify-center gap-6 w-full h-full ">
@@ -49,17 +54,25 @@ function SprintBoardContent() {
               <Column column={column} />
             </div>
           ))}
-          <FaPlus className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"/>
+          <FaPlus 
+            className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"
+            onClick={() => setIsModalOpen(true)}
+          />
         </div>
       </div>
     </div>
+
+    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <CreateColumnModal />
+    </Modal>  
+
   </div>
   );
 }
 
 function Header({sprintName}: {sprintName: string}) {
   return (
-    <div className="bg-ap-onyx-50 border-b border-ap-onyx-200">
+    <div className="bg-ap-onyx-50/20 border-b border-ap-onyx-200">
       <div className="flex flex-row items-center justify-start gap-2 p-4 text-ap-onyx-500">
         <FaArrowLeft className="text-2xl" />
         <h1 className="text-2xl">{sprintName}</h1>

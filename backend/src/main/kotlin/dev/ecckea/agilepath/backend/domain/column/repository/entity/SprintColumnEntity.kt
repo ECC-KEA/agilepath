@@ -23,6 +23,6 @@ class SprintColumnEntity (
     @Column(name = "status", nullable = false, length = 50)
     val status: SprintColumnStatus,
 
-    @Column(name = "column_index", nullable = false)
-    val columnIndex: Int,
+    @Column(name = "column_index")
+    val columnIndex: Int? = null
 )

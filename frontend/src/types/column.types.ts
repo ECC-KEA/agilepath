@@ -5,10 +5,10 @@ export enum ColumnStatus {
 }
 
 export interface INewColumn {
-  name: string;
-  status: ColumnStatus;
   sprintId: string;
-  columnIndex: number;
+  name: string;
+  columnStatus: ColumnStatus;
+  columnIndex?: number; 
 }
 
 
@@ -16,6 +16,6 @@ export interface IColumn {
   id: string;
   sprintId: string;
   name: string;
-  status: ColumnStatus;
+  columnStatus: ColumnStatus;
   columnIndex: number;
 }

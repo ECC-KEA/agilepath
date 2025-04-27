@@ -1,6 +1,5 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
 import { ISprint } from "../../types/sprint.types";
-import { IColumn } from "../../types/column.types";
 import { useApi } from "../utils/useApi";
 import SprintContext from "./SprintContext";
 
@@ -11,10 +10,8 @@ interface SprintProviderProps extends PropsWithChildren {
 function SprintProvider({ children, sprintId }: SprintProviderProps) {
   const { get } = useApi();
   const [_sprint, setSprint] = useState<ISprint>();
-  const [_columns, setColumns] = useState<IColumn[]>();
   
   const sprint = useMemo(() => _sprint, [_sprint]);
-  const columns = useMemo(() => _columns, [_columns]);
 
   const loadSprint = useCallback(async () => {
     const sprintData = await get(`/sprints/${sprintId}`);
@@ -25,28 +22,15 @@ function SprintProvider({ children, sprintId }: SprintProviderProps) {
     setSprint(sprintData);
   }, [get, sprintId]);
 
-  const loadColumns = useCallback(async () => {
-    const columnsData = await get(`/sprints/${sprintId}/sprint-columns`);
-    console.log("Columns Data: ", columnsData);
-    if (!columnsData) {
-      throw new Error("Failed to fetch columns data or malformed data");
-    }
-    setColumns(columnsData[1]);
-  }, [get, sprintId]);
-
   useEffect(() => {
     loadSprint();
   }, [loadSprint]);
-
-  useEffect(() => {
-    loadColumns();
-  }, [loadColumns]);
 
   return (
     <SprintContext.Provider
       value={{
         sprint,
-        columns
+        sprintId,
       }}
     >
       {children}

@@ -4,7 +4,7 @@ import { IColumn } from "../../types/column.types";
 
 interface ISprintContext {
   sprint: ISprint | undefined;
-  columns: IColumn[] | undefined;
+  sprintId: string;
 }
 
 const SprintContext = createContext<ISprintContext | undefined>(undefined);
