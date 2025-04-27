@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import { ISprint } from "../../types/sprint.types";
-import { IColumn } from "../../types/column.types";
 
 interface ISprintContext {
   sprint: ISprint | undefined;

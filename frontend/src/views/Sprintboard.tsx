@@ -3,8 +3,6 @@ import useColumn from "../hooks/column/useColumn";
 import SprintProvider from "../hooks/sprint/SprintProvider";
 import ColumnProvider from "../hooks/column/ColumnProvider";
 import Column from "../components/sprintboard/Column";
-import { IColumn } from "../types/column.types";
-import { TiDelete } from "react-icons/ti";
 import Modal from "../components/generic/Modal";
 import CreateColumnModal from "../components/sprintboard/CreateColumnModal";
 import { useParams } from "react-router-dom";
