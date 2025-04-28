@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class ProjectApplication (
+class ProjectApplication(
     private val projectService: ProjectService,
     private val userService: UserService,
 ) {
+
     fun getProject(id: UUID): Project {
         return projectService.getProject(id)
     }
@@ -23,7 +24,8 @@ class ProjectApplication (
     }
 
     fun createProject(project: NewProject): Project {
-        return projectService.createProject(project)
+        val user = userService.get(currentUser())
+        return projectService.createProject(project, user)
     }
 
     fun deleteProject(id: UUID) {
@@ -31,6 +33,8 @@ class ProjectApplication (
     }
 
     fun updateProject(id: UUID, project: NewProject): Project {
-        return projectService.updateProject(id, project)
+        val user = userService.get(currentUser())
+        return projectService.updateProject(id, project, user)
     }
 }
+
