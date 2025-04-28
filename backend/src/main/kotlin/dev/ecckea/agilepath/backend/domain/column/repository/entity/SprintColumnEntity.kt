@@ -24,5 +24,5 @@ class SprintColumnEntity (
     val status: SprintColumnStatus,
 
     @Column(name = "column_index", nullable = false)
-    val columnIndex: Int,
+    val columnIndex: Int? = null,
 )

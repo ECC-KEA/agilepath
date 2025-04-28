@@ -14,6 +14,7 @@ import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 fun SprintColumnEntity.toModel(): SprintColumn {
     val entityId = id ?: throw ResourceNotFoundException("SprintColumn ID cannot be null.")
     val sprintId = sprint.id ?: throw ResourceNotFoundException("Sprint ID cannot be null.")
+    val columnIndex = columnIndex ?: throw ResourceNotFoundException("Column index cannot be null.")
 
     return SprintColumn(
         id = entityId,
