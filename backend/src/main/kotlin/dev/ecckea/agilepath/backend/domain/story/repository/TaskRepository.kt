@@ -7,4 +7,6 @@ import java.util.*
 
 @Repository
 interface TaskRepository : JpaRepository<TaskEntity, UUID> {
+    fun findByStoryId(storyId: UUID): List<TaskEntity>
+    fun findOneById(id: UUID): TaskEntity?
 }

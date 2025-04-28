@@ -10,6 +10,7 @@ data class NewTask(
     val description: String?,
     val estimateTshirt: TshirtEstimate?,
     val estimatePoints: PointEstimate?,
+    val assigneeIds: List<String>,
     val createdBy: String,
     val createdAt: Instant,
 )

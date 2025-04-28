@@ -10,5 +10,6 @@ data class TaskRequest(
     val title: String,
     val description: String?,
     val estimateTshirt: TshirtEstimate?,
-    val estimatePoints: PointEstimate?
+    val estimatePoints: PointEstimate?,
+    val assigneeIds: List<String>,
 )
