@@ -10,6 +10,8 @@ data class Story(
     val description: String?,
     val status: String,
     val priority: Int,
+    val comments: List<Comment>? = emptyList(),
+    val tasks: List<Task>? = emptyList(),
     val createdBy: String,
     val modifiedBy: String?,
     val createdAt: Instant,

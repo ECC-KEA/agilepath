@@ -1,12 +1,16 @@
 package dev.ecckea.agilepath.backend.domain.story.model.mapper
 
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
+import dev.ecckea.agilepath.backend.domain.story.dto.CommentResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.StoryRequest
 import dev.ecckea.agilepath.backend.domain.story.dto.StoryResponse
+import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
 import dev.ecckea.agilepath.backend.domain.story.model.NewStory
 import dev.ecckea.agilepath.backend.domain.story.model.Story
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.StoryEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
+import dev.ecckea.agilepath.backend.shared.context.repository.ref
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.utils.now
@@ -43,6 +47,21 @@ fun Story.toDTO() = StoryResponse(
     modifiedAt = modifiedAt?.let { toZonedDateTime(it) },
 )
 
+fun Story.toDTO(comments: List<CommentResponse>, tasks: List<TaskResponse>) = StoryResponse(
+    id = id,
+    projectId = projectId,
+    title = title,
+    description = description,
+    status = status,
+    priority = priority,
+    comments = comments,
+    tasks = tasks,
+    createdBy = createdBy,
+    modifiedBy = modifiedBy,
+    createdAt = toZonedDateTime(createdAt),
+    modifiedAt = modifiedAt?.let { toZonedDateTime(it) },
+)
+
 fun Story.toEntity(
     project: ProjectEntity,
     createdBy: UserEntity,
@@ -72,22 +91,19 @@ fun StoryRequest.toModel(userId: String = currentUser().id) = NewStory(
     createdAt = now()
 )
 
-fun NewStory.toEntity(
-    project: ProjectEntity,
-    createdBy: UserEntity,
-): StoryEntity {
+fun NewStory.toEntity(ctx: RepositoryContext): StoryEntity {
     return StoryEntity(
-        project = project,
+        project = ctx.project.ref(projectId),
         title = title,
         description = description,
         status = status,
         priority = priority,
-        createdBy = createdBy,
+        createdBy = ctx.user.ref(createdBy),
         createdAt = createdAt
     )
 }
 
-fun StoryEntity.updatedWith(update: NewStory, modifiedBy: UserEntity): StoryEntity {
+fun StoryEntity.updatedWith(update: NewStory, userId: String, ctx: RepositoryContext): StoryEntity {
     return StoryEntity(
         id = this.id,
         project = this.project,
@@ -96,7 +112,7 @@ fun StoryEntity.updatedWith(update: NewStory, modifiedBy: UserEntity): StoryEnti
         status = update.status,
         priority = update.priority,
         createdBy = this.createdBy,
-        modifiedBy = modifiedBy,
+        modifiedBy = ctx.user.ref(userId),
         createdAt = this.createdAt,
         modifiedAt = now()
     )

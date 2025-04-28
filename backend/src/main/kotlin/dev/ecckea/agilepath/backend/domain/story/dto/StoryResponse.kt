@@ -10,6 +10,8 @@ data class StoryResponse(
     val description: String?,
     val status: String,
     val priority: Int,
+    val comments: List<CommentResponse>? = emptyList(),
+    val tasks: List<TaskResponse>? = emptyList(),
     val createdBy: String,
     val modifiedBy: String?,
     val createdAt: ZonedDateTime,

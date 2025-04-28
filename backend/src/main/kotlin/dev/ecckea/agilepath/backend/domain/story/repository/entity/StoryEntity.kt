@@ -7,6 +7,7 @@ import java.time.Instant
 import java.util.*
 
 @Entity
+@Table(name = "stories")
 data class StoryEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

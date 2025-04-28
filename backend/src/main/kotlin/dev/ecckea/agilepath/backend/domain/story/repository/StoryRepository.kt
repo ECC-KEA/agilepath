@@ -7,4 +7,5 @@ import java.util.*
 
 @Repository
 interface StoryRepository : JpaRepository<StoryEntity, UUID> {
+    fun findOneById(id: UUID): StoryEntity?
 }
