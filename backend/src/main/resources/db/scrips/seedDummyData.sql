@@ -75,3 +75,60 @@ VALUES
 ('c2222222-0000-0000-0000-000000000007', '22222222-0000-0000-0000-000000000003', 'To Do', 'TODO', 0),
 ('c2222222-0000-0000-0000-000000000008', '22222222-0000-0000-0000-000000000003', 'In Progress', 'IN_PROGRESS', 1),
 ('c2222222-0000-0000-0000-000000000009', '22222222-0000-0000-0000-000000000003', 'Done', 'DONE', 2);
+
+-- === Insert STORIES ===
+INSERT INTO stories (id, project_id, title, description, status, priority, created_by)
+VALUES
+-- Project 1 stories
+('11111111-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Setup Kanban Board',
+ 'Initial setup of project board', 'TODO', 1, 'dummy-user-1'),
+('11111111-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'User Authentication',
+ 'Implement Clerk login', 'TODO', 2, 'dummy-user-1'),
+
+-- Project 2 stories
+('11111111-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000002', 'Pair Programming Guide',
+ 'Write a guide for pair programming', 'TODO', 1, 'dummy-user-2'),
+('11111111-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', 'CI/CD Setup',
+ 'Set up continuous integration workflows', 'TODO', 2, 'dummy-user-2');
+
+-- === Insert TASKS ===
+INSERT INTO tasks (id, story_id, title, description, sprint_column_id, created_by)
+VALUES
+-- Tasks for Project 1 Story 1
+('22222222-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000001', 'Design Board Layout',
+ 'Design the initial Kanban board layout.', 'c1111111-0000-0000-0000-000000000001', 'dummy-user-1'),
+('22222222-0000-0000-0000-000000000002', '11111111-0000-0000-0000-000000000001', 'Setup Database',
+ 'Set up initial Postgres database.', 'c1111111-0000-0000-0000-000000000001', 'dummy-user-1'),
+
+-- Tasks for Project 2 Story 3
+('22222222-0000-0000-0000-000000000003', '11111111-0000-0000-0000-000000000003', 'Write Pair Programming Article',
+ 'Explain best practices for pair programming.', 'c2222222-0000-0000-0000-000000000001', 'dummy-user-2');
+
+-- === Insert SUBTASKS ===
+INSERT INTO subtasks (id, task_id, title, description, created_by)
+VALUES
+-- Subtasks for Task 1
+('33333333-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', 'Draw Wireframes',
+ 'Sketch the wireframes for the board.', 'dummy-user-1'),
+('33333333-0000-0000-0000-000000000002', '22222222-0000-0000-0000-000000000001', 'Create Column Entities',
+ 'Define entities for board columns.', 'dummy-user-1'),
+
+-- Subtasks for Task 3
+('33333333-0000-0000-0000-000000000003', '22222222-0000-0000-0000-000000000003', 'Draft First Section',
+ 'Write an intro to pair programming.', 'dummy-user-2');
+
+-- === Insert COMMENTS ===
+INSERT INTO comments (id, content, story_id, created_by)
+VALUES
+-- Comments on Story 1
+('44444444-0000-0000-0000-000000000001', 'Looks good so far!', '11111111-0000-0000-0000-000000000001', 'dummy-user-2'),
+
+-- Comments on Story 3
+('44444444-0000-0000-0000-000000000002', 'Nice start on the article!', '11111111-0000-0000-0000-000000000003',
+ 'dummy-user-1');
+-- === Insert TASK ASSIGNEES ===
+INSERT INTO task_assignees (task_id, user_id)
+VALUES ('task-0001-0000-0000-0000-000000000001', 'dummy-user-1'),
+       ('task-0001-0000-0000-0000-000000000003', 'dummy-user-1'),
+       ('task-0002-0000-0000-0000-000000000001', 'dummy-user-2'),
+       ('task-0002-0000-0000-0000-000000000002', 'dummy-user-2');
