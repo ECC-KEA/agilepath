@@ -7,6 +7,8 @@ import dev.ecckea.agilepath.backend.domain.sprint.model.NewSprint
 import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
+import dev.ecckea.agilepath.backend.shared.context.repository.ref
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.utils.now
 
@@ -70,19 +72,19 @@ fun SprintRequest.toModel() = NewSprint(
 )
 
 // Create new Entity from NewSprint
-fun NewSprint.toEntity(project: ProjectEntity, createdByUser: UserEntity): SprintEntity = SprintEntity(
+fun NewSprint.toEntity(ctx: RepositoryContext, userId: String): SprintEntity = SprintEntity(
     id = null,  // New entity, so ID is null
-    project = project,
+    project = ctx.project.ref(projectId),
     name = name,
     goal = goal,
     startDate = startDate,
     endDate = endDate,
-    createdBy = createdByUser,
+    createdBy = ctx.user.ref(userId),
     createdAt = now()
 )
 
 // Update existing entity with NewSprint data
-fun SprintEntity.updatedWith(update: NewSprint, modifiedByUser: UserEntity): SprintEntity {
+fun SprintEntity.updatedWith(update: NewSprint, userId: String, ctx: RepositoryContext): SprintEntity {
     return SprintEntity(
         id = this.id,
         project = this.project,
@@ -91,7 +93,7 @@ fun SprintEntity.updatedWith(update: NewSprint, modifiedByUser: UserEntity): Spr
         startDate = update.startDate,
         endDate = update.endDate,
         createdBy = this.createdBy,
-        modifiedBy = modifiedByUser,
+        modifiedBy = ctx.user.ref(userId),
         createdAt = this.createdAt,
         modifiedAt = now()
     )
