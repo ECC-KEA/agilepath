@@ -5,6 +5,7 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
+@Table(name = "task_assignees")
 @IdClass(TaskAssigneeId::class)
 data class TaskAssigneeEntity(
     @Id

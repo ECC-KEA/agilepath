@@ -4,6 +4,6 @@ import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskAssigneeE
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskAssigneeId
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface TaskAssigneeRepository : JpaRepository<TaskAssigneeEntity, TaskAssigneeId> {
+interface TaskAssigneeRepository : JpaRepository<TaskAssigneeEntity, TaskAssigneeId>, TaskAssigneeRepositoryCustom {
 
 }
