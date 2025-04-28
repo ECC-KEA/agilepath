@@ -8,6 +8,8 @@ import dev.ecckea.agilepath.backend.domain.story.repository.entity.CommentEntity
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.StoryEntity
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
+import dev.ecckea.agilepath.backend.shared.context.repository.ref
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.utils.now
@@ -66,28 +68,24 @@ fun CommentRequest.toModel(userId: String = currentUser().id) = NewComment(
     createdAt = now()
 )
 
-fun NewComment.toEntity(
-    story: StoryEntity?,
-    task: TaskEntity?,
-    createdBy: UserEntity,
-): CommentEntity {
+fun NewComment.toEntity(ctx: RepositoryContext): CommentEntity {
     return CommentEntity(
-        story = story,
-        task = task,
+        story = storyId?.let { ctx.story.ref(it) },
+        task = taskId?.let { ctx.task.ref(it) },
         content = content,
-        createdBy = createdBy,
+        createdBy = ctx.user.ref(createdBy),
         createdAt = createdAt,
     )
 }
 
-fun CommentEntity.updatedWith(update: NewComment, modifiedBy: UserEntity): CommentEntity {
+fun CommentEntity.updatedWith(update: NewComment, userId: String, ctx: RepositoryContext): CommentEntity {
     return CommentEntity(
         id = id,
         story = story,
         task = task,
         content = update.content,
         createdBy = createdBy,
-        modifiedBy = modifiedBy,
+        modifiedBy = ctx.user.ref(userId),
         createdAt = createdAt,
         modifiedAt = now()
     )
