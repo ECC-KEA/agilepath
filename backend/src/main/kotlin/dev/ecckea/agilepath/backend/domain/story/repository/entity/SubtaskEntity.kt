@@ -6,6 +6,7 @@ import java.time.Instant
 import java.util.*
 
 @Entity
+@Table(name = "subtasks")
 data class SubtaskEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

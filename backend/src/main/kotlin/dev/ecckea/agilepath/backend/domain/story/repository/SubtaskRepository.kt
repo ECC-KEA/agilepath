@@ -7,4 +7,8 @@ import java.util.*
 
 @Repository
 interface SubtaskRepository : JpaRepository<SubtaskEntity, UUID> {
+    fun findOneById(id: UUID): SubtaskEntity?
+    fun findByTaskId(taskId: UUID): List<SubtaskEntity>
+    fun countByTaskId(taskId: UUID): Int
+    fun existsByIdAndTaskId(id: UUID, taskId: UUID): Boolean
 }

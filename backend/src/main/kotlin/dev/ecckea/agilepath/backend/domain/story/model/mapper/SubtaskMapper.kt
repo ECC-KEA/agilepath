@@ -7,6 +7,8 @@ import dev.ecckea.agilepath.backend.domain.story.model.Subtask
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.SubtaskEntity
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
+import dev.ecckea.agilepath.backend.shared.context.repository.ref
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.utils.now
@@ -67,21 +69,18 @@ fun SubtaskRequest.toModel(userId: String = currentUser().id) = NewSubtask(
     createdAt = now()
 )
 
-fun NewSubtask.toEntity(
-    task: TaskEntity,
-    createdBy: UserEntity
-): SubtaskEntity {
+fun NewSubtask.toEntity(ctx: RepositoryContext): SubtaskEntity {
     return SubtaskEntity(
-        task = task,
+        task = ctx.task.ref(taskId),
         title = title,
         description = description,
         isDone = isDone,
-        createdBy = createdBy,
+        createdBy = ctx.user.ref(createdBy),
         createdAt = createdAt,
     )
 }
 
-fun SubtaskEntity.updatedWith(update: NewSubtask, modifiedBy: UserEntity): SubtaskEntity {
+fun SubtaskEntity.updatedWith(update: NewSubtask, userId: String, ctx: RepositoryContext): SubtaskEntity {
     return SubtaskEntity(
         id = id,
         task = task,
@@ -89,7 +88,7 @@ fun SubtaskEntity.updatedWith(update: NewSubtask, modifiedBy: UserEntity): Subta
         description = update.description,
         isDone = update.isDone,
         createdBy = createdBy,
-        modifiedBy = modifiedBy,
+        modifiedBy = ctx.user.ref(userId),
         createdAt = createdAt,
         modifiedAt = now()
     )
