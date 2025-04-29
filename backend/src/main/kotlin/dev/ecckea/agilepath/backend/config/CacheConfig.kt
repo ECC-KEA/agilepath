@@ -2,6 +2,7 @@ package dev.ecckea.agilepath.backend.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev.ecckea.agilepath.backend.shared.logging.Logged
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
@@ -26,7 +27,7 @@ import java.time.Duration
 @Profile("!test")
 @EnableCaching
 class CacheConfig(
-    private val customObjectMapper: ObjectMapper,
+    @Qualifier("redisCacheObjectMapper") private val redisCacheObjectMapper: ObjectMapper,
 ) : Logged() {
     /**
      * Configures the primary CacheManager bean using Redis as the backing store.
@@ -41,7 +42,7 @@ class CacheConfig(
      */
     @Bean
     fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
-        val serializer = GenericJackson2JsonRedisSerializer(customObjectMapper)
+        val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
 
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(15))
@@ -112,7 +113,7 @@ class CacheConfig(
     @Bean
     fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
         val template = RedisTemplate<String, Any>()
-        val serializer = GenericJackson2JsonRedisSerializer(customObjectMapper)
+        val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
 
         template.connectionFactory = connectionFactory
         template.keySerializer = StringRedisSerializer()

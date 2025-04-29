@@ -12,9 +12,7 @@ fun UserEntity.toModel(): User = User(
     email = email,
     fullName = fullName,
     avatarUrl = avatarUrl,
-    createdAt = createdAt,
-    modifiedAt = modifiedAt,
-    modifiedBy = modifiedBy?.id,
+    createdAt = createdAt
 )
 
 // Model to Response DTO
@@ -26,4 +24,13 @@ fun User.toDTO(): UserResponse = UserResponse(
     githubUsername = githubUsername,
     githubProfileUrl = githubUsername?.let { "https://github.com/$it" },
     createdAt = toZonedDateTime(createdAt)
+)
+
+fun User.toEntity(): UserEntity = UserEntity(
+    id = id,
+    githubUsername = githubUsername,
+    email = email,
+    fullName = fullName,
+    avatarUrl = avatarUrl,
+    createdAt = createdAt
 )

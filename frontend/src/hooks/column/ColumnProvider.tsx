@@ -2,50 +2,49 @@ import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "re
 import { IColumn, INewColumn } from "../../types/column.types";
 import { useApi } from "../utils/useApi";
 import ColumnContext from "./ColumnContext";
+import { useLoading } from "../utils/loading/useLoading";
 
 interface ColumnProviderProps extends PropsWithChildren {
   sprintId: string;
 }
 
 function ColumnProvider({ children, sprintId }: ColumnProviderProps) {
+  const loader = useLoading();
   const { get, post, del } = useApi();
-  const [_columns, setColumns] = useState<IColumn[]>();
-  
+  const [_columns, setColumns] = useState<IColumn[]>([]);
+
   const columns = useMemo(() => _columns, [_columns]);
 
   const loadColumns = useCallback(async () => {
-    const columnsData = await get(`/sprints/${sprintId}/sprint-columns`);
-    console.log("Columns Data: ", columnsData);
-    if (!columnsData) {
-      throw new Error("Failed to fetch columns data or malformed data");
-    }
-    setColumns(columnsData[1]); //for nu, fix på backend efterfølgende
+    loader.add();
+    return get(`/sprints/${sprintId}/sprint-columns`).then(setColumns).finally(loader.done);
   }, [get, sprintId]);
 
+  const createColumn = useCallback(
+    async (newColumn: INewColumn) => {
+      loader.add();
+      return post(`/sprint-columns`, newColumn)
+        .then((col) => setColumns((prevColumns) => [...(prevColumns || []), col]))
+        .finally(loader.done);
+    },
+    [post, loader]
+  );
 
-  const createColumn = useCallback(async (newColumn: INewColumn) => {
-    const response = await post(`/sprint-columns`, newColumn);
-    
-    console.log("Create Column Response: ", response);
-    if (!response.ok) {
-      throw new Error("Failed to create column or malformed data");
-    }
-
-    const createdColumn = await response.json();
-    console.log("Created Column: ", createdColumn);
-  
-    setColumns((prevColumns) => [...(prevColumns || []), createdColumn]);
-  }, [post]);
-
-  const deleteColumn = useCallback(async (columnId: string) => {
-    await del(`/sprint-columns/${columnId}`);
-    setColumns((prevColumns) => prevColumns?.filter((column) => column.id !== columnId));
-  }, [del]);
+  const deleteColumn = useCallback(
+    async (columnId: string) => {
+      loader.add();
+      return del(`/sprint-columns/${columnId}`)
+        .then(() =>
+          setColumns((prevColumns) => prevColumns?.filter((column) => column.id !== columnId))
+        )
+        .finally(loader.done);
+    },
+    [del, loader]
+  );
 
   useEffect(() => {
     loadColumns();
   }, [loadColumns]);
-
 
   return (
     <ColumnContext.Provider
@@ -53,12 +52,12 @@ function ColumnProvider({ children, sprintId }: ColumnProviderProps) {
         columns,
         loadColumns,
         createColumn,
-        deleteColumn,
+        deleteColumn
       }}
     >
       {children}
     </ColumnContext.Provider>
-  )
+  );
 }
 
 export default ColumnProvider;

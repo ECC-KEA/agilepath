@@ -6,6 +6,8 @@ import dev.ecckea.agilepath.backend.domain.column.model.NewSprintColumn
 import dev.ecckea.agilepath.backend.domain.column.model.SprintColumn
 import dev.ecckea.agilepath.backend.domain.column.repository.entity.SprintColumnEntity
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
+import dev.ecckea.agilepath.backend.shared.context.repository.ref
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 
 // Entity -> Domain Model
@@ -41,13 +43,14 @@ fun SprintColumnRequest.toModel(): NewSprintColumn = NewSprintColumn(
 )
 
 // NewSprintColumn -> Entity
-fun NewSprintColumn.toEntity(sprint: SprintEntity): SprintColumnEntity = SprintColumnEntity(
+fun NewSprintColumn.toEntity(ctx: RepositoryContext): SprintColumnEntity = SprintColumnEntity(
     id = null,  // New entity, so ID is null
-    sprint = sprint,
+    sprint = ctx.sprint.ref(sprintId),
     name = name,
     status = status,
     columnIndex = columnIndex
 )
+
 
 // Domain Model -> Entity
 fun SprintColumn.toEntity(sprint: SprintEntity): SprintColumnEntity = SprintColumnEntity(

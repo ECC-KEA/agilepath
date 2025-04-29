@@ -2,24 +2,22 @@ import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "re
 import { ISprint } from "../../types/sprint.types";
 import { useApi } from "../utils/useApi";
 import SprintContext from "./SprintContext";
+import { useLoading } from "../utils/loading/useLoading";
 
 interface SprintProviderProps extends PropsWithChildren {
   sprintId: string;
 }
 
 function SprintProvider({ children, sprintId }: SprintProviderProps) {
+  const loader = useLoading();
   const { get } = useApi();
   const [_sprint, setSprint] = useState<ISprint>();
-  
+
   const sprint = useMemo(() => _sprint, [_sprint]);
 
   const loadSprint = useCallback(async () => {
-    const sprintData = await get(`/sprints/${sprintId}`);
-    console.log("Sprint Data: ", sprintData);
-    if (!sprintData || !sprintData.id) {
-      throw new Error("Failed to fetch sprint data or malformed data");
-    }
-    setSprint(sprintData);
+    loader.add();
+    return get(`/sprints/${sprintId}`).then(setSprint).finally(loader.done);
   }, [get, sprintId]);
 
   useEffect(() => {
@@ -30,7 +28,7 @@ function SprintProvider({ children, sprintId }: SprintProviderProps) {
     <SprintContext.Provider
       value={{
         sprint,
-        sprintId,
+        sprintId
       }}
     >
       {children}

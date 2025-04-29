@@ -6,5 +6,5 @@ data class NewSprintColumn(
     val sprintId: UUID,
     val name: String,
     val status: SprintColumnStatus,
-    val columnIndex: Int?= null,
+    val columnIndex: Int? = null,
 )

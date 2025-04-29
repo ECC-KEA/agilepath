@@ -86,6 +86,14 @@ fun WebTestClient.webPutWithAuth(uri: String, body: Any, token: String = "test-t
     .accept(MediaType.APPLICATION_JSON)
     .bodyValue(body)
 
+fun WebTestClient.webPatchWithAuth(uri: String, body: Any? = null, token: String = "test-token") = this
+    .patch()
+    .uri(uri)
+    .header("Authorization", "Bearer $token")
+    .contentType(MediaType.APPLICATION_JSON)
+    .accept(MediaType.APPLICATION_JSON)
+    .let { if (body != null) it.bodyValue(body) else it }
+
 fun WebTestClient.webPut(uri: String, body: Any) = this
     .put()
     .uri(uri)

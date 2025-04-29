@@ -14,5 +14,4 @@ data class Project(
     val createdAt: Instant,
     val modifiedBy: String? = null, // UserId
     val modifiedAt: Instant? = null,
-
     )

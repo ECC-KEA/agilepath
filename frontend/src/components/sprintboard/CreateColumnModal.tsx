@@ -1,54 +1,95 @@
 import useSprint from "../../hooks/sprint/useSprint";
 import useColumn from "../../hooks/column/useColumn";
 import { ColumnStatus, INewColumn } from "../../types/column.types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { notifyError, notifySuccess } from "../../helpers/notify";
+import Modal from "../generic/Modal";
+import CustomSelect from "../generic/select/CustomSelect";
+import Input from "../generic/inputs/Input";
 
-export default function CreateColumnModal() {
+interface CreateColumnModalProps {
+  show: boolean;
+  onClose: () => void;
+}
+
+export default function CreateColumnModal(props: CreateColumnModalProps) {
   const [columnName, setColumnName] = useState<string>("");
   const [columnStatus, setColumnStatus] = useState<ColumnStatus>(ColumnStatus.TODO);
   const { sprintId } = useSprint();
-  const { createColumn } = useColumn();
+  const { createColumn, columns } = useColumn();
+
+  const disableCreate = useMemo(() => {
+    return columnName === "";
+  }, [columnName]);
 
   const handleCreateColumn = async (name: string, columnStatus: ColumnStatus) => {
-    try {
-      const newColumn: INewColumn = {
-        sprintId,
-        name,
-        columnStatus
-      };
-      await createColumn(newColumn);
-      console.log("New Column Created: ", newColumn);
-    } catch (error) {
-      console.error("Error creating column: ", error);
-    }
+    const endIndex = Math.max(...columns.map((c) => c.columnIndex)) + 1;
+    const newColumn: INewColumn = {
+      sprintId,
+      name,
+      columnStatus,
+      columnIndex: endIndex
+    };
+    createColumn(newColumn)
+      .then(() => notifySuccess(`New Column Created: ${newColumn.name}`))
+      .catch(() => notifyError("Something went wrong while creating column"));
   };
 
-  return (
-  <div className="flex flex-col gap-4 p-4">
-    <div className="text-lg font-bold">Create New Column</div>
-    <input type="text" placeholder="Column Name" className="border border-ap-onyx-200 rounded-md p-2" 
-      value={columnName}
-      onChange={(e) => setColumnName(e.target.value)}
-    />
-    <select className="border border-ap-onyx-200 rounded-md p-2"
-      value={columnStatus}
-      onChange={(e) => setColumnStatus(e.target.value as ColumnStatus)}
-    >
-      <option value={ColumnStatus.TODO}>TODO</option>
-      <option value={ColumnStatus.IN_PROGRESS}>IN_PROGRESS</option>
-      <option value={ColumnStatus.DONE}>DONE</option>
-    </select>
+  const columnStatusOptions = [
+    {
+      label: (
+        <span className="gap-2 flex">
+          To do <span className="italic text-ap-onyx-200">Auto-open tasks</span>
+        </span>
+      ),
+      value: ColumnStatus.TODO
+    },
+    { label: <span>In progress</span>, value: ColumnStatus.IN_PROGRESS },
+    {
+      label: (
+        <span>
+          Done <span className="text-ap-onyx-200 italic">Auto-close tasks</span>
+        </span>
+      ),
+      value: ColumnStatus.DONE
+    }
+  ];
 
-    <div 
-      className="m-4 text-xl text-center border-ap-onyx-200 border rounded-md p-2 cursor-pointer"
-      onClick={() => {
+  return (
+    <Modal
+      title="Create column"
+      show={props.show}
+      onClose={props.onClose}
+      onAction={() => {
         handleCreateColumn(columnName, columnStatus);
-        setColumnName("");
-        setColumnStatus(ColumnStatus.TODO);
+        props.onClose();
       }}
+      actionText="Create"
+      disableAction={disableCreate}
     >
-        Create
-    </div>
-  </div>
+      <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col">
+          <div className="text-ap-onyx-200">Title</div>
+          <Input
+            type="text"
+            placeholder="Column Name"
+            value={columnName}
+            onChange={(e) => setColumnName(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-col">
+          <div className="text-ap-onyx-200">Type</div>
+          <CustomSelect
+            options={columnStatusOptions}
+            value={columnStatusOptions.find((o) => o.value === columnStatus)}
+            onChange={(o) => {
+              if (o) {
+                setColumnStatus(o.value);
+              }
+            }}
+          />
+        </div>
+      </div>
+    </Modal>
   );
 }

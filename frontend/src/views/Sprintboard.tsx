@@ -3,24 +3,23 @@ import useColumn from "../hooks/column/useColumn";
 import SprintProvider from "../hooks/sprint/SprintProvider";
 import ColumnProvider from "../hooks/column/ColumnProvider";
 import Column from "../components/sprintboard/Column";
-import Modal from "../components/generic/Modal";
 import CreateColumnModal from "../components/sprintboard/CreateColumnModal";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
-import LoadingSpinner from "../components/generic/loading/LoadingSpinner";
 import { useState } from "react";
+import ShowIf from "../components/generic/ShowIf";
 
 function SprintBoard() {
   const { sprintId } = useParams<{ sprintId: string }>();
 
   if (!sprintId) {
-    return <div>Invalid sprint ID</div>;
+    return null;
   }
 
   return (
     <SprintProvider sprintId={sprintId}>
       <ColumnProvider sprintId={sprintId}>
-          <SprintBoardContent />
+        <SprintBoardContent />
       </ColumnProvider>
     </SprintProvider>
   );
@@ -29,46 +28,46 @@ function SprintBoard() {
 function SprintBoardContent() {
   const { sprint } = useSprint();
   const { columns } = useColumn();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  if (!sprint) {
-    return <LoadingSpinner size={24} color="#7145d9" />;
-  }
-
-  if (!columns) {
-    return <LoadingSpinner size={24} color="#7145d9" />;
-  }
+  const [showCreateColumnModal, setShowCreateColumnModal] = useState(false);
 
   return (
     <div className="sprint-board w-full h-[80vh] ">
-      <Header sprintName={sprint.name} />
+      {!!sprint && <Header sprintName={sprint.name} />}
       <div className="flex flex-row w-full h-full">
         <Sidebar />
-      <div className="flex flex-col w-full h-full p-4 gap-4 border-ap-onyx-200 border">
-        <input className="w-72 h-8 ml-4 pl-4 border border-ap-onyx-200 rounded-md" placeholder="Search..."/>
-        <div className="flex flex-row justify-center gap-6 w-full h-full ">
-          {columns.map((column) => (
-            <div key={column.id} className="flex-1 m-4 text-center  border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400">
-              <Column column={column} />
-            </div>
-          ))}
-          <FaPlus 
-            className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"
-            onClick={() => setIsModalOpen(true)}
+        <div className="flex flex-col w-full h-full p-4 gap-4 border-ap-onyx-200 border">
+          <input
+            className="w-72 h-8 ml-4 pl-4 border border-ap-onyx-200 rounded-md"
+            placeholder="Search..."
           />
+          <div className="flex flex-row justify-center gap-6 w-full h-full ">
+            {columns.map((column) => (
+              <div
+                key={column.id}
+                className="flex-1 m-4 text-center  border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400"
+              >
+                <Column column={column} />
+              </div>
+            ))}
+            <FaPlus
+              className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"
+              onClick={() => setShowCreateColumnModal(true)}
+            />
+          </div>
         </div>
       </div>
+
+      <ShowIf if={showCreateColumnModal}>
+        <CreateColumnModal
+          show={showCreateColumnModal}
+          onClose={() => setShowCreateColumnModal(false)}
+        />
+      </ShowIf>
     </div>
-
-    <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-      <CreateColumnModal />
-    </Modal>  
-
-  </div>
   );
 }
 
-function Header({sprintName}: {sprintName: string}) {
+function Header({ sprintName }: { sprintName: string }) {
   return (
     <div className="bg-ap-onyx-50/20 border-b border-ap-onyx-200">
       <div className="flex flex-row items-center justify-start gap-2 p-4 text-ap-onyx-500">
@@ -81,7 +80,7 @@ function Header({sprintName}: {sprintName: string}) {
         <div className="text-ap-onyx-700 cursor-pointer">stats</div>
       </div>
     </div>
-  )
+  );
 }
 
 function Sidebar() {
