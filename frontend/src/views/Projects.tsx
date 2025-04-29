@@ -1,7 +1,7 @@
 import useProjects from "../hooks/projects/useProjects";
 
 function Projects() {
-  const { projects, createProject } = useProjects();
+  const { projects } = useProjects();
 
   console.log(projects);
 
