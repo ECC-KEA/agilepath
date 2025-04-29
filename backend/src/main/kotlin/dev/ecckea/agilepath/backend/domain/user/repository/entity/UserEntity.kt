@@ -25,12 +25,4 @@ class UserEntity(
     // @JsonSerialize(using = InstantSerializer::class)
     @Column(name = "created_at", nullable = false)
     val createdAt: Instant = Instant.now(),
-
-    // @JsonSerialize(using = InstantSerializer::class)
-    @Column(name = "modified_at")
-    var modifiedAt: Instant? = null,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modified_by")
-    var modifiedBy: UserEntity? = null
 )

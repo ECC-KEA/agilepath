@@ -4,7 +4,7 @@ spring:
       on-profile: dev
 
   flyway:
-    locations: classpath:db/migration, classpath:db/dummy/postgres
+    locations: classpath:db/migration
 
   devtools:
     restart:

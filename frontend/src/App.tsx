@@ -1,11 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import Layout from "./components/generic/Layout";
-import { SignedIn, SignedOut, useAuth } from "@clerk/clerk-react";
+import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Login from "./views/Login";
+import Projects from "./views/Projects";
 
 function App() {
-  console.log(useAuth());
-
   return (
     <BrowserRouter>
       <Layout>
@@ -22,6 +21,11 @@ function App() {
           <Routes>
             <Route
               index
+              path="/"
+              element={<Projects />}
+            />
+            <Route
+              path="/projects/:projectID"
               element={<div></div>}
             />
           </Routes>

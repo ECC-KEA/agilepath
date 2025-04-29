@@ -26,5 +26,38 @@ export const useApi = () => {
     return fetch(API_URL + url, { ...options });
   };
 
-  return { fetchWithAuth, fetchNoAuth, api_url: API_URL };
+  const get = useCallback(
+    (url: string) =>
+      fetchWithAuth(url)
+        .then((res) => res.json())
+        .catch(console.error),
+    [fetchWithAuth]
+  );
+
+  const post = useCallback(
+    (url: string, data: unknown) =>
+      fetchWithAuth(url, {
+        method: "POST",
+        body: JSON.stringify(data)
+      }),
+    [fetchWithAuth]
+  );
+
+  const put = useCallback(
+    (url: string, data: unknown) =>
+      fetchWithAuth(url, {
+        method: "PUT",
+        body: JSON.stringify(data)
+      })
+        .then((res) => res.json())
+        .catch(console.error),
+    [fetchWithAuth]
+  );
+
+  const del = useCallback(
+    (url: string) => fetchWithAuth(url, { method: "DELETE" }).catch(console.error),
+    [fetchWithAuth]
+  );
+
+  return { fetchWithAuth, fetchNoAuth, get, put, post, del, api_url: API_URL };
 };

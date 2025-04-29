@@ -1,4 +1,0 @@
-ALTER TABLE sprints
-    ALTER COLUMN start_date SET NOT NULL;
-ALTER TABLE sprints
-    ALTER COLUMN end_date SET NOT NULL;

@@ -7,5 +7,5 @@ data class SprintColumnRequest(
     val sprintId: UUID,
     val name: String,
     val columnStatus: SprintColumnStatus,
-    val columnIndex: Int,
+    val columnIndex: Int? = null,
 )

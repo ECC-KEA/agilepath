@@ -2,7 +2,7 @@ package dev.ecckea.agilepath.backend.domain.user.service
 
 import dev.ecckea.agilepath.backend.domain.user.model.User
 import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
-import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
+import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
+    private val ctx: RepositoryContext
 ) : Logged() {
     /**
      * Returns the user matching the id of the principal. If the user does not exist, it will be created.
@@ -24,12 +24,24 @@ class UserService(
      */
     @Cacheable("users", key = "#principal.id")
     fun getOrCreate(principal: UserPrincipal): User {
-        val exists = userRepository.existsById(principal.id)
+        val exists = ctx.user.existsById(principal.id)
         if (!exists) {
             log.info("User with id ${principal.id} does not exist, creating it")
-            return userRepository.save(principal.toEntity()).toModel()
+            return ctx.user.save(principal.toEntity()).toModel()
         }
-        return userRepository.findOneById(principal.id)?.toModel()
+        return ctx.user.findOneById(principal.id)?.toModel()
             ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+    }
+
+    @Cacheable("users", key = "#principal.id")
+    fun get(principal: UserPrincipal): User {
+        return ctx.user.findOneById(principal.id)?.toModel()
+            ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+    }
+
+    @Cacheable("users", key = "#id")
+    fun getById(id: String): User {
+        return ctx.user.findOneById(id)?.toModel()
+            ?: throw ResourceNotFoundException("User with id $id not found")
     }
 }
