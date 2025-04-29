@@ -24,13 +24,10 @@ class TaskApplication(
     fun createTask(newTask: NewTask): Task {
         log.info("Creating task with title: {}", newTask.title)
 
-        // Create the task
         val created = taskService.createTask(newTask)
 
-        // Add assignees - use forEach for side effects
         newTask.assigneeIds.forEach { taskAssigneeService.addAssignee(created.id, it) }
 
-        // Get assignees for response - use map for transformation
         val assignees = newTask.assigneeIds.map { userService.getById(it) }
 
         return created.copy(assignees = assignees)
@@ -39,14 +36,12 @@ class TaskApplication(
     fun getTask(id: UUID): Task {
         log.info("Getting task with id: {}", id)
 
-        // Get the task and related entities
         val task = taskService.getTask(id)
         val subtasks = subtaskService.getSubtasksByTaskId(id)
         val comments = commentService.getCommentsByTaskId(id)
         val assigneeIds = taskAssigneeService.getAssignees(id)
         val assignees = assigneeIds.map { userService.getById(it) }
 
-        // Use copy to create a new instance with additional data
         return task.copy(
             subtasks = subtasks.map { it },
             comments = comments.map { it },
@@ -57,26 +52,18 @@ class TaskApplication(
     fun updateTask(id: UUID, newTask: NewTask): Task {
         log.info("Updating task with id: {}", id)
 
-        // Update the task entity
         val updated = taskService.updateTask(id, newTask, currentUser().id)
-
-        // Update assignees
         val currentAssignees = taskAssigneeService.getAssignees(id)
-
-        // Use filter+subtract for more idiomatic collection operations
-        // Remove assignees that are no longer in the list
         val assigneesToRemove = currentAssignees.filter { it !in newTask.assigneeIds }
         assigneesToRemove.forEach { assigneeId ->
             taskAssigneeService.removeAssignee(id, assigneeId)
         }
 
-        // Add new assignees
         val assigneesToAdd = newTask.assigneeIds.filter { it !in currentAssignees }
         assigneesToAdd.forEach { assigneeId ->
             taskAssigneeService.addAssignee(id, assigneeId)
         }
 
-        // Retrieve updated assignees for response
         val assignees = newTask.assigneeIds.map { userService.getById(it) }
 
         return updated.copy(assignees = assignees)
