@@ -25,15 +25,12 @@ function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
   const createProject = useCallback(
     (newProj: INewProject) => {
       loader.add();
-      return (
-        post("/projects", newProj)
-          // do nothing with response
-          .then(() => {})
-          .catch((e) => {
-            toast.error(e);
-          })
-          .finally(loader.done)
-      );
+      return post("/projects", newProj)
+        .then((proj) => setProjects([...projects, proj]))
+        .catch((e) => {
+          toast.error(e);
+        })
+        .finally(loader.done);
     },
     [post, loader]
   );

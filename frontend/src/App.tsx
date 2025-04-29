@@ -3,7 +3,7 @@ import Layout from "./components/generic/Layout";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Login from "./views/Login";
 import Projects from "./views/Projects";
-import SprintBoard from "./views/SprintBoard";
+import Sprint from "./views/Sprint";
 
 function App() {
   return (
@@ -31,7 +31,7 @@ function App() {
             />
             <Route
               path="/sprintboard/:sprintId"
-              element={<SprintBoard />}
+              element={<Sprint />}
             />
           </Routes>
         </SignedIn>

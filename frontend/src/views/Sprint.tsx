@@ -2,14 +2,14 @@ import useSprint from "../hooks/sprint/useSprint";
 import useColumn from "../hooks/column/useColumn";
 import SprintProvider from "../hooks/sprint/SprintProvider";
 import ColumnProvider from "../hooks/column/ColumnProvider";
-import Column from "../components/sprintboard/Column";
-import CreateColumnModal from "../components/sprintboard/CreateColumnModal";
+import Column from "../components/sprint/Column";
+import CreateColumnModal from "../components/sprint/CreateColumnModal";
 import { useParams } from "react-router";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
 import { useState } from "react";
 import ShowIf from "../components/generic/ShowIf";
 
-function SprintBoard() {
+function Sprint() {
   const { sprintId } = useParams<{ sprintId: string }>();
 
   if (!sprintId) {
@@ -19,13 +19,13 @@ function SprintBoard() {
   return (
     <SprintProvider sprintId={sprintId}>
       <ColumnProvider sprintId={sprintId}>
-        <SprintBoardContent />
+        <SprintContent />
       </ColumnProvider>
     </SprintProvider>
   );
 }
 
-function SprintBoardContent() {
+function SprintContent() {
   const { sprint } = useSprint();
   const { columns } = useColumn();
   const [showCreateColumnModal, setShowCreateColumnModal] = useState(false);
@@ -99,4 +99,4 @@ function Sidebar() {
   );
 }
 
-export default SprintBoard;
+export default Sprint;
