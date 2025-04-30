@@ -34,4 +34,8 @@ class StoryApplication(
     fun deleteStory(id: UUID) {
         storyService.deleteStory(id)
     }
+
+    fun getStoriesByProjectId(projectId: UUID): List<Story> {
+        return storyService.getStoriesByProjectId(projectId)
+    }
 }

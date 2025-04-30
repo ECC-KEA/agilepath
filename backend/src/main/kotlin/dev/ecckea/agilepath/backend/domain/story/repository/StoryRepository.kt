@@ -8,4 +8,5 @@ import java.util.*
 @Repository
 interface StoryRepository : JpaRepository<StoryEntity, UUID> {
     fun findOneById(id: UUID): StoryEntity?
+    fun findAllByProjectId(projectId: UUID): List<StoryEntity>
 }

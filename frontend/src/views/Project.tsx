@@ -4,17 +4,23 @@ import { PropsWithChildren } from "react";
 import CurrentProjectProvider from "../hooks/projects/CurrentProjectProvider";
 import ProjectSidebar from "../components/project/ProjectSidebar";
 import ProjectHeader from "../components/project/ProjectHeader";
+import StoryProvider from "../hooks/story/StoryProvider";
 
 export function ProjectWrapper({ children }: Readonly<PropsWithChildren>) {
   const { projectID } = useParams();
   if (!projectID) {
     return null; // TODO return 404 page
   }
-  return <CurrentProjectProvider projectID={projectID}>{children}</CurrentProjectProvider>;
+  return (
+    <CurrentProjectProvider projectID={projectID}>
+      <StoryProvider>{children}</StoryProvider>
+    </CurrentProjectProvider>
+  );
 }
 
 function Project() {
   const { project } = useCurrentProject();
+  console.log(project);
 
   if (!project) {
     return null; // TODO return 404 page
