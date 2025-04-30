@@ -1,42 +1,61 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import Layout from "./components/generic/Layout";
+import { Route, Routes } from "react-router";
+import Layout from "./components/Layout";
 import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Login from "./views/Login";
 import Projects from "./views/Projects";
 import Sprint from "./views/Sprint";
+import Project, { ProjectWrapper } from "./views/Project";
+import ProjectOverview from "./views/ProjectOverview";
+import SprintBoard from "./views/SprintBoard";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Layout>
-        <SignedOut>
-          <Routes>
+    <Layout>
+      <SignedOut>
+        <Routes>
+          <Route
+            index
+            path="*"
+            element={<Login />}
+          />
+        </Routes>
+      </SignedOut>
+      <SignedIn>
+        <Routes>
+          <Route
+            index
+            path="/"
+            element={<Projects />}
+          />
+          <Route
+            path="/projects/:projectID"
+            element={
+              <ProjectWrapper>
+                <Project />
+              </ProjectWrapper>
+            }
+          >
             <Route
-              index
-              path="*"
-              element={<Login />}
-            />
-          </Routes>
-        </SignedOut>
-        <SignedIn>
-          <Routes>
-            <Route
-              index
-              path="/"
-              element={<Projects />}
-            />
-            <Route
-              path="/projects/:projectID"
-              element={<div></div>}
-            />
-            <Route
-              path="/sprintboard/:sprintId"
+              path="sprint/:sprintId"
               element={<Sprint />}
+            >
+              <Route
+                path=""
+                element={<SprintBoard />}
+              />
+              <Route
+                path="stats"
+                element={<div>Stats</div>}
+              />
+            </Route>
+            <Route
+              path="*"
+              element={<ProjectOverview />}
             />
-          </Routes>
-        </SignedIn>
-      </Layout>
-    </BrowserRouter>
+          </Route>
+        </Routes>
+      </SignedIn>
+    </Layout>
   );
 }
 

@@ -1,17 +1,17 @@
 import { PropsWithChildren } from "react";
-import Nav from "../navigation/Nav";
+import Nav from "./navigation/Nav";
 import { Toaster } from "react-hot-toast";
-import { useLoading } from "../../hooks/utils/loading/useLoading";
-import { LoadingOverlay } from "./loading/LoadingOverlay";
-import ShowIf from "./ShowIf";
+import { useLoading } from "../hooks/utils/loading/useLoading";
+import { LoadingOverlay } from "./generic/loading/LoadingOverlay";
+import ShowIf from "./generic/ShowIf";
 
 function Layout({ children }: Readonly<PropsWithChildren>) {
   const loader = useLoading();
 
   return (
-    <div className="w-screen min-h-screen flex flex-col">
+    <div className="w-screen h-screen flex flex-col">
       <Nav />
-      {children}
+      <div className="flex-1 overflow-auto relative">{children}</div>
       <ShowIf if={loader.isLoading}>
         <LoadingOverlay
           position={loader.position}

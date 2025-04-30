@@ -5,7 +5,7 @@ import ColumnContext from "./ColumnContext";
 import { useLoading } from "../utils/loading/useLoading";
 
 interface ColumnProviderProps extends PropsWithChildren {
-  sprintId: string;
+  sprintId: string | undefined;
 }
 
 function ColumnProvider({ children, sprintId }: ColumnProviderProps) {

@@ -26,7 +26,7 @@ function ProjectListItem(props: Readonly<ProjectListItemProps>) {
   const navigate = useNavigate();
   return (
     <div
-      onClick={() => navigate("/projects/" + props.project.id)}
+      onClick={() => navigate("/projects/" + props.project.id + "/overview")}
       className="cursor-pointer hover:bg-ap-cyan-50/10 flex gap-2 justify-between p-3 border border-ap-lavender-50 rounded-lg w-96 shadow-xs"
     >
       <div className="text-lg">{props.project.name}</div>
