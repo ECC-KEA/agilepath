@@ -20,7 +20,6 @@ export function ProjectWrapper({ children }: Readonly<PropsWithChildren>) {
 
 function Project() {
   const { project } = useCurrentProject();
-  console.log(project);
 
   if (!project) {
     return null; // TODO return 404 page

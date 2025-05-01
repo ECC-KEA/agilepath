@@ -1,5 +1,6 @@
+import { PropsWithChildren } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useNavigate } from "react-router";
+import { NavLink, To, useNavigate } from "react-router";
 
 interface ProjectHeaderProps {
   projectName: string;
@@ -16,12 +17,29 @@ function ProjectHeader(props: Readonly<ProjectHeaderProps>) {
         />
         <h1 className="text-2xl">{props.projectName}</h1>
       </div>
-      <div className="flex flex-row gap-2">
-        <div className="w-50" />
-        <div className="text-ap-lavender-600 underline cursor-pointer">board</div>
-        <div className="text-ap-onyx-700 cursor-pointer">stats</div>
+      <div className="flex flex-row gap-2 pl-58">
+        <HeaderLink to="overview">board</HeaderLink>
+        <HeaderLink to="stats">stats</HeaderLink>
+        <HeaderLink to="members">members</HeaderLink>
       </div>
     </div>
+  );
+}
+
+interface HeaderLinkProps extends PropsWithChildren {
+  to: To;
+}
+
+function HeaderLink(props: Readonly<HeaderLinkProps>) {
+  return (
+    <NavLink
+      to={props.to}
+      className={({ isActive }) =>
+        `${isActive ? "text-ap-lavender-600 underline" : "text-ap-onyx-700 hover:text-ap-lavender-400 hover:underline"} cursor-pointer`
+      }
+    >
+      {props.children}
+    </NavLink>
   );
 }
 

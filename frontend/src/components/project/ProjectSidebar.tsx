@@ -64,7 +64,7 @@ function SprintLink(props: Readonly<SprintLinkProps>) {
   }, [props.sprint]);
   return (
     <NavLink
-      to={`/projects/${projectID}/sprint/${props.sprint.id}`}
+      to={`/projects/${projectID}/sprint/${props.sprint.id}/overview`}
       className={`border-ap-lavender-700 text-center`}
     >
       {({ isActive }) => (

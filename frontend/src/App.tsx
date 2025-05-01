@@ -7,6 +7,9 @@ import Sprint from "./views/Sprint";
 import Project, { ProjectWrapper } from "./views/Project";
 import ProjectOverview from "./views/ProjectOverview";
 import SprintBoard from "./views/SprintBoard";
+import SprintStats from "./views/SprintStats";
+import ProjectStats from "./views/ProjectStats";
+import ProjectMembers from "./views/ProjectMembers";
 
 function App() {
   return (
@@ -40,17 +43,27 @@ function App() {
               element={<Sprint />}
             >
               <Route
-                path=""
+                index
+                path="overview"
                 element={<SprintBoard />}
               />
               <Route
                 path="stats"
-                element={<div>Stats</div>}
+                element={<SprintStats />}
               />
             </Route>
             <Route
-              path="*"
+              index
+              path="overview"
               element={<ProjectOverview />}
+            />
+            <Route
+              path="stats"
+              element={<ProjectStats />}
+            />
+            <Route
+              path="members"
+              element={<ProjectMembers />}
             />
           </Route>
         </Routes>
