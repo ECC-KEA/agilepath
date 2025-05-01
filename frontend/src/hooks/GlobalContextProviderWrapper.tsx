@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import MeProvider from "./me/MeProvider";
 import ProjectProvider from "./projects/ProjectProvider";
+import { LoadingProvider } from "./utils/loading/LoadingProvider";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -12,9 +13,11 @@ if (!PUBLISHABLE_KEY) {
 export default function GlobalContextProviderWrapper({ children }: Readonly<PropsWithChildren>) {
   return (
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <MeProvider>
-        <ProjectProvider>{children}</ProjectProvider>
-      </MeProvider>
+      <LoadingProvider>
+        <MeProvider>
+          <ProjectProvider>{children}</ProjectProvider>
+        </MeProvider>
+      </LoadingProvider>
     </ClerkProvider>
   );
 }
