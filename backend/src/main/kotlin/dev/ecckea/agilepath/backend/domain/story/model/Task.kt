@@ -4,6 +4,8 @@ import dev.ecckea.agilepath.backend.domain.user.model.User
 import java.time.Instant
 import java.util.*
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeName("dev.ecckea.agilepath.backend.domain.story.model.Task")
 data class Task(
     val id: UUID,
     val storyId: UUID,

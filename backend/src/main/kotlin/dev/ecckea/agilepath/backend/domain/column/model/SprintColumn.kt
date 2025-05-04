@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeName("dev.ecckea.agilepath.backend.domain.column.model.SprintColumn")
 data class SprintColumn(
     val id: UUID,
     val sprintId: UUID,

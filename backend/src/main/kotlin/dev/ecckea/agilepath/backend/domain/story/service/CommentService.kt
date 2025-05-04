@@ -9,27 +9,33 @@ import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
+import org.springframework.cache.CacheManager
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
 class CommentService(
-    private val ctx: RepositoryContext
+    private val ctx: RepositoryContext,
+    private val cacheManager: CacheManager
 ) : Logged() {
 
     @Transactional(readOnly = true)
+    @Cacheable(value = ["comments"], key = "#id")
     fun getComment(id: UUID): Comment {
         return ctx.comment.findOneById(id)?.toModel()
             ?: throw ResourceNotFoundException("Comment with id $id not found")
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = ["commentsByTask"], key = "#taskId")
     fun getCommentsByTaskId(taskId: UUID): List<Comment> {
         return ctx.comment.findByTaskId(taskId).map { it.toModel() }
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = ["commentsByStory"], key = "#storyId")
     fun getCommentsByStoryId(storyId: UUID): List<Comment> {
         return ctx.comment.findByStoryId(storyId).map { it.toModel() }
     }
@@ -38,14 +44,21 @@ class CommentService(
     fun createComment(newComment: NewComment): Comment {
         log.info("Creating new comment")
 
-        // Validate that exactly one of storyId or taskId is provided
         validateCommentTarget(newComment.storyId, newComment.taskId)
-
-        // Verify target exists
         validateTargetExists(newComment.storyId, newComment.taskId)
 
         val commentEntity = newComment.toEntity(ctx)
-        return ctx.comment.save(commentEntity).toModel()
+        val saved = ctx.comment.save(commentEntity)
+
+        // Manual eviction: storyId or taskId list
+        newComment.taskId?.let {
+            cacheManager.getCache("commentsByTask")?.evict(it)
+        }
+        newComment.storyId?.let {
+            cacheManager.getCache("commentsByStory")?.evict(it)
+        }
+
+        return saved.toModel()
     }
 
     @Transactional
@@ -55,11 +68,18 @@ class CommentService(
         val commentEntity = ctx.comment.findOneById(id)
             ?: throw ResourceNotFoundException("Comment with id $id not found")
 
-        // Ensure the target (story or task) doesn't change
-        validateTargetConsistency(commentEntity.toModel(), newComment)
+        val existingModel = commentEntity.toModel()
+        validateTargetConsistency(existingModel, newComment)
 
         val updatedEntity = commentEntity.updatedWith(newComment, userId, ctx)
-        return ctx.comment.save(updatedEntity).toModel()
+        val saved = ctx.comment.save(updatedEntity)
+
+        // Evict individual and parent
+        cacheManager.getCache("comments")?.evict(id)
+        existingModel.taskId?.let { cacheManager.getCache("commentsByTask")?.evict(it) }
+        existingModel.storyId?.let { cacheManager.getCache("commentsByStory")?.evict(it) }
+
+        return saved.toModel()
     }
 
     @Transactional
@@ -69,12 +89,15 @@ class CommentService(
         val comment = ctx.comment.findOneById(id)
             ?: throw ResourceNotFoundException("Comment with id $id not found")
 
+        // Manual eviction before delete
+        cacheManager.getCache("comments")?.evict(id)
+        comment.task?.id?.let { cacheManager.getCache("commentsByTask")?.evict(it) }
+        comment.story?.id?.let { cacheManager.getCache("commentsByStory")?.evict(it) }
+
         ctx.comment.delete(comment)
     }
 
-    /**
-     * Validates that exactly one of storyId or taskId is provided
-     */
+
     private fun validateCommentTarget(storyId: UUID?, taskId: UUID?) {
         when {
             storyId != null && taskId != null ->
@@ -85,9 +108,7 @@ class CommentService(
         }
     }
 
-    /**
-     * Validates that the target (story or task) exists
-     */
+
     private fun validateTargetExists(storyId: UUID?, taskId: UUID?) {
         if (storyId != null) {
             val storyExists = ctx.story.existsById(storyId)
@@ -98,9 +119,7 @@ class CommentService(
         }
     }
 
-    /**
-     * Validates that the comment's target (story or task) hasn't changed during update
-     */
+
     private fun validateTargetConsistency(existingComment: Comment, newComment: NewComment) {
         // Ensure the parent entity remains the same
         val targetChanged = when {

@@ -7,6 +7,7 @@ import java.time.LocalDate
 import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeName("dev.ecckea.agilepath.backend.domain.sprint.model.Sprint")
 data class Sprint(
     val id: UUID,
     val projectId: UUID,

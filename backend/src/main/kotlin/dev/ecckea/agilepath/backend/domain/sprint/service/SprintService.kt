@@ -10,6 +10,9 @@ import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -18,16 +21,19 @@ class SprintService(
     private val ctx: RepositoryContext
 ) : Logged() {
 
+    @Cacheable("sprintsByProject", key = "#projectId")
     fun getSprints(projectId: UUID): List<Sprint> {
         return ctx.sprint.findByProjectId(projectId).map { it.toModel() }
             .sortedBy { it.startDate }
     }
 
+    @Cacheable("sprints", key = "#sprintId")
     fun getSprint(sprintId: UUID): Sprint {
         return ctx.sprint.findOneById(sprintId)?.toModel()
             ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
     }
 
+    @CacheEvict(value = ["sprintsByProject"], key = "#newSprint.projectId")
     fun createSprint(newSprint: NewSprint): Sprint {
         log.info("Creating sprint with name ${newSprint.name}")
 
@@ -40,8 +46,15 @@ class SprintService(
         return saved.toModel()
     }
 
+    @Caching(
+        evict = [
+            CacheEvict(value = ["sprints"], key = "#sprintId"),
+            CacheEvict(value = ["sprintsByProject"], key = "#sprint.projectId")
+        ]
+    )
     fun updateSprint(sprintId: UUID, sprint: NewSprint): Sprint {
         log.info("Updating sprint with ID $sprintId")
+
         val existingSprint = ctx.sprint.findOneById(sprintId)
             ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
 

@@ -10,6 +10,9 @@ import dev.ecckea.agilepath.backend.domain.user.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -20,6 +23,7 @@ class ProjectService(
 ) : Logged() {
 
     @Transactional(readOnly = true)
+    @Cacheable("projects", key = "#id")
     fun getProject(id: UUID): Project {
         log.info("Fetching project with id $id")
         return ctx.project.findOneById(id)
@@ -28,6 +32,7 @@ class ProjectService(
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("projectsByUser", key = "#user.id")
     fun getProjects(user: User): List<Project> {
         log.info("Fetching projects for user with id {}", user.id)
         return ctx.project.findAllByCreatedBy(user.toEntity())
@@ -35,6 +40,7 @@ class ProjectService(
     }
 
     @Transactional
+    @CacheEvict(value = ["projectsByUser"], key = "#owner.id")
     fun createProject(newProject: NewProject, owner: User): Project {
         log.info("Creating project with name ${newProject.name}")
         val entity = newProject.toEntity(ctx)
@@ -43,6 +49,12 @@ class ProjectService(
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(value = ["projects"], key = "#id"),
+            //CacheEvict(value = ["projectsByUser"], key = "#entity.createdBy.id") // refine this when usersProjects is implemented
+        ]
+    )
     fun deleteProject(id: UUID) {
         log.info("Deleting project with id $id")
         val entity = ctx.project.findOneById(id)
@@ -51,6 +63,12 @@ class ProjectService(
     }
 
     @Transactional
+    @Caching(
+        evict = [
+            CacheEvict(value = ["projects"], key = "#id"),
+            CacheEvict(value = ["projectsByUser"], key = "#owner.id")
+        ]
+    )
     fun updateProject(id: UUID, updated: NewProject, owner: User): Project {
         log.info("Updating project with id $id")
         val existingEntity = ctx.project.findOneById(id)
