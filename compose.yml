@@ -64,7 +64,6 @@ services:
       - "8080:8080"
     profiles:
       - dev
-      - ci
       - prod
     volumes:
       - backend-gradle-cache:/home/gradle/.gradle
