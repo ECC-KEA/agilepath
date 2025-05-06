@@ -67,3 +67,17 @@ export enum PointEstimate {
   POINT_13 = 13,
   POINT_21 = 21
 }
+
+export interface INewStory {
+  projectId: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: number;
+}
+
+export enum Status {
+  DONE = "DONE",
+  TODO = "TODO",
+  ARCHIVED = "ARCHIVED"
+}

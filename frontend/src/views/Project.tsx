@@ -12,7 +12,7 @@ export function ProjectWrapper({ children }: Readonly<PropsWithChildren>) {
     return null; // TODO return 404 page
   }
   return (
-    <CurrentProjectProvider projectID={projectID}>
+    <CurrentProjectProvider>
       <StoryProvider>{children}</StoryProvider>
     </CurrentProjectProvider>
   );
