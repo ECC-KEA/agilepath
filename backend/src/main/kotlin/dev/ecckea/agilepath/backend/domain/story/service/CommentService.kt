@@ -8,6 +8,7 @@ import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
+import dev.ecckea.agilepath.backend.shared.exceptions.ValidationException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.Cacheable
@@ -101,10 +102,10 @@ class CommentService(
     private fun validateCommentTarget(storyId: UUID?, taskId: UUID?) {
         when {
             storyId != null && taskId != null ->
-                throw BadRequestException("Comment must be associated with either a story or a task, not both")
+                throw ValidationException("Comment must be associated with either a story or a task, not both")
 
             storyId == null && taskId == null ->
-                throw BadRequestException("Comment must be associated with either a story or a task")
+                throw ValidationException("Comment must be associated with either a story or a task")
         }
     }
 
