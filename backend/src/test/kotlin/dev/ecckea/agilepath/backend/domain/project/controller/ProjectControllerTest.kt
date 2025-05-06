@@ -27,7 +27,7 @@ class ProjectControllerTest : IntegrationTestBase() {
     ) = ProjectRequest(
         name = name,
         description = description,
-        framework = framework
+        framework = framework.toString()
     )
 
     private fun createProject(request: ProjectRequest = createProjectRequest()): ProjectResponse {
@@ -51,7 +51,7 @@ class ProjectControllerTest : IntegrationTestBase() {
         assertNotNull(created.id)
         assertEquals(request.name, created.name)
         assertEquals(request.description, created.description)
-        assertEquals(request.framework, created.framework)
+        assertEquals(request.framework, created.framework.toString())
         assertNotNull(created.createdBy)
         assertNotNull(created.createdAt)
     }
@@ -104,7 +104,7 @@ class ProjectControllerTest : IntegrationTestBase() {
         val updatedRequest = ProjectRequest(
             name = "AgilePath++",
             description = "Updated description",
-            framework = Framework.XP
+            framework = Framework.XP.toString()
         )
 
         val updated = webTestClient
