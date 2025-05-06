@@ -1,12 +1,16 @@
 package dev.ecckea.agilepath.backend.shared.exceptions
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import dev.ecckea.agilepath.backend.shared.dto.ErrorResponse
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.utils.nowInZone
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
@@ -19,115 +23,113 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 class GlobalExceptionHandler : Logged() {
 
-    /**
-     * Handles ResourceNotFoundException and returns a 404 NOT FOUND response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(ResourceNotFoundException::class)
-    fun handleNotFound(ex: ResourceNotFoundException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.NOT_FOUND, ex.message)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleNotFound(ex: ResourceNotFoundException) = createErrorResponse(
+        HttpStatus.NOT_FOUND,
+        ex.message
+    )
 
-    /**
-     * Handles BadRequestException and returns a 400 BAD REQUEST response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(BadRequestException::class)
-    fun handleBadRequest(ex: BadRequestException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.BAD_REQUEST, ex.message)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleBadRequest(ex: BadRequestException) = createErrorResponse(
+        HttpStatus.BAD_REQUEST,
+        ex.message
+    )
 
-    /**
-     * Handles UnauthorizedException and returns a 401 UNAUTHORIZED response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(UnauthorizedException::class)
-    fun handleUnauthorized(ex: UnauthorizedException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.UNAUTHORIZED, ex.message)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleUnauthorized(ex: UnauthorizedException) = createErrorResponse(
+        HttpStatus.UNAUTHORIZED,
+        ex.message
+    )
 
-    /**
-     * Handles ConflictException and returns a 409 CONFLICT response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(ConflictException::class)
-    fun handleConflict(ex: ConflictException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.CONFLICT, ex.message)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun handleConflict(ex: ConflictException) = createErrorResponse(
+        HttpStatus.CONFLICT,
+        ex.message
+    )
 
-    /**
-     * Handles ValidationException and returns a 422 UNPROCESSABLE ENTITY response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(ValidationException::class)
-    fun handleValidation(ex: ValidationException): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.message)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    fun handleValidation(ex: ValidationException) = createErrorResponse(
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        ex.message
+    )
 
-    /**
-     * Handles generic exceptions and returns a 500 INTERNAL SERVER ERROR response.
-     * Logs the error details for debugging purposes.
-     *
-     * @param ex The exception instance.
-     * @param request The web request during which the exception occurred.
-     * @return ResponseEntity containing the error response.
-     */
     @ExceptionHandler(Exception::class)
-    fun handleGeneric(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> =
-        errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error occurred")
-            .also { log.error("Unexpected error occurred at ${request.getDescription(false)}: ${ex.message}", ex) }
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun handleGeneric(ex: Exception, request: WebRequest) = createErrorResponse(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        "An unexpected error occurred: ${ex.message}"
+    ).also { log.error("Unexpected error occurred at ${request.getDescription(false)}: ${ex.message}", ex) }
 
-    /**
-     * Handles MethodArgumentTypeMismatchException and returns a 400 BAD REQUEST response.
-     * Provides details about the invalid parameter and expected type.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
+
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    fun handleTypeMismatch(ex: MethodArgumentTypeMismatchException): ResponseEntity<ErrorResponse> {
-        val param = ex.name
-        val expectedType = ex.requiredType?.simpleName ?: "unknown"
-        val value = ex.value?.toString() ?: "null"
-        val message = "Invalid value for parameter '$param': '$value' is not a valid $expectedType"
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleTypeMismatch(ex: MethodArgumentTypeMismatchException) = createErrorResponse(
+        HttpStatus.BAD_REQUEST,
+        "Invalid value for parameter '${ex.name}': '${ex.value}' is not a valid ${ex.requiredType?.simpleName}"
+    )
 
-        return errorResponse(HttpStatus.BAD_REQUEST, message)
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleConstraintViolation(ex: ConstraintViolationException) = createErrorResponse(
+        HttpStatus.BAD_REQUEST,
+        "Contraint violation occured: ${ex.constraintViolations.joinToString("; ") { "${it.propertyPath.last().name}: ${it.message}" }}"
+    )
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleMethodArgumentNotValid(
+        ex: MethodArgumentNotValidException,
+        request: HttpServletRequest
+    ): ErrorResponse {
+        val errors = formatValidationErrors(ex)
+        log.warn("Validation error for request ${request.method} ${request.requestURI}: ${ex.message}")
+        return createErrorResponse(HttpStatus.BAD_REQUEST, errors)
     }
 
-    /**
-     * Handles ConstraintViolationException and returns a 400 BAD REQUEST response.
-     * Aggregates all constraint violation messages into a single response.
-     *
-     * @param ex The exception instance.
-     * @return ResponseEntity containing the error response.
-     */
-    @ExceptionHandler(ConstraintViolationException::class)
-    fun handleConstraintViolation(ex: ConstraintViolationException): ResponseEntity<ErrorResponse> {
-        val message = ex.constraintViolations.joinToString("; ") {
-            "${it.propertyPath.last().name}: ${it.message}"
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ErrorResponse {
+        // Extract meaningful error message from the exception
+        val message = when {
+            ex.cause is MismatchedInputException -> {
+                val cause = ex.cause as MismatchedInputException
+                val fieldName = cause.path.lastOrNull()?.fieldName ?: "unknown field"
+                "Required field '$fieldName' is missing"
+            }
+
+            ex.message?.contains("JSON parse error") == true -> {
+                "Invalid JSON format: ${ex.message?.substringAfter("JSON parse error:")?.trim()}"
+            }
+
+            else -> {
+                "Invalid request body: ${ex.message}"
+            }
         }
 
-        return errorResponse(HttpStatus.BAD_REQUEST, message)
+        return createErrorResponse(HttpStatus.BAD_REQUEST, message)
     }
 
-    /**
-     * Helper method to create an error response.
-     *
-     * @param status The HTTP status to be returned.
-     * @param message The error message to include in the response.
-     * @return ResponseEntity containing the error response.
-     */
-    private fun errorResponse(status: HttpStatus, message: String?): ResponseEntity<ErrorResponse> {
-        val error = ErrorResponse(
+    private fun createErrorResponse(status: HttpStatus, message: String?): ErrorResponse =
+        ErrorResponse(
             status = status.value(),
             message = message ?: "An error occurred",
             timestamp = nowInZone()
         )
-        return ResponseEntity.status(status).body(error)
+
+    /**
+     * Helper method to format validation errors from MethodArgumentNotValidException.
+     */
+    private fun formatValidationErrors(ex: MethodArgumentNotValidException): String {
+        val errors = ex.bindingResult.fieldErrors.joinToString("; ") {
+            "${it.field}: ${it.defaultMessage}"
+        }
+
+        return if (errors.isNotEmpty()) "Validation failed: $errors" else "Validation failed"
     }
 }
