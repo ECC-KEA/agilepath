@@ -11,12 +11,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/comments")
+@Validated
 @Tag(name = "Comments", description = "Endpoints related to Comment management")
 class CommentController(
     private val commentApplication: CommentApplication
@@ -38,7 +41,7 @@ class CommentController(
         ]
     )
     @PostMapping
-    fun createComment(@RequestBody commentRequest: CommentRequest): CommentResponse {
+    fun createComment(@Valid @RequestBody commentRequest: CommentRequest): CommentResponse {
         log.info("POST /comments - Create comment")
         return commentApplication.createComment(commentRequest.toModel()).toDTO()
     }
@@ -115,7 +118,7 @@ class CommentController(
         ]
     )
     @PutMapping("/{id}")
-    fun updateComment(@PathVariable id: UUID, @RequestBody commentRequest: CommentRequest): CommentResponse {
+    fun updateComment(@PathVariable id: UUID, @Valid @RequestBody commentRequest: CommentRequest): CommentResponse {
         log.info("PUT /comments/$id - Update comment")
         return commentApplication.updateComment(id, commentRequest.toModel()).toDTO()
     }
