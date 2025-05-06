@@ -2,27 +2,37 @@ import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "re
 import { INewProject, IProject } from "../../types/project.types";
 import { useApi } from "../utils/useApi";
 import ProjectContext from "./ProjectContext";
+import toast from "react-hot-toast";
+import { useLoading } from "../utils/loading/useLoading";
 
 function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
+  const loader = useLoading();
   const { get, post } = useApi();
   const [_projects, setProjects] = useState<IProject[]>([]);
 
   const projects = useMemo(() => _projects, [_projects]);
 
   const loadProjects = useCallback(() => {
-    return get("/projects").then(setProjects).catch(console.log);
+    loader.add();
+    return get("/projects")
+      .then(setProjects)
+      .catch((e) => {
+        toast.error(e);
+      })
+      .finally(loader.done);
   }, [get]);
 
   const createProject = useCallback(
     (newProj: INewProject) => {
-      return (
-        post("/projects", newProj)
-          // do nothing with response
-          .then(() => {})
-          .catch(console.error)
-      );
+      loader.add();
+      return post("/projects", newProj)
+        .then((proj) => setProjects([...projects, proj]))
+        .catch((e) => {
+          toast.error(e);
+        })
+        .finally(loader.done);
     },
-    [post]
+    [post, loader]
   );
 
   useEffect(() => {

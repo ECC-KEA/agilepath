@@ -74,4 +74,13 @@ class StoryService(
 
         ctx.story.delete(entity)
     }
+
+    @Transactional(readOnly = true)
+    fun getStoriesByProjectId(projectId: UUID): List<Story> {
+        log.info("Fetching stories for project with id: $projectId")
+        if (!ctx.project.existsById(projectId)) {
+            throw ResourceNotFoundException("Project with ID $projectId not found")
+        }
+        return ctx.story.findAllByProjectId(projectId).map { it.toModel() }
+    }
 }

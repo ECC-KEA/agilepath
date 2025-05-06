@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
-@RequestMapping("/stories")
 @Validated
 @Tag(name = "Stories", description = "Endpoints related to Story management")
 class StoryController(
@@ -40,7 +39,7 @@ class StoryController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @PostMapping
+    @PostMapping("/stories")
     fun createStory(@Valid @RequestBody storyRequest: StoryRequest): StoryResponse {
         log.info("POST /stories - Create story")
         return storyApplication.createStory(storyRequest.toModel()).toDTO()
@@ -63,7 +62,7 @@ class StoryController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @GetMapping("/{id}")
+    @GetMapping("/stories/{id}")
     fun getStory(@PathVariable id: UUID): StoryResponse {
         log.info("GET /stories/{} - Get story", id)
         return storyApplication.getStory(id).toDTO()
@@ -86,7 +85,7 @@ class StoryController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @PutMapping("/{id}")
+    @PutMapping("/stories/{id}")
     fun updateStory(@PathVariable id: UUID, @Valid @RequestBody storyRequest: StoryRequest): StoryResponse {
         log.info("PUT /stories/{} - Update story", id)
         return storyApplication.updateStory(id, storyRequest.toModel()).toDTO()
@@ -109,9 +108,32 @@ class StoryController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/stories/{id}")
     fun deleteStory(@PathVariable id: UUID) {
         log.info("DELETE /stories/{} - Delete story", id)
         storyApplication.deleteStory(id)
+    }
+
+    @Operation(
+        summary = "Get all stories for a project",
+        description = "Returns a list of all stories associated with the specified project ID",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully returned list of stories"),
+            ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+            ApiResponse(
+                responseCode = "403",
+                description = "Forbidden – Authenticated but not allowed to access this project"
+            ),
+            ApiResponse(responseCode = "404", description = "Not Found – Project with specified ID does not exist"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    @GetMapping("/projects/{projectId}/stories")
+    fun getSprints(@PathVariable projectId: UUID): List<StoryResponse> {
+        log.info("GET /projects/{}/stories - Get stories for project", projectId)
+        return storyApplication.getStoriesByProjectId(projectId).map { it.toDTO() }
     }
 }
