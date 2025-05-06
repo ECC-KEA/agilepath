@@ -1,5 +1,7 @@
 package dev.ecckea.agilepath.backend.domain.story.model
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonTypeName
 import dev.ecckea.agilepath.backend.domain.user.model.User
 import java.time.Instant
 import java.util.*
