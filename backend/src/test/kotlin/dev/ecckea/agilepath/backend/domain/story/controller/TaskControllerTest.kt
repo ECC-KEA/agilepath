@@ -31,8 +31,8 @@ class TaskControllerTest : IntegrationTestBase() {
 
         assertThat(response.title).isEqualTo(request.title)
         assertThat(response.description).isEqualTo(request.description)
-        assertThat(response.estimateTshirt).isEqualTo(request.estimateTshirt)
-        assertThat(response.estimatePoints).isEqualTo(request.estimatePoints)
+        assertThat(response.estimateTshirt.toString()).isEqualTo(request.estimateTshirt)
+        assertThat(response.estimatePoints.toString()).isEqualTo(request.estimatePoints)
         assertThat(response.storyId).isEqualTo(request.storyId)
         assertThat(response.sprintColumnId).isEqualTo(request.sprintColumnId)
         assertThat(response.id).isNotNull()
@@ -73,8 +73,8 @@ class TaskControllerTest : IntegrationTestBase() {
         assertThat(updated.id).isEqualTo(created.id)
         assertThat(updated.title).isEqualTo(updateRequest.title)
         assertThat(updated.description).isEqualTo(updateRequest.description)
-        assertThat(updated.estimateTshirt).isEqualTo(updateRequest.estimateTshirt)
-        assertThat(updated.estimatePoints).isEqualTo(updateRequest.estimatePoints)
+        assertThat(updated.estimateTshirt.toString()).isEqualTo(updateRequest.estimateTshirt)
+        assertThat(updated.estimatePoints.toString()).isEqualTo(updateRequest.estimatePoints)
     }
 
     @Test
@@ -111,8 +111,8 @@ class TaskControllerTest : IntegrationTestBase() {
         sprintColumnId = sprintColumnId,
         title = title,
         description = description,
-        estimateTshirt = estimateTshirt,
-        estimatePoints = estimatePoints,
+        estimateTshirt = estimateTshirt.toString(),
+        estimatePoints = estimatePoints.toString(),
         assigneeIds = assigneeIds
     )
 
