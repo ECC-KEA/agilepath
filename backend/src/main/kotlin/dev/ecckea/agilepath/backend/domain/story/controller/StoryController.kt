@@ -11,11 +11,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/stories")
+@Validated
 @Tag(name = "Stories", description = "Endpoints related to Story management")
 class StoryController(
     private val storyApplication: StoryApplication
@@ -38,7 +41,7 @@ class StoryController(
         ]
     )
     @PostMapping
-    fun createStory(@RequestBody storyRequest: StoryRequest): StoryResponse {
+    fun createStory(@Valid @RequestBody storyRequest: StoryRequest): StoryResponse {
         log.info("POST /stories - Create story")
         return storyApplication.createStory(storyRequest.toModel()).toDTO()
     }
@@ -84,7 +87,7 @@ class StoryController(
         ]
     )
     @PutMapping("/{id}")
-    fun updateStory(@PathVariable id: UUID, @RequestBody storyRequest: StoryRequest): StoryResponse {
+    fun updateStory(@PathVariable id: UUID, @Valid @RequestBody storyRequest: StoryRequest): StoryResponse {
         log.info("PUT /stories/{} - Update story", id)
         return storyApplication.updateStory(id, storyRequest.toModel()).toDTO()
     }
