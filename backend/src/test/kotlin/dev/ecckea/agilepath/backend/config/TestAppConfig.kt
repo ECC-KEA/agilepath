@@ -4,7 +4,8 @@ import dev.ecckea.agilepath.backend.support.TestSecurityContextFilter
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.cache.CacheManager
-import org.springframework.cache.support.NoOpCacheManager
+import org.springframework.cache.annotation.EnableCaching
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -17,6 +18,7 @@ import java.time.Instant
 
 @TestConfiguration
 @Profile("test")
+@EnableCaching
 @Import(TestSecurityConfig::class)
 class TestAppConfig {
 
@@ -44,7 +46,43 @@ class TestAppConfig {
 
     @Bean
     @Primary
-    fun testCacheManager(): CacheManager = NoOpCacheManager()
+    fun testCacheManager(): CacheManager {
+        // Replace NoOpCacheManager with ConcurrentMapCacheManager
+        // that contains all the cache names used in your services
+        return ConcurrentMapCacheManager(
+            // SprintColumnService caches
+            "sprintColumns",
+            "sprintColumnsBySprint",
+
+            // ProjectService caches
+            "projects",
+            "projectsByUser",
+
+            // SprintService caches
+            "sprints",
+            "sprintsByProject",
+
+            // StoryService caches
+            "stories",
+            "storiesByProject",
+
+            // TaskService caches
+            "tasks",
+            "tasksByStory",
+
+            // SubtaskService caches
+            "subtasks",
+            "subtasksByTask",
+
+            // CommentService caches
+            "comments",
+            "commentsByTask",
+            "commentsByStory",
+
+            // UserService caches
+            "users"
+        )
+    }
 
     @Bean
     @Primary
