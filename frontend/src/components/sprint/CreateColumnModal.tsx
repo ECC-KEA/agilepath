@@ -23,7 +23,9 @@ export default function CreateColumnModal(props: CreateColumnModalProps) {
   }, [columnName]);
 
   const handleCreateColumn = async (name: string, columnStatus: ColumnStatus) => {
-    const endIndex = Math.max(...columns.map((c) => c.columnIndex)) + 1;
+    const endIndex = columns.length === 0 ? 0 : Math.max(...columns.map((c) => c.columnIndex)) + 1;
+    console.log(endIndex);
+
     const newColumn: INewColumn = {
       sprintId,
       name,
