@@ -11,12 +11,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/subtasks")
+@Validated
 @Tag(name = "Subtasks", description = "Endpoints related to Subtask management")
 class SubtaskController(
     private val subtaskApplication: SubtaskApplication
@@ -37,7 +40,7 @@ class SubtaskController(
         ]
     )
     @PostMapping
-    fun createSubtask(@RequestBody subtaskRequest: SubtaskRequest): SubtaskResponse {
+    fun createSubtask(@Valid @RequestBody subtaskRequest: SubtaskRequest): SubtaskResponse {
         log.info("POST /subtasks - Create subtask")
         return subtaskApplication.createSubtask(subtaskRequest.toModel()).toDTO()
     }
@@ -95,7 +98,7 @@ class SubtaskController(
         ]
     )
     @PutMapping("/{id}")
-    fun updateSubtask(@PathVariable id: UUID, @RequestBody subtaskRequest: SubtaskRequest): SubtaskResponse {
+    fun updateSubtask(@PathVariable id: UUID, @Valid @RequestBody subtaskRequest: SubtaskRequest): SubtaskResponse {
         log.info("PUT /subtasks/$id - Update subtask")
         return subtaskApplication.updateSubtask(id, subtaskRequest.toModel()).toDTO()
     }
