@@ -31,14 +31,14 @@ function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
     getSprints();
   }, [projectID]);
 
+  const contextValue = useMemo(() => ({
+    project,
+    sprints,
+    addSprint
+  }), [project, sprints, addSprint]);
+
   return (
-    <CurrentProjectContext.Provider
-      value={{
-        project,
-        sprints,
-        addSprint
-      }}
-    >
+    <CurrentProjectContext.Provider value={contextValue}>
       {props.children}
     </CurrentProjectContext.Provider>
   );

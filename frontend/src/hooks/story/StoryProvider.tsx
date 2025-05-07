@@ -7,9 +7,7 @@ import { useParams } from "react-router";
 function StoryProvider({ children }: Readonly<PropsWithChildren>) {
   const { projectID } = useParams();
   const { get, post } = useApi();
-  const [_stories, setStories] = useState<IStory[]>([]);
-
-  const stories = useMemo(() => _stories, [_stories]);
+  const [stories, setStories] = useState<IStory[]>([]);
 
   const getStories = useCallback(() => {
     return get(`/projects/${projectID}/stories`).then(setStories).catch(console.error);
@@ -28,16 +26,15 @@ function StoryProvider({ children }: Readonly<PropsWithChildren>) {
     void getStories();
   }, [projectID]);
 
-  return (
-    <StoryContext.Provider
-      value={{
-        stories,
-        createStory
-      }}
-    >
-      {children}
-    </StoryContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      stories,
+      createStory
+    }),
+    [stories, createStory]
   );
+
+  return <StoryContext.Provider value={contextValue}>{children}</StoryContext.Provider>;
 }
 
 export default StoryProvider;

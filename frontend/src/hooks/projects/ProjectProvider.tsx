@@ -8,14 +8,16 @@ import { useLoading } from "../utils/loading/useLoading";
 function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
   const loader = useLoading();
   const { get, post } = useApi();
-  const [_projects, setProjects] = useState<IProject[]>([]);
-
-  const projects = useMemo(() => _projects, [_projects]);
+  const [projects, setProjects] = useState<IProject[]>([]);
 
   const loadProjects = useCallback(() => {
     loader.add();
     return get("/projects")
-      .then(setProjects)
+      .then((res) => {
+        if (Array.isArray(res)) {
+          setProjects(res);
+        }
+      })
       .catch((e) => {
         toast.error(e);
       })
@@ -39,16 +41,15 @@ function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
     loadProjects();
   }, [loadProjects]);
 
-  return (
-    <ProjectContext.Provider
-      value={{
-        projects,
-        createProject
-      }}
-    >
-      {children}
-    </ProjectContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      projects,
+      createProject
+    }),
+    [projects, createProject]
   );
+
+  return <ProjectContext.Provider value={contextValue}>{children}</ProjectContext.Provider>;
 }
 
 export default ProjectProvider;

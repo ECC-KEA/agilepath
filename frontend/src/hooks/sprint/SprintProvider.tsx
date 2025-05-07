@@ -8,12 +8,11 @@ interface SprintProviderProps extends PropsWithChildren {
   sprintId: string;
 }
 
-function SprintProvider({ children, sprintId }: SprintProviderProps) {
+function SprintProvider({ children, sprintId }: Readonly<SprintProviderProps>) {
   const loader = useLoading();
   const { get } = useApi();
-  const [_sprint, setSprint] = useState<ISprint>();
+  const [sprint, setSprint] = useState<ISprint>();
 
-  const sprint = useMemo(() => _sprint, [_sprint]);
 
   const loadSprint = useCallback(async () => {
     loader.add();
@@ -24,13 +23,13 @@ function SprintProvider({ children, sprintId }: SprintProviderProps) {
     loadSprint();
   }, [loadSprint]);
 
+  const contextValue = useMemo(() => ({
+    sprint,
+    sprintId
+  }), [sprint, sprintId]);
+
   return (
-    <SprintContext.Provider
-      value={{
-        sprint,
-        sprintId
-      }}
-    >
+    <SprintContext.Provider value={contextValue}>
       {children}
     </SprintContext.Provider>
   );

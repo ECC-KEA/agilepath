@@ -7,9 +7,7 @@ import { useApi } from "../utils/useApi";
 function TaskProvider({ children }: Readonly<PropsWithChildren>) {
   const { columns } = useColumn();
   const { get, post } = useApi();
-  const [_tasks, setTasks] = useState<ITask[]>([]);
-
-  const tasks = useMemo(() => _tasks, [_tasks]);
+  const [tasks, setTasks] = useState<ITask[]>([]);
 
   const getAllSprintTasks = useCallback(() => {
     const t: ITask[] = [];
@@ -37,16 +35,15 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
     [post]
   );
 
-  return (
-    <TaskContext.Provider
-      value={{
-        tasks,
-        createTask
-      }}
-    >
-      {children}
-    </TaskContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      tasks,
+      createTask
+    }),
+    [tasks, createTask]
   );
+
+  return <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>;
 }
 
 export default TaskProvider;
