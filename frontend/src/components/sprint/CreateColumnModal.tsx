@@ -1,11 +1,12 @@
 import useSprint from "../../hooks/sprint/useSprint";
 import useColumn from "../../hooks/column/useColumn";
-import { ColumnStatus, INewColumn } from "../../types/column.types";
+import { INewColumn } from "../../types/column.types";
 import { useMemo, useState } from "react";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Modal from "../generic/Modal";
 import CustomSelect from "../generic/select/CustomSelect";
 import Input from "../generic/inputs/Input";
+import { Status } from "../../types/story.types";
 
 interface CreateColumnModalProps {
   show: boolean;
@@ -13,17 +14,20 @@ interface CreateColumnModalProps {
 }
 
 export default function CreateColumnModal(props: CreateColumnModalProps) {
-  const [columnName, setColumnName] = useState<string>("");
-  const [columnStatus, setColumnStatus] = useState<ColumnStatus>(ColumnStatus.TODO);
+  const [name, setName] = useState<string>("");
+  const [columnStatus, setColumnStatus] = useState<Status>(Status.TODO);
   const { sprintId } = useSprint();
   const { createColumn, columns } = useColumn();
 
   const disableCreate = useMemo(() => {
-    return columnName === "";
-  }, [columnName]);
+    return name === "";
+  }, [name]);
 
-  const handleCreateColumn = async (name: string, columnStatus: ColumnStatus) => {
-    const endIndex = Math.max(...columns.map((c) => c.columnIndex)) + 1;
+  console.log(columns);
+
+  const handleCreateColumn = async () => {
+    const endIndex = columns.length === 0 ? 0 : Math.max(...columns.map((c) => c.columnIndex)) + 1;
+
     const newColumn: INewColumn = {
       sprintId,
       name,
@@ -42,16 +46,24 @@ export default function CreateColumnModal(props: CreateColumnModalProps) {
           To do <span className="italic text-ap-onyx-200">Auto-open tasks</span>
         </span>
       ),
-      value: ColumnStatus.TODO
+      value: Status.TODO
     },
-    { label: <span>In progress</span>, value: ColumnStatus.IN_PROGRESS },
+    { label: <span>In progress</span>, value: Status.IN_PROGRESS },
     {
       label: (
         <span>
           Done <span className="text-ap-onyx-200 italic">Auto-close tasks</span>
         </span>
       ),
-      value: ColumnStatus.DONE
+      value: Status.DONE
+    },
+    {
+      label: (
+        <span>
+          Archived <span className="text-ap-onyx-200 italic">Auto archive tasks</span>
+        </span>
+      ),
+      value: Status.ARCHIVED
     }
   ];
 
@@ -61,7 +73,7 @@ export default function CreateColumnModal(props: CreateColumnModalProps) {
       show={props.show}
       onClose={props.onClose}
       onAction={() => {
-        handleCreateColumn(columnName, columnStatus);
+        handleCreateColumn();
         props.onClose();
       }}
       actionText="Create"
@@ -73,8 +85,8 @@ export default function CreateColumnModal(props: CreateColumnModalProps) {
           <Input
             type="text"
             placeholder="Column Name"
-            value={columnName}
-            onChange={(e) => setColumnName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </div>
         <div className="flex flex-col">

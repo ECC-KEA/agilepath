@@ -39,6 +39,16 @@ export interface ITask {
   assignees: IUser[];
 }
 
+export interface INewTask {
+  storyId: string;
+  sprintColumnId: string;
+  title: string;
+  description?: string;
+  estimateTshirt?: TshirtEstimate;
+  estimatePoints?: PointEstimate;
+  assigneeIds: string[];
+}
+
 export interface ISubTask {
   id: string;
   content: string;
@@ -66,4 +76,19 @@ export enum PointEstimate {
   POINT_8 = 8,
   POINT_13 = 13,
   POINT_21 = 21
+}
+
+export interface INewStory {
+  projectId: string;
+  title: string;
+  description?: string;
+  status: string;
+  priority: number;
+}
+
+export enum Status {
+  DONE = "DONE",
+  TODO = "TODO",
+  ARCHIVED = "ARCHIVED",
+  IN_PROGRESS = "IN_PROGRESS"
 }

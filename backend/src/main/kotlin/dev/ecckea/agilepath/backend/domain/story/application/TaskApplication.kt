@@ -1,5 +1,7 @@
 package dev.ecckea.agilepath.backend.domain.story.application
 
+import dev.ecckea.agilepath.backend.domain.column.service.SprintColumnService
+import dev.ecckea.agilepath.backend.domain.sprint.service.SprintService
 import dev.ecckea.agilepath.backend.domain.story.model.NewTask
 import dev.ecckea.agilepath.backend.domain.story.model.Task
 import dev.ecckea.agilepath.backend.domain.story.service.CommentService
@@ -18,7 +20,7 @@ class TaskApplication(
     private val userService: UserService,
     private val taskAssigneeService: TaskAssigneeService,
     private val commentService: CommentService,
-    private val subtaskService: SubtaskService
+    private val subtaskService: SubtaskService,
 ) : Logged() {
 
     fun createTask(newTask: NewTask): Task {
@@ -47,6 +49,11 @@ class TaskApplication(
             comments = comments.map { it },
             assignees = assignees
         )
+    }
+
+    fun getSprintColumnTasks(sprintColumnId: UUID): List<Task> {
+        log.info("Getting tasks for sprint column with id: {}", sprintColumnId)
+        return taskService.getTasksBySprintColumn(sprintColumnId)
     }
 
     fun updateTask(id: UUID, newTask: NewTask): Task {

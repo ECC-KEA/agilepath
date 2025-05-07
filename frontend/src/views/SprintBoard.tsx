@@ -4,6 +4,7 @@ import CreateColumnModal from "../components/sprint/CreateColumnModal";
 import Column from "../components/sprint/Column";
 import useColumn from "../hooks/column/useColumn";
 import { useState } from "react";
+import Input from "../components/generic/inputs/Input";
 
 function SprintBoard() {
   const { columns } = useColumn();
@@ -11,20 +12,18 @@ function SprintBoard() {
 
   return (
     <div className="sprint-board w-full">
-      <div className="flex flex-row w-full h-full">
+      <div className="flex w-full h-full">
         <div className="flex flex-col w-full h-full p-4 gap-4">
-          <input
-            className="w-72 h-8 ml-4 pl-4 border border-ap-onyx-200 rounded-md"
+          <Input
+            className="w-72"
             placeholder="Search..."
           />
-          <div className="flex flex-row justify-center gap-6 w-full h-full ">
+          <div className="flex gap-6 w-full h-full ">
             {columns.map((column) => (
-              <div
-                key={column.id}
-                className="flex-1 m-4 text-center  border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400"
-              >
-                <Column column={column} />
-              </div>
+              <Column
+                column={column}
+                key={column.id + "-sprintcol"}
+              />
             ))}
             <FaPlus
               className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"

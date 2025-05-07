@@ -1,13 +1,9 @@
-export enum ColumnStatus {
-  TODO = "TODO",
-  IN_PROGRESS = "IN_PROGRESS",
-  DONE = "DONE"
-}
+import { Status } from "./story.types";
 
 export interface INewColumn {
   sprintId: string;
   name: string;
-  columnStatus: ColumnStatus;
+  columnStatus: Status;
   columnIndex: number;
 }
 
@@ -15,6 +11,6 @@ export interface IColumn {
   id: string;
   sprintId: string;
   name: string;
-  columnStatus: ColumnStatus;
+  status: Status;
   columnIndex: number;
 }
