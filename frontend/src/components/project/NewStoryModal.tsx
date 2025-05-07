@@ -57,7 +57,7 @@ function NewStoryModal(props: Readonly<NewStoryModalProps>) {
           <TextArea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Sprint goal"
+            placeholder="Story description"
             className="w-full"
           />
         </div>
