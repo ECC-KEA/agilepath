@@ -8,12 +8,10 @@ interface ColumnProviderProps extends PropsWithChildren {
   sprintId: string | undefined;
 }
 
-function ColumnProvider({ children, sprintId }: ColumnProviderProps) {
+function ColumnProvider({ children, sprintId }: Readonly<ColumnProviderProps>) {
   const loader = useLoading();
   const { get, post, del } = useApi();
-  const [_columns, setColumns] = useState<IColumn[]>([]);
-
-  const columns = useMemo(() => _columns, [_columns]);
+  const [columns, setColumns] = useState<IColumn[]>([]);
 
   const loadColumns = useCallback(async () => {
     loader.add();
@@ -46,15 +44,15 @@ function ColumnProvider({ children, sprintId }: ColumnProviderProps) {
     loadColumns();
   }, [loadColumns]);
 
+  const contextValue = useMemo(() => ({
+    columns,
+    loadColumns,
+    createColumn,
+    deleteColumn
+  }), [columns, loadColumns, createColumn, deleteColumn]);
+
   return (
-    <ColumnContext.Provider
-      value={{
-        columns,
-        loadColumns,
-        createColumn,
-        deleteColumn
-      }}
-    >
+    <ColumnContext.Provider value={contextValue}>
       {children}
     </ColumnContext.Provider>
   );

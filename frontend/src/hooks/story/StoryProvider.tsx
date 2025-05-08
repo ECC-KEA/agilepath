@@ -1,33 +1,40 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
-import useCurrentProject from "../projects/useCurrentProject";
-import { IStory } from "../../types/story.types";
+import { INewStory, IStory } from "../../types/story.types";
 import StoryContext from "./StoryContext";
 import { useApi } from "../utils/useApi";
+import { useParams } from "react-router";
 
 function StoryProvider({ children }: Readonly<PropsWithChildren>) {
-  const { project } = useCurrentProject();
-  const { get } = useApi();
-  const [_stories, setStories] = useState<IStory[]>([]);
-
-  const stories = useMemo(() => _stories, [_stories]);
+  const { projectID } = useParams();
+  const { get, post } = useApi();
+  const [stories, setStories] = useState<IStory[]>([]);
 
   const getStories = useCallback(() => {
-    return get(`/projects/${project?.id}/stories`).then(setStories).catch(console.error);
-  }, [get, project]);
+    return get(`/projects/${projectID}/stories`).then(setStories).catch(console.error);
+  }, [get, projectID]);
+
+  const createStory = useCallback(
+    (story: INewStory) => {
+      return post(`/stories`, story)
+        .then((res) => setStories((prev) => [...prev, res]))
+        .catch(console.error);
+    },
+    [post]
+  );
 
   useEffect(() => {
     void getStories();
-  }, [project]);
+  }, [projectID]);
 
-  return (
-    <StoryContext.Provider
-      value={{
-        stories
-      }}
-    >
-      {children}
-    </StoryContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      stories,
+      createStory
+    }),
+    [stories, createStory]
   );
+
+  return <StoryContext.Provider value={contextValue}>{children}</StoryContext.Provider>;
 }
 
 export default StoryProvider;

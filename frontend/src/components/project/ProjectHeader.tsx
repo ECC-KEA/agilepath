@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
-import { NavLink, To, useNavigate } from "react-router";
+import { NavLink, To, useNavigate, useParams } from "react-router";
+import ShowIf from "../generic/ShowIf";
 
 interface ProjectHeaderProps {
   projectName: string;
@@ -8,6 +9,11 @@ interface ProjectHeaderProps {
 
 function ProjectHeader(props: Readonly<ProjectHeaderProps>) {
   const navigate = useNavigate();
+  const { projectID, sprintId } = useParams();
+  const basePath = sprintId
+    ? `/projects/${projectID}/sprint/${sprintId}`
+    : `/projects/${projectID}`;
+
   return (
     <div className="bg-ap-onyx-50/20 border-b border-ap-onyx-200">
       <div className="flex flex-row items-center justify-start gap-2 p-4 text-ap-onyx-500">
@@ -18,9 +24,11 @@ function ProjectHeader(props: Readonly<ProjectHeaderProps>) {
         <h1 className="text-2xl">{props.projectName}</h1>
       </div>
       <div className="flex flex-row gap-2 pl-58">
-        <HeaderLink to="overview">board</HeaderLink>
-        <HeaderLink to="stats">stats</HeaderLink>
-        <HeaderLink to="members">members</HeaderLink>
+        <HeaderLink to={`${basePath}/overview`}>board</HeaderLink>
+        <HeaderLink to={`${basePath}/stats`}>stats</HeaderLink>
+        <ShowIf if={!sprintId}>
+          <HeaderLink to={`${basePath}/members`}>members</HeaderLink>
+        </ShowIf>
       </div>
     </div>
   );

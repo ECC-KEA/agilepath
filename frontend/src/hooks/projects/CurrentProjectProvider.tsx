@@ -3,22 +3,20 @@ import useProjects from "./useProjects";
 import { INewSprint, ISprint } from "../../types/sprint.types";
 import { useApi } from "../utils/useApi";
 import CurrentProjectContext from "./CurrentProjectContext";
+import { useParams } from "react-router";
 
-interface CurrentProjectProviderProps extends PropsWithChildren {
-  projectID: string;
-}
-
-function CurrentProjectProvider(props: Readonly<CurrentProjectProviderProps>) {
+function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
+  const { projectID } = useParams();
   const { get, post } = useApi();
   const { projects } = useProjects();
   const project = useMemo(() => {
-    return projects.find((p) => p.id === props.projectID);
-  }, [projects, props.projectID]);
+    return projects.find((p) => p.id === projectID);
+  }, [projects, projectID]);
   const [sprints, setSprints] = useState<ISprint[]>([]);
 
   const getSprints = useCallback(() => {
-    get(`/projects/${props.projectID}/sprints`).then(setSprints).catch(console.error);
-  }, [props.projectID]);
+    get(`/projects/${projectID}/sprints`).then(setSprints).catch(console.error);
+  }, [projectID]);
 
   const addSprint = useCallback(
     (newSprint: INewSprint) => {
@@ -26,21 +24,21 @@ function CurrentProjectProvider(props: Readonly<CurrentProjectProviderProps>) {
         .then((sprint) => setSprints((prev) => [...prev, sprint]))
         .catch(console.error);
     },
-    [props.projectID]
+    [projectID]
   );
 
   useEffect(() => {
     getSprints();
-  }, [props.projectID]);
+  }, [projectID]);
+
+  const contextValue = useMemo(() => ({
+    project,
+    sprints,
+    addSprint
+  }), [project, sprints, addSprint]);
 
   return (
-    <CurrentProjectContext.Provider
-      value={{
-        project,
-        sprints,
-        addSprint
-      }}
-    >
+    <CurrentProjectContext.Provider value={contextValue}>
       {props.children}
     </CurrentProjectContext.Provider>
   );

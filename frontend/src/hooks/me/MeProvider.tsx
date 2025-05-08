@@ -7,9 +7,7 @@ import { useLoading } from "../utils/loading/useLoading";
 function MeProvider({ children }: Readonly<PropsWithChildren>) {
   const loader = useLoading();
   const { fetchWithAuth } = useApi();
-  const [_me, setMe] = useState<IUser>();
-
-  const me = useMemo(() => _me, [_me]);
+  const [me, setMe] = useState<IUser>();
 
   useEffect(() => {
     loader.add();
@@ -19,11 +17,14 @@ function MeProvider({ children }: Readonly<PropsWithChildren>) {
       .finally(loader.done);
   }, [fetchWithAuth]);
 
+  const contextVal = useMemo(() => ({
+    me
+  }), [me]);
+
+
   return (
     <MeContext.Provider
-      value={{
-        me
-      }}
+      value={contextVal}
     >
       {children}
     </MeContext.Provider>

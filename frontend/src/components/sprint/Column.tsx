@@ -3,6 +3,15 @@ import { FaPlus } from "react-icons/fa6";
 import { TiDelete } from "react-icons/ti";
 import useColumn from "../../hooks/column/useColumn";
 import { notifyError, notifySuccess } from "../../helpers/notify";
+import useTask from "../../hooks/task/useTask";
+import { useMemo, useState } from "react";
+import TaskBox from "./TaskBox";
+import Button from "../generic/buttons/Button";
+import AddTaskPopper from "./AddTaskPopper";
+import { useOutsideClick } from "../../hooks/utils/useOutsideClick";
+import ShowIf from "../generic/ShowIf";
+import ExistingTaskModal from "./ExistingTaskModal";
+import NewTaskModal from "./NewTaskModal";
 
 interface IColumnProps {
   column: IColumn;
@@ -10,6 +19,13 @@ interface IColumnProps {
 
 export default function Column({ column }: IColumnProps) {
   const { deleteColumn } = useColumn();
+  const { tasks } = useTask();
+  const [showAddExistingTaskModal, setShowAddExistingTaskModal] = useState<boolean>(false);
+  const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState<boolean>(false);
+
+  const colTasks = useMemo(() => {
+    return tasks.filter((t) => t.sprintColumnId === column.id);
+  }, [tasks, column]);
 
   const handleDeleteColumn = async () => {
     deleteColumn(column.id)
@@ -18,27 +34,77 @@ export default function Column({ column }: IColumnProps) {
   };
 
   return (
-    <div className="flex flex-col h-full justify-between pb-2 relative">
-      {/* Delete Column Button (X) at the top right of the column */}
-      <div
-        className="absolute top-2 right-2 text-3xl cursor-pointer"
-        onClick={() => handleDeleteColumn()}
-      >
-        <TiDelete className="text-red-500" />
+    <div className="flex flex-col h-[calc(100vh-250px)] justify-between pb-2 flex-1 text-center border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400 max-w-96">
+      <div className="flex items-center justify-between p-2 border-b border-ap-onyx-50/50">
+        <div className="w-8"></div>
+        <div className="text-xl">{column.name}</div>
+        <div
+          className="text-3xl cursor-pointer"
+          onClick={() => handleDeleteColumn()}
+        >
+          <TiDelete className="text-red-500" />
+        </div>
       </div>
 
-      <div className="text-xl">{column.name}</div>
-
-      <div className="flex-grow">
-        <div>Task1</div>
-        <div>Task2</div>
-        <div>Task3</div>
+      <div className="h-full overflow-y-auto p-2">
+        {colTasks.map((t) => (
+          <TaskBox
+            key={t.id + "-sprinttask"}
+            task={t}
+            column={column}
+          />
+        ))}
       </div>
 
-      <div className="inline-flex justify-center items-center text-xl border border-ap-onyx-200 rounded-md px-4 py-1 max-w-max m-auto cursor-pointer">
-        <FaPlus className="text-ap-lavender-800" />
-        <div className="pl-1">Add</div>
+      <div className="p-2 border-t border-ap-onyx-50/50">
+        <AddTaskButton
+          onAddExistingClick={() => setShowAddExistingTaskModal(true)}
+          onCreateNewClick={() => setShowCreateNewTaskModal(true)}
+        />
       </div>
+      <ShowIf if={showAddExistingTaskModal}>
+        <ExistingTaskModal
+          column={column}
+          show={showAddExistingTaskModal}
+          onClose={() => setShowAddExistingTaskModal(false)}
+        />
+      </ShowIf>
+      <ShowIf if={showCreateNewTaskModal}>
+        <NewTaskModal
+          column={column}
+          show={showCreateNewTaskModal}
+          onClose={() => setShowCreateNewTaskModal(false)}
+        />
+      </ShowIf>
+    </div>
+  );
+}
+
+interface AddTaskButtonProps {
+  onCreateNewClick: () => void;
+  onAddExistingClick: () => void;
+}
+
+function AddTaskButton(props: Readonly<AddTaskButtonProps>) {
+  const [popperAnchorEl, setPopperAnchorEl] = useState<null | HTMLElement>(null);
+  const outsideClickRef = useOutsideClick(() => setPopperAnchorEl(null));
+  return (
+    <div ref={outsideClickRef}>
+      <Button
+        text={
+          <span className="flex gap-1 items-center">
+            <FaPlus className="text-ap-lavender-800" />
+            Add
+          </span>
+        }
+        className="bg-white shadow border border-ap-onyx-50 px-4"
+        onClick={(e) => setPopperAnchorEl(popperAnchorEl ? null : e.currentTarget)}
+      />
+      <AddTaskPopper
+        anchorEl={popperAnchorEl}
+        onAddExistingClick={props.onAddExistingClick}
+        onCreateNewClick={props.onCreateNewClick}
+      />
     </div>
   );
 }

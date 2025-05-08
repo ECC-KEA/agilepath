@@ -1,8 +1,9 @@
 import { createContext } from "react";
-import { IStory } from "../../types/story.types";
+import { INewStory, IStory } from "../../types/story.types";
 
 interface IStoryContext {
   stories: IStory[];
+  createStory: (story: INewStory) => Promise<void>;
 }
 
 const StoryContext = createContext<IStoryContext | undefined>(undefined);

@@ -2,6 +2,7 @@ import { Outlet, useParams } from "react-router";
 import SprintProvider from "../hooks/sprint/SprintProvider";
 import ColumnProvider from "../hooks/column/ColumnProvider";
 import useCurrentProject from "../hooks/projects/useCurrentProject";
+import TaskProvider from "../hooks/task/TaskProvider";
 
 function Sprint() {
   const { sprintId } = useParams();
@@ -15,7 +16,9 @@ function Sprint() {
   return (
     <SprintProvider sprintId={sprintId}>
       <ColumnProvider sprintId={sprintId}>
-        <Outlet />
+        <TaskProvider>
+          <Outlet />
+        </TaskProvider>
       </ColumnProvider>
     </SprintProvider>
   );

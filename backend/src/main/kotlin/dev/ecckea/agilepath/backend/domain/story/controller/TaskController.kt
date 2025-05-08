@@ -16,9 +16,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import kotlin.collections.List
 
 @RestController
-@RequestMapping("/tasks")
 @Validated
 @Tag(name = "Tasks", description = "Endpoints related to Task management")
 class TaskController(
@@ -42,7 +42,8 @@ class TaskController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @PostMapping
+
+    @PostMapping("/tasks")
     fun createTask(@Valid @RequestBody taskRequest: TaskRequest): TaskResponse {
         log.info("POST /tasks - Create task")
         return taskApplication.createTask(taskRequest.toModel()).toDTO()
@@ -65,10 +66,32 @@ class TaskController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @GetMapping("/{id}")
+    @GetMapping("/tasks/{id}")
     fun getTask(@PathVariable id: UUID): TaskResponse {
         log.info("GET /tasks/$id - Get task by ID")
         return taskApplication.getTask(id).toDTO()
+    }
+
+    @Operation(
+        summary = "Get tasks by sprint column ID",
+        description = "Returns the tasks with details for the specified sprint column ID",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully returned tasks"),
+            ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+            ApiResponse(
+                responseCode = "403",
+                description = "Forbidden – Authenticated but not allowed to access this task"
+            ),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    @GetMapping("/sprint-columns/{sprintColumnID}/tasks")
+    fun getSprintColumnTasks(@PathVariable sprintColumnID: UUID): List<TaskResponse> {
+        log.info("GET /sprint-columns/$sprintColumnID/tasks - Get tasks by sprint column ID")
+        return taskApplication.getSprintColumnTasks(sprintColumnID).map { it.toDTO() }
     }
 
     @Operation(
@@ -88,7 +111,7 @@ class TaskController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @PutMapping("/{id}")
+    @PutMapping("/tasks/{id}")
     fun updateTask(@PathVariable id: UUID, @Valid @RequestBody taskRequest: TaskRequest): TaskResponse {
         log.info("PUT /tasks/$id - Update task")
         return taskApplication.updateTask(id, taskRequest.toModel()).toDTO()
@@ -111,7 +134,7 @@ class TaskController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/tasks/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteTask(@PathVariable id: UUID) {
         log.info("DELETE /tasks/$id - Delete task")

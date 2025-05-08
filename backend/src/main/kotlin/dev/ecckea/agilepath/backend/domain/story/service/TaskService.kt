@@ -1,5 +1,9 @@
 package dev.ecckea.agilepath.backend.domain.story.service
 
+import dev.ecckea.agilepath.backend.domain.column.model.SprintColumn
+import dev.ecckea.agilepath.backend.domain.column.model.mapper.toEntity
+import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toEntity
+import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
 import dev.ecckea.agilepath.backend.domain.story.model.NewTask
 import dev.ecckea.agilepath.backend.domain.story.model.Task
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
@@ -42,6 +46,13 @@ class TaskService(
     fun getTask(id: UUID): Task {
         return ctx.task.findOneById(id)?.toModel()
             ?: throw ResourceNotFoundException("Task with id $id not found")
+    }
+
+    @Transactional(readOnly = true)
+    fun getTasksBySprintColumn(sprintColumnID: UUID): List<Task> {
+        val sprintColumnEntity = ctx.sprintColumn.findOneById(sprintColumnID)
+            ?: throw ResourceNotFoundException("Sprint column with id $sprintColumnID not found")
+        return ctx.task.findBySprintColumn(sprintColumnEntity).map { it.toModel() }
     }
 
     @Transactional(readOnly = true)
