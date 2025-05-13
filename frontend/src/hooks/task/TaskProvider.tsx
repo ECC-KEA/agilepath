@@ -6,7 +6,7 @@ import { useApi } from "../utils/useApi";
 
 function TaskProvider({ children }: Readonly<PropsWithChildren>) {
   const { columns } = useColumn();
-  const { get, post } = useApi();
+  const { get, post, put } = useApi();
   const [tasks, setTasks] = useState<ITask[]>([]);
 
   const getAllSprintTasks = useCallback(() => {
@@ -35,12 +35,22 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
     [post]
   );
 
+  const updateTask = useCallback(
+    (task: ITask) => {
+      return put(`/tasks/${task.id}`, task)
+        .then((res) => setTasks((prev) => prev.map((t) => (t.id === res.id ? res : t))))
+        .catch(console.error);
+    },
+    [put]
+  );
+
   const contextValue = useMemo(
     () => ({
       tasks,
-      createTask
+      createTask,
+      updateTask
     }),
-    [tasks, createTask]
+    [tasks, createTask, updateTask]
   );
 
   return <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>;
