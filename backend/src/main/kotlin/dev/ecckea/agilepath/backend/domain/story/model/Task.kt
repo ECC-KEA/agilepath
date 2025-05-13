@@ -1,11 +1,9 @@
 package dev.ecckea.agilepath.backend.domain.story.model
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import dev.ecckea.agilepath.backend.domain.user.model.User
 import java.time.Instant
 import java.util.*
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 data class Task(
     val id: UUID,
     val storyId: UUID,
