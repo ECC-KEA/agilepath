@@ -5,7 +5,16 @@ import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
-
+/**
+ * Service that provides a logging wrapper around Redis cache operations.
+ *
+ * This service enhances the underlying [RedisCacheService] by adding consistent
+ * logging for all cache operations (hits, misses, storage, and invalidation),
+ * making it easier to track and debug cache behavior in the application.
+ *
+ * Not active in the "test" profile to allow for different caching strategies
+ * during testing.
+ */
 @Component
 @Profile("!test")
 class CacheService(
@@ -13,13 +22,14 @@ class CacheService(
 ) : Logged() {
 
     /**
-     * Generic method to retrieve an item from cache with logging.
+     * Generic method to retrieve a single object from cache with hit/miss logging.
      *
-     * @param key The cache key
-     * @param clazz The class type of the cached object
-     * @param idForLogging An identifier used in log messages
-     * @return The cached object if found, null otherwise
+     * @param key Cache key for the object
+     * @param clazz Type of object to retrieve
+     * @param idForLogging Descriptive identifier used in logs
+     * @return The cached object or null if not found
      */
+
     fun <T> getFromCache(key: String, clazz: Class<T>, idForLogging: String): T? {
         return redisCache.get(key, clazz)?.also {
             log.info("Cache hit for $idForLogging")
@@ -30,7 +40,7 @@ class CacheService(
     }
 
     /**
-     * Generic method to retrieve a list from cache with logging.
+     * Generic method to retrieve a list from cache with hit/miss logging.
      *
      * @param key The cache key
      * @param typeRef The type reference for the list
