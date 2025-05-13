@@ -26,6 +26,18 @@ export const useApi = () => {
     return fetch(API_URL + url, { ...options });
   };
 
+  const fetchOpenAI = async (url: string, options: RequestInit = {}) => {
+    const token = "";
+    console.log("token", token);
+    console.log("all env vars", import.meta.env);
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`
+    };
+
+    return fetch(url, { ...options, headers });
+  }
+
   const get = useCallback(
     (url: string) =>
       fetchWithAuth(url)
@@ -65,5 +77,19 @@ export const useApi = () => {
     [fetchWithAuth]
   );
 
-  return { fetchWithAuth, fetchNoAuth, get, put, post, del, api_url: API_URL };
+  const postOpenAI = useCallback(
+    (url: string, data: unknown) =>
+      fetchOpenAI(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+        .then(res => res.json())
+        .catch(console.error),
+    [fetchOpenAI]
+  );
+
+  return { fetchWithAuth, fetchNoAuth, get, put, post, del, postOpenAI, api_url: API_URL };
 };

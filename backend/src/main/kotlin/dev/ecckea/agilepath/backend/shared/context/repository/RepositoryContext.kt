@@ -1,5 +1,6 @@
 package dev.ecckea.agilepath.backend.shared.context.repository
 
+import dev.ecckea.agilepath.backend.domain.assistant.repository.AssistantRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
@@ -18,4 +19,5 @@ class RepositoryContext(
     val taskAssinee: TaskAssigneeRepository,
     val subtask: SubtaskRepository,
     val comment: CommentRepository,
+    val assistant: AssistantRepository,
     )
