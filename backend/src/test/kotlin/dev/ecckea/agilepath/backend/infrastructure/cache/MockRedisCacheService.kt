@@ -1,28 +1,37 @@
 package dev.ecckea.agilepath.backend.infrastructure.cache
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap
 
-/**
- * In-memory implementation of RedisCacheService for testing.
- */
 @Component
 @Profile("test")
 @Primary
-class MockRedisCacheService : RedisCacheService(DummyRedisTemplate()) {
+class MockRedisCacheService(
+    private val objectMapper: ObjectMapper
+) : RedisCacheService(DummyRedisTemplate(), objectMapper) {
 
-    private val cache = ConcurrentHashMap<String, Any>()
+    private val cache = ConcurrentHashMap<String, String>()
 
-    override fun <T> get(key: String): T? {
-        @Suppress("UNCHECKED_CAST")
-        return cache[key] as? T
+    override fun <T> get(key: String, clazz: Class<T>): T? {
+        val json = cache[key] ?: return null
+        return objectMapper.readValue(json, clazz)
+    }
+
+    override fun <T> getList(key: String, typeRef: TypeReference<T>): T? {
+        val json = cache[key] ?: return null
+        val javaType = objectMapper.typeFactory.constructType(typeRef)
+        return objectMapper.readValue(json, javaType)
     }
 
     override fun set(key: String, value: Any, ttlMinutes: Long) {
-        cache[key] = value
+        val json = objectMapper.writeValueAsString(value)
+        cache[key] = json
+        // TTL is ignored in test/mock
     }
 
     override fun delete(key: String) {
@@ -30,7 +39,7 @@ class MockRedisCacheService : RedisCacheService(DummyRedisTemplate()) {
     }
 
     override fun deleteByPattern(pattern: String) {
-        val keysToRemove = cache.keys().toList().filter { it.startsWith(pattern) }
+        val keysToRemove = cache.keys.filter { it.startsWith(pattern) }
         keysToRemove.forEach { cache.remove(it) }
     }
 
@@ -40,7 +49,6 @@ class MockRedisCacheService : RedisCacheService(DummyRedisTemplate()) {
 }
 
 /**
- * Dummy implementation of RedisTemplate for testing purposes.
- * None of its methods will be called as the MockRedisCacheService overrides all methods that use it.
+ * Dummy RedisTemplate, never used because all Redis operations are mocked.
  */
-class DummyRedisTemplate : RedisTemplate<String, Any>()
+class DummyRedisTemplate : RedisTemplate<String, String>()
