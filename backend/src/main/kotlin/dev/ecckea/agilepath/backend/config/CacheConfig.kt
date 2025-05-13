@@ -4,60 +4,44 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.Cache
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.cache.interceptor.SimpleCacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
-import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import java.time.Duration
 
-/**
- * Configures Spring Cache using Redis as the underlying cache backend.
- */
+
 @Configuration
 @Profile("!test")
-@EnableCaching
 class CacheConfig(
     @Qualifier("redisCacheObjectMapper") private val redisCacheObjectMapper: ObjectMapper,
 ) : Logged() {
+
     /**
-     * Configures the primary CacheManager bean using Redis as the backing store.
-     *
-     * This method sets up a RedisCacheManager with the following configurations:
-     * - A default Time-To-Live (TTL) of 15 minutes for cache entries.
-     * - String serialization for cache keys.
-     * - JSON serialization for cache values using a custom ObjectMapper.
-     *
-     * @param connectionFactory the RedisConnectionFactory used to establish connections to the Redis server.
-     * @return a configured instance of CacheManager for managing application caches.
+     * Configures a RedisTemplate bean for direct Redis operations.
+     * Used by the RedisCacheService for explicit cache management.
      */
     @Bean
-    fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
+    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
+        val template = RedisTemplate<String, Any>()
         val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
 
-        val config = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(15))
-            .serializeKeysWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
-            )
-            .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(serializer)
-            )
-
-        return RedisCacheManager.builder(connectionFactory)
-            .cacheDefaults(config)
-            .build()
+        template.connectionFactory = connectionFactory
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = serializer
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = serializer
+        template.afterPropertiesSet()
+        return template
     }
 
+    /**
+     * Provides error handling for cache operations.
+     */
     @Bean
     fun cacheErrorHandler(): CacheErrorHandler {
         return object : SimpleCacheErrorHandler() {
@@ -97,30 +81,5 @@ class CacheConfig(
                 super.handleCacheClearError(exception, cache)
             }
         }
-    }
-
-    /**
-     * Configures a RedisTemplate bean for direct access to Redis.
-     *
-     * This method sets up a RedisTemplate with the following configurations:
-     * - String serialization for keys and hash keys.
-     * - JSON serialization for values and hash values using a custom ObjectMapper.
-     * - The provided RedisConnectionFactory is used to establish connections to the Redis server.
-     *
-     * @param connectionFactory the RedisConnectionFactory used to connect to the Redis server.
-     * @return a configured instance of RedisTemplate for interacting with Redis.
-     */
-    @Bean
-    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
-        val template = RedisTemplate<String, Any>()
-        val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
-
-        template.connectionFactory = connectionFactory
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = serializer
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = serializer
-        template.afterPropertiesSet()
-        return template
     }
 }
