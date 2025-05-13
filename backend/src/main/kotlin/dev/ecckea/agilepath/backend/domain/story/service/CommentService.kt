@@ -5,13 +5,12 @@ import dev.ecckea.agilepath.backend.domain.story.model.NewComment
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
+import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.exceptions.ValidationException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -19,26 +18,46 @@ import java.util.*
 @Service
 class CommentService(
     private val ctx: RepositoryContext,
-    private val cacheManager: CacheManager
+    private val cacheService: CacheService
 ) : Logged() {
 
     @Transactional(readOnly = true)
-    @Cacheable(value = ["comments"], key = "#id")
     fun getComment(id: UUID): Comment {
-        return ctx.comment.findOneById(id)?.toModel()
-            ?: throw ResourceNotFoundException("Comment with id $id not found")
+        log.info("Fetching comment with id: $id")
+
+        // Check if the comment is in the cache
+        cacheService.getComment(id)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        return getFromDbAndCache(id)
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = ["commentsByTask"], key = "#taskId")
     fun getCommentsByTaskId(taskId: UUID): List<Comment> {
-        return ctx.comment.findByTaskId(taskId).map { it.toModel() }
+        log.info("Fetching comments for task with id: $taskId")
+
+        // Check if the comments are in the cache
+        cacheService.getTaskComments(taskId)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        val comments = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+
+        cacheService.cacheTaskComments(taskId, comments)
+        return comments
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = ["commentsByStory"], key = "#storyId")
     fun getCommentsByStoryId(storyId: UUID): List<Comment> {
-        return ctx.comment.findByStoryId(storyId).map { it.toModel() }
+        log.info("Fetching comments for story with id: $storyId")
+
+        // Check if the comments are in the cache
+        cacheService.getStoryComments(storyId)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        val comments = ctx.comment.findByStoryId(storyId).map { it.toModel() }
+
+        cacheService.cacheStoryComments(storyId, comments)
+        return comments
     }
 
     @Transactional
@@ -50,16 +69,17 @@ class CommentService(
 
         val commentEntity = newComment.toEntity(ctx)
         val saved = ctx.comment.save(commentEntity)
+        val comment = saved.toModel()
 
-        // Manual eviction: storyId or taskId list
+        // Invalidate relevant caches
         newComment.taskId?.let {
-            cacheManager.getCache("commentsByTask")?.evict(it)
+            cacheService.invalidateTaskComments(it)
         }
         newComment.storyId?.let {
-            cacheManager.getCache("commentsByStory")?.evict(it)
+            cacheService.invalidateStoryComments(it)
         }
 
-        return saved.toModel()
+        return comment
     }
 
     @Transactional
@@ -74,13 +94,14 @@ class CommentService(
 
         val updatedEntity = commentEntity.updatedWith(newComment, userId, ctx)
         val saved = ctx.comment.save(updatedEntity)
+        val updatedComment = saved.toModel()
 
-        // Evict individual and parent
-        cacheManager.getCache("comments")?.evict(id)
-        existingModel.taskId?.let { cacheManager.getCache("commentsByTask")?.evict(it) }
-        existingModel.storyId?.let { cacheManager.getCache("commentsByStory")?.evict(it) }
+        // Invalidate caches
+        cacheService.invalidateComment(id)
+        existingModel.taskId?.let { cacheService.invalidateTaskComments(it) }
+        existingModel.storyId?.let { cacheService.invalidateStoryComments(it) }
 
-        return saved.toModel()
+        return updatedComment
     }
 
     @Transactional
@@ -90,10 +111,10 @@ class CommentService(
         val comment = ctx.comment.findOneById(id)
             ?: throw ResourceNotFoundException("Comment with id $id not found")
 
-        // Manual eviction before delete
-        cacheManager.getCache("comments")?.evict(id)
-        comment.task?.id?.let { cacheManager.getCache("commentsByTask")?.evict(it) }
-        comment.story?.id?.let { cacheManager.getCache("commentsByStory")?.evict(it) }
+        // Invalidate caches before delete
+        cacheService.invalidateComment(id)
+        comment.task?.id?.let { cacheService.invalidateTaskComments(it) }
+        comment.story?.id?.let { cacheService.invalidateStoryComments(it) }
 
         ctx.comment.delete(comment)
     }
@@ -132,5 +153,14 @@ class CommentService(
         require(!targetChanged) {
             throw BadRequestException("Cannot change the comment's target (story or task) during update")
         }
+    }
+
+    private fun getFromDbAndCache(id: UUID): Comment {
+        log.info("Fetching comment $id from database")
+        val comment = ctx.comment.findOneById(id)?.toModel()
+            ?: throw ResourceNotFoundException("Comment with id $id not found")
+
+        cacheService.cacheComment(comment)
+        return comment
     }
 }

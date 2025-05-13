@@ -5,13 +5,10 @@ import dev.ecckea.agilepath.backend.domain.story.model.Subtask
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
+import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.Cacheable
-import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -19,11 +16,10 @@ import java.util.*
 @Service
 class SubtaskService(
     private val ctx: RepositoryContext,
-    private val cacheManager: CacheManager
+    private val cacheService: CacheService
 ) : Logged() {
 
     @Transactional
-    @CacheEvict(value = ["subtasksByTask"], key = "#newSubtask.taskId")
     fun createSubtask(newSubtask: NewSubtask): Subtask {
         log.info("Creating new subtask: {}", newSubtask.title)
 
@@ -31,30 +27,44 @@ class SubtaskService(
         require(taskExists) { throw ResourceNotFoundException("Task with id ${newSubtask.taskId} not found") }
 
         val subtaskEntity = newSubtask.toEntity(ctx)
-        return ctx.subtask.save(subtaskEntity).toModel()
+        val savedEntity = ctx.subtask.save(subtaskEntity)
+        val subtask = savedEntity.toModel()
+
+        // Invalidate task subtasks cache
+        cacheService.invalidateTaskSubtasks(newSubtask.taskId)
+
+        return subtask
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = ["subtasks"], key = "#id")
     fun getSubtask(id: UUID): Subtask {
-        return ctx.subtask.findOneById(id)?.toModel()
-            ?: throw ResourceNotFoundException("Subtask with id $id not found")
+        log.info("Fetching subtask with id: $id")
+
+        // Check if the subtask is in the cache
+        cacheService.getSubtask(id)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        return getFromDbAndCache(id)
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = ["subtasksByTask"], key = "#taskId")
     fun getSubtasksByTaskId(taskId: UUID): List<Subtask> {
-        return ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+        log.info("Fetching subtasks for task with id: $taskId")
+
+        // Check if the subtasks are in the cache
+        cacheService.getTaskSubtasks(taskId)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+
+        cacheService.cacheTaskSubtasks(taskId, subtasks)
+        return subtasks
     }
 
     @Transactional
-    @Caching(
-        evict = [
-            CacheEvict(value = ["subtasks"], key = "#id"),
-            CacheEvict(value = ["subtasksByTask"], key = "#newSubtask.taskId")
-        ]
-    )
     fun updateSubtask(id: UUID, newSubtask: NewSubtask, userId: String): Subtask {
+        log.info("Updating subtask with id: $id")
+
         val subtaskEntity = ctx.subtask.findOneById(id)
             ?: throw ResourceNotFoundException("Subtask with id $id not found")
 
@@ -63,18 +73,29 @@ class SubtaskService(
         }
 
         val updatedEntity = subtaskEntity.updatedWith(newSubtask, userId, ctx)
-        return ctx.subtask.save(updatedEntity).toModel()
+        val savedEntity = ctx.subtask.save(updatedEntity)
+        val subtask = savedEntity.toModel()
+
+        // Invalidate caches
+        cacheService.invalidateSubtask(id)
+        cacheService.invalidateTaskSubtasks(newSubtask.taskId)
+
+        return subtask
     }
 
     @Transactional
-    @CacheEvict(value = ["subtasks"], key = "#id")
     fun deleteSubtask(id: UUID) {
+        log.info("Deleting subtask with id: $id")
+
         val subtask = ctx.subtask.findOneById(id)
             ?: throw ResourceNotFoundException("Subtask with id $id not found")
 
         val taskId = subtask.task.id
+
+        // Invalidate caches
+        cacheService.invalidateSubtask(id)
         if (taskId != null) {
-            cacheManager.getCache("subtasksByTask")?.evict(taskId)
+            cacheService.invalidateTaskSubtasks(taskId)
         }
 
         ctx.subtask.delete(subtask)
@@ -82,6 +103,7 @@ class SubtaskService(
 
     @Transactional
     fun toggleSubtaskStatus(id: UUID, userId: String): Subtask {
+        log.info("Toggling subtask status for id: $id")
         val subtask = ctx.subtask.findOneById(id)?.toModel()
             ?: throw ResourceNotFoundException("Subtask with id $id not found")
 
@@ -97,5 +119,14 @@ class SubtaskService(
         )
 
         return updateSubtask(id, newSubtask, userId)
+    }
+
+    private fun getFromDbAndCache(id: UUID): Subtask {
+        log.info("Fetching subtask $id from database")
+        val subtask = ctx.subtask.findOneById(id)?.toModel()
+            ?: throw ResourceNotFoundException("Subtask with id $id not found")
+
+        cacheService.cacheSubtask(subtask)
+        return subtask
     }
 }

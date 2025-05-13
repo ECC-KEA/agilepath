@@ -2,46 +2,58 @@ package dev.ecckea.agilepath.backend.domain.user.service
 
 import dev.ecckea.agilepath.backend.domain.user.model.User
 import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
+import dev.ecckea.agilepath.backend.infrastructure.cache.CacheService
+import dev.ecckea.agilepath.backend.infrastructure.cache.cacheUser
+import dev.ecckea.agilepath.backend.infrastructure.cache.getUser
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import dev.ecckea.agilepath.backend.shared.security.toEntity
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val ctx: RepositoryContext
+    private val ctx: RepositoryContext,
+    private val cacheService: CacheService
 ) : Logged() {
-    /**
-     * Returns the user matching the id of the principal. If the user does not exist, it will be created.
-     * Caches the result using the id as key.
-     *
-     * @param principal the principal to get the user for
-     * @return the user matching the id of the principal
-     * @throws ResourceNotFoundException if the user does not exist
-     */
-    @Cacheable("users", key = "#principal.id")
+
+
     fun getOrCreate(principal: UserPrincipal): User {
+        // Check if the user is in the cache
+        cacheService.getUser(principal.id)?.let { return it }
+
+        // If not, check if the user exists in the database
         val exists = ctx.user.existsById(principal.id)
+
+        // If the user does not exist, create it and cache it
         if (!exists) {
             log.info("User with id ${principal.id} does not exist, creating it")
-            return ctx.user.save(principal.toEntity()).toModel()
+            val savedUser = ctx.user.save(principal.toEntity()).toModel()
+            cacheService.cacheUser(savedUser)
+            return savedUser
         }
-        return ctx.user.findOneById(principal.id)?.toModel()
-            ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+        // If the user exists, fetch it from the database and cache it
+        return getFromDbAndCache(principal.id)
     }
 
-    @Cacheable("users", key = "#principal.id")
     fun get(principal: UserPrincipal): User {
-        return ctx.user.findOneById(principal.id)?.toModel()
-            ?: throw ResourceNotFoundException("User with id ${principal.id} not found")
+        return getById(principal.id)
     }
 
-    @Cacheable("users", key = "#id")
     fun getById(id: String): User {
-        return ctx.user.findOneById(id)?.toModel()
+        // Check if the user is in the cache
+        cacheService.getUser(id)?.let { return it }
+        // If not, fetch from the database and cache it
+        return getFromDbAndCache(id)
+    }
+
+    private fun getFromDbAndCache(id: String): User {
+        log.debug("Fetching user $id from database")
+        val user = ctx.user.findOneById(id)?.toModel()
             ?: throw ResourceNotFoundException("User with id $id not found")
+
+        cacheService.cacheUser(user)
+        return user
     }
 }
