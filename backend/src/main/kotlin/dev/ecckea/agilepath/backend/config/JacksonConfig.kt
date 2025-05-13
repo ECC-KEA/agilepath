@@ -66,6 +66,7 @@ class JacksonConfig {
             .allowIfBaseType(APP_PACKAGE)
             .allowIfSubType(APP_PACKAGE)
             .allowIfSubType("java.time")
+            .allowIfSubType("java.util")
             .build()
 
         val objectMapper = ObjectMapper()
