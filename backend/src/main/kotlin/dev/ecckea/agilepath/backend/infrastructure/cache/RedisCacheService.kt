@@ -2,76 +2,77 @@ package dev.ecckea.agilepath.backend.infrastructure.cache
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 /**
- * Service for interacting with Redis cache.
- * Provides methods to get, set, and delete cache entries.
+ * Redis-based caching service that handles JSON serialization.
  *
- * @property redisTemplate The RedisTemplate used for Redis operations.
- * @property objectMapper The ObjectMapper used for serialization and deserialization.
+ * This service provides a simple interface for storing and retrieving
+ * JSON-serialized objects in Redis. It handles all serialization/deserialization
+ * automatically and supports configurable time-to-live for cached items.
+ *
+ * Not active in the "test" profile.
  */
 @Component
 @Profile("!test")
 class RedisCacheService(
-    private val redisTemplate: RedisTemplate<String, Any>,
-    @Qualifier("redisCacheObjectMapper") private val objectMapper: ObjectMapper
+    private val redisTemplate: RedisTemplate<String, String>,
+    private val objectMapper: ObjectMapper
 ) {
 
     /**
-     * Retrieves a value from Redis and converts it to the specified class type.
+     * Retrieves and deserializes a cached object.
      *
-     * @param key The key of the cached value.
-     * @param clazz The class type to convert the cached value to.
-     * @return The cached value converted to the specified type, or null if the key does not exist.
+     * @param key The cache key
+     * @param clazz The class to deserialize the object into
+     * @return The deserialized object, or null if not in cache
      */
     fun <T> get(key: String, clazz: Class<T>): T? {
-        val raw = redisTemplate.opsForValue().get(key) ?: return null
-        return objectMapper.convertValue(raw, clazz)
+        val json = redisTemplate.opsForValue().get(key) ?: return null
+        return objectMapper.readValue(json, clazz)
     }
 
     /**
-     * Retrieves a list or collection from Redis and converts it to the specified type.
+     * Retrieves and deserializes a cached list or complex object.
      *
-     * @param key The key of the cached value.
-     * @param typeRef The TypeReference representing the type to convert the cached value to.
-     * @return The cached value converted to the specified type, or null if the key does not exist.
+     * @param key The cache key
+     * @param typeRef Type reference for handling generic collections
+     * @return The deserialized object, or null if not in cache
      */
     fun <T> getList(key: String, typeRef: TypeReference<T>): T? {
-        val raw = redisTemplate.opsForValue().get(key) ?: return null
+        val json = redisTemplate.opsForValue().get(key) ?: return null
         val javaType = objectMapper.typeFactory.constructType(typeRef)
-        val json = objectMapper.writeValueAsString(raw)
         return objectMapper.readValue(json, javaType)
     }
 
     /**
-     * Stores a value in Redis with a specified time-to-live (TTL).
+     * Serializes and stores an object in the cache.
      *
-     * @param key The key to store the value under.
-     * @param value The value to store in the cache.
-     * @param ttlMinutes The time-to-live for the cached value in minutes. Defaults to 15 minutes.
+     * @param key The cache key
+     * @param value The object to cache
+     * @param ttlMinutes How long to keep in cache (defaults to 15 minutes)
      */
     fun set(key: String, value: Any, ttlMinutes: Long = 15) {
-        redisTemplate.opsForValue().set(key, value, ttlMinutes, TimeUnit.MINUTES)
+        val json = objectMapper.writeValueAsString(value)
+        redisTemplate.opsForValue().set(key, json, ttlMinutes, TimeUnit.MINUTES)
     }
 
     /**
-     * Deletes a value from Redis by its key.
+     * Removes a single item from the cache.
      *
-     * @param key The key of the value to delete.
+     * @param key The cache key to remove
      */
     fun delete(key: String) {
         redisTemplate.delete(key)
     }
 
     /**
-     * Deletes all keys matching a given pattern from Redis.
+     * Removes multiple items matching a pattern from the cache.
      *
-     * @param pattern The pattern to match keys against.
+     * @param pattern The key pattern to match (e.g., "user:123:*")
      */
     fun deleteByPattern(pattern: String) {
         val keys = redisTemplate.keys("$pattern*")
