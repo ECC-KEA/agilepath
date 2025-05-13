@@ -1,10 +1,10 @@
 import { createContext } from "react";
-import { INewTask, ITask } from "../../types/story.types";
+import { ITaskRequest, ITask } from "../../types/story.types";
 
 interface ITaskContext {
   tasks: ITask[];
-  createTask: (task: INewTask) => Promise<void>;
-  updateTask: (task: ITask) => Promise<void>;
+  createTask: (task: ITaskRequest) => Promise<void>;
+  updateTask: (task: ITaskRequest, id: string) => Promise<void>;
 }
 
 const TaskContext = createContext<ITaskContext | undefined>(undefined);

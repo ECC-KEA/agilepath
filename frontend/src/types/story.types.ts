@@ -39,7 +39,7 @@ export interface ITask {
   assignees: IUser[];
 }
 
-export interface INewTask {
+export interface ITaskRequest {
   storyId: string;
   sprintColumnId: string;
   title: string;
@@ -47,6 +47,18 @@ export interface INewTask {
   estimateTshirt?: TshirtEstimate;
   estimatePoints?: PointEstimate;
   assigneeIds: string[];
+}
+
+export function convertTaskToRequest(task: ITask): ITaskRequest {
+  return {
+    storyId: task.storyId,
+    sprintColumnId: task.sprintColumnId,
+    title: task.title,
+    description: task.description,
+    estimateTshirt: task.estimateTshirt,
+    estimatePoints: task.estimatePoints,
+    assigneeIds: task.assignees.map((a) => a.id)
+  };
 }
 
 export interface ISubTask {

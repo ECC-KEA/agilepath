@@ -5,10 +5,26 @@ import Column from "../components/sprint/Column";
 import useColumn from "../hooks/column/useColumn";
 import { useState } from "react";
 import Input from "../components/generic/inputs/Input";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import useTask from "../hooks/task/useTask";
+import { ITask, convertTaskToRequest } from "../types/story.types";
+import { notifyError } from "../helpers/notify";
 
 function SprintBoard() {
   const { columns } = useColumn();
+  const { updateTask } = useTask();
   const [showCreateColumnModal, setShowCreateColumnModal] = useState(false);
+
+  const handleTaskDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    const task: ITask = active.data.current as ITask;
+
+    if (over && task) {
+      const tmp = convertTaskToRequest(task);
+      tmp.sprintColumnId = over.id.toString();
+      updateTask(tmp, task.id).catch(() => notifyError("Failed to move task"));
+    }
+  };
 
   return (
     <div className="sprint-board w-full">
@@ -18,13 +34,15 @@ function SprintBoard() {
             className="w-72"
             placeholder="Search..."
           />
-          <div className="flex gap-6 w-full h-full ">
-            {columns.map((column) => (
-              <Column
-                column={column}
-                key={column.id + "-sprintcol"}
-              />
-            ))}
+          <div className="flex gap-6 w-full max-h-full overflow-auto">
+            <DndContext onDragEnd={handleTaskDragEnd}>
+              {columns.map((column) => (
+                <Column
+                  column={column}
+                  key={column.id}
+                />
+              ))}
+            </DndContext>
             <FaPlus
               className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer"
               onClick={() => setShowCreateColumnModal(true)}

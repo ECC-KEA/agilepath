@@ -1,7 +1,7 @@
 import { PropsWithChildren, useCallback, useEffect, useMemo, useState } from "react";
 import useColumn from "../column/useColumn";
 import TaskContext from "./TaskContext";
-import { INewTask, ITask } from "../../types/story.types";
+import { ITaskRequest, ITask } from "../../types/story.types";
 import { useApi } from "../utils/useApi";
 
 function TaskProvider({ children }: Readonly<PropsWithChildren>) {
@@ -27,7 +27,7 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
   }, [columns]);
 
   const createTask = useCallback(
-    (task: INewTask) => {
+    (task: ITaskRequest) => {
       return post("/tasks", task)
         .then((res) => setTasks((prev) => [...prev, res]))
         .catch(console.error);
@@ -36,8 +36,8 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
   );
 
   const updateTask = useCallback(
-    (task: ITask) => {
-      return put(`/tasks/${task.id}`, task)
+    (task: ITaskRequest, id: string) => {
+      return put(`/tasks/${id}`, task)
         .then((res) => setTasks((prev) => prev.map((t) => (t.id === res.id ? res : t))))
         .catch(console.error);
     },
