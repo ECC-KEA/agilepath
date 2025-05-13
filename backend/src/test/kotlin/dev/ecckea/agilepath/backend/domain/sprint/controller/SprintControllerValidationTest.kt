@@ -79,7 +79,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
         }
     """
 
-        val response = webTestClient
+        webTestClient
             .webPostWithAuth("/sprints", json)
             .exchange()
             .expectStatus().isBadRequest
