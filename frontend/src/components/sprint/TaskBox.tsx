@@ -2,29 +2,29 @@ import { useDraggable } from "@dnd-kit/core";
 import { IColumn } from "../../types/column.types";
 import { ITask } from "../../types/story.types";
 import StatusLabel from "../status/StatusLabel";
-import { CSS } from "@dnd-kit/utilities";
 import { FaGripLines } from "react-icons/fa6";
 interface TaskBoxProps {
   task: ITask;
   column: IColumn;
+  isDragOverlay?: boolean;
 }
 function TaskBox(props: Readonly<TaskBoxProps>) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: props.task.id,
     data: props.task
   });
 
-  const style = {
-    transform: CSS.Translate.toString(transform)
-  };
   return (
     <div
-      className={`${isDragging ? "absolute" : ""} p-2 bg-ap-onyx-50/20 rounded shadow w-80 h-28`}
+      className={`
+        ${props.isDragOverlay ? "absolute backdrop-blur-2xl" : ""} 
+        ${isDragging ? "opacity-50" : ""}
+        p-2  rounded shadow w-80 h-28 bg-ap-onyx-50/20
+      `}
       ref={setNodeRef}
-      style={style}
     >
       <div
-        className={`${isDragging ? "cursor-grabbing" : "cursor-grab"} flex items-center justify-center`}
+        className={`${props.isDragOverlay ? "cursor-grabbing" : "cursor-grab"} flex items-center justify-center`}
         {...attributes}
         {...listeners}
       >

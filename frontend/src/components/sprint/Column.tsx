@@ -38,7 +38,7 @@ export default function Column({ column }: IColumnProps) {
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col h-[calc(100vh-250px)] justify-between pb-2 flex-1 text-center border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400 max-w-88 min-w-88 flex-shrink-0"
+      className="flex flex-col h-[calc(100vh-265px)] justify-between pb-2 flex-1 text-center border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400 max-w-88 min-w-88 flex-shrink-0"
     >
       <div className="flex items-center justify-between p-2 border-b border-ap-onyx-50/50">
         <div className="w-8"></div>
@@ -51,7 +51,7 @@ export default function Column({ column }: IColumnProps) {
         </div>
       </div>
 
-      <div className="h-full p-2 overflow-y-auto flex justify-center">
+      <div className="h-full p-2 overflow-y-auto flex flex-col items-center gap-2">
         {colTasks.map((t) => (
           <TaskBox
             key={t.id}
