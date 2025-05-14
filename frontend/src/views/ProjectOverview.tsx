@@ -1,24 +1,25 @@
 import { Status } from "../types/story.types";
 import StoryColumn from "../components/project/StoryColumn";
-import Input from "../components/generic/inputs/Input";
 import { useMemo, useState } from "react";
 import useStory from "../hooks/story/useStory";
+import SearchInput from "../components/generic/inputs/SearchInput";
+import { storySearchPredicate } from "../helpers/storyHelpers";
 
 function ProjectOverview() {
   const { stories } = useStory();
   const [search, setSearch] = useState<string>("");
 
   const filteredStories = useMemo(
-    () => stories.filter((s) => s.title.toLowerCase().includes(search.toLowerCase())),
+    () => stories.filter((s) => storySearchPredicate(s, search)),
     [stories, search]
   );
 
   return (
     <div className="p-4">
-      <Input
+      <SearchInput
         type="search"
-        placeholder="Search..."
-        className="w-96"
+        placeholder="Search by Story title or ID"
+        containerClassName="w-96"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />

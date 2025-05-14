@@ -4,12 +4,12 @@ import CreateColumnModal from "../components/sprint/CreateColumnModal";
 import Column from "../components/sprint/Column";
 import useColumn from "../hooks/column/useColumn";
 import { useState } from "react";
-import Input from "../components/generic/inputs/Input";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import useTask from "../hooks/task/useTask";
 import { ITask, convertTaskToRequest } from "../types/story.types";
 import { notifyError } from "../helpers/notify";
 import TaskBox from "../components/sprint/TaskBox";
+import SearchInput from "../components/generic/inputs/SearchInput";
 
 function SprintBoard() {
   const { columns } = useColumn();
@@ -43,9 +43,9 @@ function SprintBoard() {
       <div className="flex w-full h-full">
         <div className="flex flex-col w-full h-full p-4 gap-4">
           <div className="flex items-center w-full justify-between">
-            <Input
-              className="w-72"
-              placeholder="Search..."
+            <SearchInput
+              containerClassName="w-88"
+              placeholder="Search by Task title, ID or assignee"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -59,10 +59,10 @@ function SprintBoard() {
               onDragEnd={handleTaskDragEnd}
               onDragStart={handleTaskDragStart}
               onDragCancel={handleTaskDragCancel}
-              // modifiers={[restrictToFirstScrollableAncestor]}
             >
               {columns.map((column) => (
                 <Column
+                  search={search}
                   column={column}
                   key={column.id}
                 />

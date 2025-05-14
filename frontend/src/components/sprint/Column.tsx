@@ -13,12 +13,14 @@ import ShowIf from "../generic/ShowIf";
 import ExistingTaskModal from "./ExistingTaskModal";
 import NewTaskModal from "./NewTaskModal";
 import { useDroppable } from "@dnd-kit/core";
+import { taskSearchPredicate } from "../../helpers/taskHelpers";
 
 interface IColumnProps {
   column: IColumn;
+  search: string;
 }
 
-export default function Column({ column }: IColumnProps) {
+export default function Column({ column, ...props }: IColumnProps) {
   const { setNodeRef } = useDroppable({ id: column.id });
   const { deleteColumn } = useColumn();
   const { tasks } = useTask();
@@ -26,8 +28,10 @@ export default function Column({ column }: IColumnProps) {
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState<boolean>(false);
 
   const colTasks = useMemo(() => {
-    return tasks.filter((t) => t.sprintColumnId === column.id);
-  }, [tasks, column]);
+    return tasks.filter(
+      (t) => t.sprintColumnId === column.id && taskSearchPredicate(t, props.search)
+    );
+  }, [tasks, column, props.search]);
 
   const handleDeleteColumn = async () => {
     deleteColumn(column.id)
