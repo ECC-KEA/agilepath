@@ -43,9 +43,8 @@ export const useApi = () => {
         },
         body: JSON.stringify(data)
       })
-        .then(res => res.json())
-        .catch(console.error)
-      ,
+        .then((res) => res.json())
+        .catch(console.error),
     [fetchWithAuth]
   );
 
@@ -53,6 +52,9 @@ export const useApi = () => {
     (url: string, data: unknown) =>
       fetchWithAuth(url, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(data)
       })
         .then((res) => res.json())
