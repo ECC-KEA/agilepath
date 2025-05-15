@@ -4,7 +4,6 @@ import dev.ecckea.agilepath.backend.config.TestAppConfig
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskRequest
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
 import dev.ecckea.agilepath.backend.domain.story.model.PointEstimate
-import dev.ecckea.agilepath.backend.domain.story.model.TshirtEstimate
 import dev.ecckea.agilepath.backend.support.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,7 +30,6 @@ class TaskControllerTest : IntegrationTestBase() {
 
         assertThat(response.title).isEqualTo(request.title)
         assertThat(response.description).isEqualTo(request.description)
-        assertThat(response.estimateTshirt.toString()).isEqualTo(request.estimateTshirt)
         assertThat(response.estimatePoints.toString()).isEqualTo(request.estimatePoints)
         assertThat(response.storyId).isEqualTo(request.storyId)
         assertThat(response.sprintColumnId).isEqualTo(request.sprintColumnId)
@@ -61,7 +59,6 @@ class TaskControllerTest : IntegrationTestBase() {
             sprintColumnId = created.sprintColumnId,
             title = "Updated Task Title",
             description = "Updated description",
-            estimateTshirt = TshirtEstimate.LARGE,
             estimatePoints = PointEstimate.POINT_13
         )
 
@@ -73,7 +70,6 @@ class TaskControllerTest : IntegrationTestBase() {
         assertThat(updated.id).isEqualTo(created.id)
         assertThat(updated.title).isEqualTo(updateRequest.title)
         assertThat(updated.description).isEqualTo(updateRequest.description)
-        assertThat(updated.estimateTshirt.toString()).isEqualTo(updateRequest.estimateTshirt)
         assertThat(updated.estimatePoints.toString()).isEqualTo(updateRequest.estimatePoints)
     }
 
@@ -103,7 +99,6 @@ class TaskControllerTest : IntegrationTestBase() {
         sprintColumnId: UUID = UUID.fromString("c1111111-0000-0000-0000-000000000001"),
         title: String = "Task ${UUID.randomUUID()}",
         description: String = "Task description",
-        estimateTshirt: TshirtEstimate = TshirtEstimate.SMALL,
         estimatePoints: PointEstimate = PointEstimate.POINT_3,
         assigneeIds: List<String> = listOf()
     ) = TaskRequest(
@@ -111,7 +106,7 @@ class TaskControllerTest : IntegrationTestBase() {
         sprintColumnId = sprintColumnId,
         title = title,
         description = description,
-        estimateTshirt = estimateTshirt.toString(),
+        estimateTshirt = null,
         estimatePoints = estimatePoints.toString(),
         assigneeIds = assigneeIds
     )
