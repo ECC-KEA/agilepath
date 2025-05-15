@@ -3,12 +3,14 @@ package dev.ecckea.agilepath.backend.domain.story.dto
 import dev.ecckea.agilepath.backend.domain.story.model.PointEstimate
 import dev.ecckea.agilepath.backend.domain.story.model.TshirtEstimate
 import dev.ecckea.agilepath.backend.shared.validation.annotations.NoHtml
+import dev.ecckea.agilepath.backend.shared.validation.annotations.RequireOneEstimate
 import dev.ecckea.agilepath.backend.shared.validation.annotations.TrimmedNotBlank
 import dev.ecckea.agilepath.backend.shared.validation.annotations.ValidEnum
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.util.*
 
+@RequireOneEstimate(message = "Either T-shirt estimate or point estimate must be provided")
 data class TaskRequest(
     @field:NotNull(message = "Story ID must not be null")
     val storyId: UUID,
