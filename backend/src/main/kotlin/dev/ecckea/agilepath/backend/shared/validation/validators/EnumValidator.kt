@@ -42,7 +42,7 @@ class EnumValidator : ConstraintValidator<ValidEnum, String> {
      * @return `true` if the value is valid, `false` otherwise.
      */
     override fun isValid(value: String?, context: ConstraintValidatorContext): Boolean {
-        if (value == null) return false
+        if (value == null) return true
         val normalized = if (ignoreCase) value.lowercase() else value
         return acceptedValues.contains(normalized)
     }
