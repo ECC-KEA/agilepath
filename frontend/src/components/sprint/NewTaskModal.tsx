@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import useTask from "../../hooks/task/useTask";
 import { IColumn } from "../../types/column.types";
-import { ITaskRequest } from "../../types/story.types";
+import { ITaskRequest, TshirtEstimate } from "../../types/story.types";
 import Modal from "../generic/Modal";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
@@ -39,7 +39,8 @@ function NewTaskModal(props: Readonly<NewTaskModalProps>) {
       sprintColumnId: props.column.id,
       storyId: storyID,
       title,
-      description
+      description,
+      estimateTshirt: TshirtEstimate.MEDIUM
     };
     void createTask(tmp)
       .then(() => notifySuccess("Successfully created task"))
