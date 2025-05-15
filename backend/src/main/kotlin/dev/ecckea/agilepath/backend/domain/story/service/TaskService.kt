@@ -86,9 +86,6 @@ class TaskService(
         require(taskEntity.story.id == newTask.storyId) {
             "Story ID cannot be changed during update"
         }
-        require(taskEntity.sprintColumn.id == newTask.sprintColumnId) {
-            "Sprint column ID cannot be changed during update"
-        }
 
         val updatedEntity = taskEntity.updatedWith(newTask, userId, ctx)
         val savedEntity = ctx.task.save(updatedEntity)

@@ -118,7 +118,7 @@ fun TaskEntity.updatedWith(update: NewTask, userId: String, ctx: RepositoryConte
     return TaskEntity(
         id = this.id,
         story = this.story,
-        sprintColumn = this.sprintColumn,
+        sprintColumn = ctx.sprintColumn.ref(update.sprintColumnId),
         title = update.title,
         description = update.description,
         estimateTshirt = update.estimateTshirt,
