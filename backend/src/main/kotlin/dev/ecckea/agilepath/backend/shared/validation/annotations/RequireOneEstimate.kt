@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [RequireOneEstimateValidator::class])
 annotation class RequireOneEstimate(
-    val message: String = "Either T-shirt estimate or point estimate must be provided",
+    val message: String = "Exactly one estimate type (T-shirt OR point estimate) must be provided, not both",
     val groups: Array<KClass<*>> = [],
     val payload: Array<KClass<out Payload>> = []
 )
