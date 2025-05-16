@@ -3,8 +3,6 @@ package dev.ecckea.agilepath.backend.config
 import dev.ecckea.agilepath.backend.support.TestSecurityContextFilter
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.web.servlet.FilterRegistrationBean
-import org.springframework.cache.CacheManager
-import org.springframework.cache.support.NoOpCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
@@ -41,10 +39,6 @@ class TestAppConfig {
             claims
         )
     }
-
-    @Bean
-    @Primary
-    fun testCacheManager(): CacheManager = NoOpCacheManager()
 
     @Bean
     @Primary

@@ -11,10 +11,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
+@Validated
 @Tag(name = "Sprint Column", description = "Endpoints related to sprint column management")
 class SprintColumnController(
     private val sprintColumnApplication: SprintColumnApplication
@@ -88,7 +91,7 @@ class SprintColumnController(
         ]
     )
     @PostMapping("/sprint-columns")
-    fun createSprintColumn(@RequestBody sprintColumn: SprintColumnRequest): SprintColumnResponse {
+    fun createSprintColumn(@Valid @RequestBody sprintColumn: SprintColumnRequest): SprintColumnResponse {
         log.info("POST /sprint-columns - Creating new column for sprint {}", sprintColumn.sprintId)
         return sprintColumnApplication.createSprintColumn(sprintColumn.toModel()).toDTO()
     }
@@ -146,7 +149,7 @@ class SprintColumnController(
     @PutMapping("/sprint-columns/{id}")
     fun updateSprintColumn(
         @PathVariable id: UUID,
-        @RequestBody sprintColumn: SprintColumnRequest
+        @Valid @RequestBody sprintColumn: SprintColumnRequest
     ): SprintColumnResponse {
         log.info("PUT /sprint-columns/{} - Updating column", id)
         return sprintColumnApplication.updateSprintColumn(id, sprintColumn.toModel()).toDTO()

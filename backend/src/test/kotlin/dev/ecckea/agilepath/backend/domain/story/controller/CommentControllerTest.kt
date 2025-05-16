@@ -108,7 +108,7 @@ class CommentControllerTest : IntegrationTestBase() {
         webTestClient
             .webPostWithAuth("/comments", request)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().isEqualTo(422)
     }
 
     @Test
@@ -122,7 +122,7 @@ class CommentControllerTest : IntegrationTestBase() {
         webTestClient
             .webPostWithAuth("/comments", request)
             .exchange()
-            .expectStatus().isBadRequest
+            .expectStatus().isEqualTo(422)
     }
 
     @Test

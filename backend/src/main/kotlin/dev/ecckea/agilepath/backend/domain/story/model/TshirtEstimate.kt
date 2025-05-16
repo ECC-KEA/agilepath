@@ -5,5 +5,12 @@ enum class TshirtEstimate {
     SMALL,
     MEDIUM,
     LARGE,
-    XLARGE
+    XLARGE;
+
+    companion object {
+        fun fromString(value: String): TshirtEstimate {
+            return entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
+                ?: throw IllegalArgumentException("Unknown tshirt estimate: $value")
+        }
+    }
 }

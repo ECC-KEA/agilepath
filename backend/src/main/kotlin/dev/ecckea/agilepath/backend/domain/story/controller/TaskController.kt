@@ -11,12 +11,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import kotlin.collections.List
 
 @RestController
+@Validated
 @Tag(name = "Tasks", description = "Endpoints related to Task management")
 class TaskController(
     private val taskApplication: TaskApplication
@@ -39,8 +42,9 @@ class TaskController(
             ApiResponse(responseCode = "500", description = "Internal server error")
         ]
     )
+
     @PostMapping("/tasks")
-    fun createTask(@RequestBody taskRequest: TaskRequest): TaskResponse {
+    fun createTask(@Valid @RequestBody taskRequest: TaskRequest): TaskResponse {
         log.info("POST /tasks - Create task")
         return taskApplication.createTask(taskRequest.toModel()).toDTO()
     }
@@ -108,7 +112,7 @@ class TaskController(
         ]
     )
     @PutMapping("/tasks/{id}")
-    fun updateTask(@PathVariable id: UUID, @RequestBody taskRequest: TaskRequest): TaskResponse {
+    fun updateTask(@PathVariable id: UUID, @Valid @RequestBody taskRequest: TaskRequest): TaskResponse {
         log.info("PUT /tasks/$id - Update task")
         return taskApplication.updateTask(id, taskRequest.toModel()).toDTO()
     }

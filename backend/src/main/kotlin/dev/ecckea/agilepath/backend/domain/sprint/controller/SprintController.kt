@@ -11,10 +11,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
+@Validated
 @Tag(name = "Sprint", description = "Endpoints related to sprint management")
 class SprintController(
     private val sprintApplication: SprintApplication
@@ -83,7 +86,7 @@ class SprintController(
         ]
     )
     @PostMapping("/sprints")
-    fun createSprint(@RequestBody sprint: SprintRequest): SprintResponse {
+    fun createSprint(@Valid @RequestBody sprint: SprintRequest): SprintResponse {
         log.info("POST /sprints - Create sprint")
         return sprintApplication.createSprint(sprint.toModel()).toDTO()
     }
@@ -107,7 +110,7 @@ class SprintController(
         ]
     )
     @PutMapping("/sprints/{id}")
-    fun updateSprint(@PathVariable id: UUID, @RequestBody sprint: SprintRequest): SprintResponse {
+    fun updateSprint(@PathVariable id: UUID, @Valid @RequestBody sprint: SprintRequest): SprintResponse {
         log.info("PUT /sprints/{} - Update sprint", id)
         return sprintApplication.updateSprint(id, sprint.toModel()).toDTO()
     }
