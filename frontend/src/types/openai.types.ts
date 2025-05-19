@@ -61,4 +61,8 @@ interface ICompletionTokensDetails {
     rejected_prediction_tokens: number;
 }
 
-export type { IOpenAIResponse, IChoice, IMessage, IUsage, IPromptTokensDetails, ICompletionTokensDetails, IOpenAIRequest };
+interface IStreamedResponse {
+  content: string;
+}
+
+export type { IOpenAIResponse, IChoice, IMessage, IUsage, IPromptTokensDetails, ICompletionTokensDetails, IOpenAIRequest, IStreamedResponse };

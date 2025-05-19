@@ -1,7 +1,7 @@
 import StatusLabel from "../components/status/StatusLabel";
 import { Status } from "../types/story.types";
 import Button from "../components/generic/buttons/Button";
-import Navn from "../components/project/Navn";
+import Navn from "../components/project/NewStoryTaskModal";
 import useAssistant from "../hooks/assistant/useAssistant";
 import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
@@ -17,6 +17,7 @@ function StoryEdit() {
   const { story } = useStory();
   const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
+  const [OpenAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
 
   
   if (!story) {
@@ -24,36 +25,50 @@ function StoryEdit() {
   }
 
   const handleBreakdown = () => {
-    loader.add();
-    console.log("Breakdown clicked");
-    const systemMessage = {
-      role: "system",
-      content: assistant?.prompt ?? "You are a helpful assistant.",
-    };
+  loader.add();
+  console.log("Breakdown clicked");
 
-    const userMessage = {
-      role: "user",
-      content: JSON.stringify({
-        task_header: story.title,
-        task_description: story.description,
-      }),
-    };
-
-    const body = {
-      model: assistant?.model ?? "gpt-4o-mini",
-      messages: [systemMessage, userMessage],
-    };
-
-    sendMessage(body)
-      .then((response) => {
-        console.log("Response from OpenAI:", response);
-      }).then(() => {
-        loader.done();
-      })
-      .catch((error) => {
-        console.error("Error sending message to OpenAI:", error);
-      });
+  const systemMessage = {
+    role: "system",
+    content: assistant?.prompt ?? "You are a helpful assistant.",
   };
+
+  const userMessage = {
+    role: "user",
+    content: JSON.stringify({
+      task_header: story.title,
+      task_description: story.description,
+    }),
+  };
+
+  const body = {
+    model: assistant?.model ?? "gpt-4o-mini",
+    messages: [systemMessage, userMessage],
+    stream: true, 
+  };
+
+  const handleChunk = (chunk: string) => {
+    setOpenAIResponse((prev) => {
+      if (prev) {
+        return prev + chunk;
+      } else {
+        return chunk;
+      }
+    });
+  };
+
+  sendMessage(body, handleChunk)
+    .then((response) => {
+      console.log("Final response from OpenAI:", response);
+    })
+    .then(() => {
+      loader.done();
+    })
+    .catch((error) => {
+      console.error("Error sending message to OpenAI:", error);
+    });
+};
+
 
   return (
     <div className="flex flex-row gap-4">
@@ -90,12 +105,12 @@ function StoryEdit() {
         </div>
       </div>
       <div className="w-min-1/3">
-        <ShowIf if={!!response}>
+        <ShowIf if={!!OpenAIResponse}>
           <div className="flex flex-col gap-4 border-l border-ap-onyx-50/50 p-4">
             <div className="font-bold">Breaking down story into tasks</div>
-            <div className="text-ap-onyx-800  border-ap-onyx-400 whitespace-pre-line text-sm">{response?.choices[0].message.content}</div>
+            <div className="text-ap-onyx-800  border-ap-onyx-400 whitespace-pre-line text-sm">{OpenAIResponse}</div>
           </div>
-        </ShowIf>
+        </ShowIf> 
       </div>
 
       <ShowIf if={showCreateNewTaskModal}>

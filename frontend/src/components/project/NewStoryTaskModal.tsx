@@ -1,86 +1,68 @@
-import { useMemo, useState } from "react";
-import useTask from "../../hooks/task/useTask";
-import { INewTask } from "../../types/story.types";
+import { useMemo, useState, useRef } from "react";
+import useCurrentProject from "../../hooks/projects/useCurrentProject";
 import Modal from "../generic/Modal";
-import { notifyError, notifySuccess } from "../../helpers/notify";
-import Input from "../generic/inputs/Input";
 import CustomSelect from "../generic/select/CustomSelect";
-import useStory from "../../hooks/story/useStory";
-import TextArea from "../generic/inputs/CustomTextArea";
+import ShowIf from "../generic/ShowIf";
+import ColumnProvider from "../../hooks/column/ColumnProvider";
+import TaskProvider from "../../hooks/task/TaskProvider";
+import TaskHandler, { TaskHandlerHandle } from "./TaskHandler";
 
 interface NewStoryTaskModalProps {
   show: boolean;
   onClose: () => void;
-  //send story prop med her.
 }
 function NewStoryTaskModal(props: Readonly<NewStoryTaskModalProps>) {
-  const { createTask } = useTask();
-  const { stories } = useStory();
+  const { sprints } = useCurrentProject();
+  const [sprintId, setSprintId] = useState<string>("");
+  
+  const taskModalRef = useRef<TaskHandlerHandle>(null);
 
-  const [storyID, setStoryID] = useState<string>("");
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-
-  const storyOptions = useMemo(() => {
-    return stories.map((s) => ({
-      label: s.title,
+  const sprintOptions = useMemo(() => {
+    return sprints.map((s) => ({
+      label: s.name,
       value: s.id
     }));
-  }, [stories]);
-
-  const disableAction = useMemo(() => {
-    return storyID === "" || title === "";
-  }, [storyID, title]);
+  }, [sprints]);
 
   const handleCreateTask = () => {
-    const tmp: INewTask = {
-      assigneeIds: [], // TODO: select m. members i projekt,
-      sprintColumnId: "123",
-      storyId: storyID,
-      title,
-      description
-    };
-    void createTask(tmp)
-      .then(() => notifySuccess("Successfully created task"))
-      .catch(() => notifyError("Failed to create task"));
+    taskModalRef.current?.handleCreateTask();
     props.onClose();
-  };
+  }
 
   return (
+    <Modal
+      title="New Task"
+      show={props.show}
+      onClose={props.onClose}
+      actionText="Create"
+      onAction={handleCreateTask}
+      disableAction={!sprintId}
+    >
       <div className="flex flex-col gap-4 p-4">
         <div className="flex flex-col">
-          <div className="text-ap-onyx-200">Story</div>
+          <div className="text-ap-onyx-200">Sprint</div>
           <CustomSelect
-            options={storyOptions}
-            value={storyOptions.find((o) => o.value === storyID)}
+            options={sprintOptions}
+            value={sprintOptions.find((o) => o.value === sprintId)}
             onChange={(o) => {
               if (o) {
-                setStoryID(o.value);
+                setSprintId(o.value);
               }
             }}
           />
         </div>
-        <div className="flex flex-col">
-          <div className="text-ap-onyx-200">Title</div>
-          <Input
-            type="text"
-            placeholder="Task title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div>
-          <div className="text-ap-onyx-400 flex justify-between">
-            Description<div className="italic">Optional</div>
-          </div>
-          <TextArea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Task description"
-            className="w-full"
-          />
-        </div>
+        <ShowIf if={!!sprintId}>
+            <ColumnProvider sprintId={sprintId}>
+                <TaskProvider>
+                    <TaskHandler
+                        show={props.show}
+                        ref={taskModalRef}
+                    />  
+                </TaskProvider>
+            </ColumnProvider>
+        </ShowIf>
       </div>
+    </Modal>
   );
 }
 export default NewStoryTaskModal;

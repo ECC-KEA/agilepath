@@ -83,6 +83,7 @@ services:
       - PROFILE=dev
       - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+      - VITE_OPENAI_API_KEY=${VITE_OPENAI_API_KEY}
     develop:
       watch:
         - action: sync
