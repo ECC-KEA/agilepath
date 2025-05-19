@@ -13,7 +13,7 @@ import {FaPlus} from "react-icons/fa";
 
 function StoryEdit() {
   const { assistant } = useAssistant();
-  const { sendMessage, response } = useOpenAI();
+  const { sendMessage } = useOpenAI();
   const { story } = useStory();
   const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
