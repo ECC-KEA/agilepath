@@ -13,19 +13,17 @@ function StoryBox(props: Readonly<StoryBoxProps>) {
   }
 
   return (
-    <>
-      <div 
-        onClick={handleClick}
-        className="p-2 bg-white rounded shadow cursor-pointer"
-      >
-        <div className="flex justify-between items-center text-sm">
-          {/* TODO: replace with issue id */}
-          <div className="truncate w-20">#{props.story.id}</div>
-          <StatusLabel status={props.story.status as Status} />
-        </div>
-        <div className="my-2 mx-4">{props.story.title}</div>
+    <div 
+      onClick={handleClick}
+      className="p-2 bg-white rounded shadow cursor-pointer"
+    >
+      <div className="flex justify-between items-center text-sm">
+        {/* TODO: replace with issue id */}
+        <div className="truncate w-20">#{props.story.id}</div>
+        <StatusLabel status={props.story.status as Status} />
       </div>
-    </>
+      <div className="my-2 mx-4">{props.story.title}</div>
+    </div>
   );
 }
 export default StoryBox;

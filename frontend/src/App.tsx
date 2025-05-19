@@ -13,6 +13,8 @@ import ProjectMembers from "./views/ProjectMembers";
 import StoryEdit from "./views/StoryEdit";
 import AssistantProvider from "./hooks/assistant/AssistantProvider";
 import OpenAIProvider from "./hooks/openai/OpenAIProvider";
+import TaskEdit from "./views/TaskEdit";
+import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
 
 function App() {
   return (
@@ -53,6 +55,18 @@ function App() {
               <Route
                 path="stats"
                 element={<SprintStats />}
+              />
+              <Route
+                path="edit/:taskId"
+                element={
+                  <AssistantProvider assistantId='e1111111-0000-0000-0000-000000000001'>
+                    <OpenAIProvider>
+                      <SubTaskProvider>
+                        <TaskEdit />
+                      </SubTaskProvider>
+                    </OpenAIProvider>
+                  </AssistantProvider>
+                }
               />
             </Route>
             <Route

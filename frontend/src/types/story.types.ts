@@ -63,13 +63,21 @@ export function convertTaskToRequest(task: ITask): ITaskRequest {
 
 export interface ISubTask {
   id: string;
-  content: string;
-  storyId: string;
   taskId: string;
+  title: string;
+  description: string;
+  isDone: boolean;
   createdBy: string;
   modifiedBy: string;
   createdAt: string;
   modifiedAt: string;
+}
+
+export interface INewSubTask {
+  taskId: string;
+  title: string;
+  description: string;
+  isDone: boolean;
 }
 
 export enum TshirtEstimate {
