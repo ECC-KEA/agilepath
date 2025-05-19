@@ -55,12 +55,12 @@ class UserProjectService(
     }
 
     private fun checkUserExists(userId: String) {
-        val user = ctx.user.findById(userId)
-        require(user.isPresent) { throw ResourceNotFoundException("User with id $userId not found") }
+        val exists = ctx.user.existsById(userId)
+        require(exists) { throw ResourceNotFoundException("User with id $userId not found") }
     }
 
     private fun checkProjectExists(projectId: UUID) {
-        val project = ctx.project.findById(projectId)
-        require(project.isPresent) { throw ResourceNotFoundException("Project with id $projectId not found") }
+        val exists = ctx.project.existsById(projectId)
+        require(exists) { throw ResourceNotFoundException("Project with id $projectId not found") }
     }
 }
