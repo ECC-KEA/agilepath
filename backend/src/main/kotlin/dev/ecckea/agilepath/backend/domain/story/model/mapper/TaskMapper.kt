@@ -5,7 +5,9 @@ import dev.ecckea.agilepath.backend.domain.story.dto.SubtaskResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskRequest
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
 import dev.ecckea.agilepath.backend.domain.story.model.NewTask
+import dev.ecckea.agilepath.backend.domain.story.model.PointEstimate
 import dev.ecckea.agilepath.backend.domain.story.model.Task
+import dev.ecckea.agilepath.backend.domain.story.model.TshirtEstimate
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskEntity
 import dev.ecckea.agilepath.backend.domain.user.model.mapper.toDTO
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
@@ -89,8 +91,8 @@ fun TaskRequest.toModel(userId: String = currentUser().id): NewTask {
         sprintColumnId = sprintColumnId,
         title = title,
         description = description,
-        estimateTshirt = estimateTshirt,
-        estimatePoints = estimatePoints,
+        estimateTshirt = estimateTshirt?.let { TshirtEstimate.fromString(it) },
+        estimatePoints = estimatePoints?.let { PointEstimate.fromString(it) },
         assigneeIds = assigneeIds,
         createdBy = userId,
         createdAt = now()
@@ -116,7 +118,7 @@ fun TaskEntity.updatedWith(update: NewTask, userId: String, ctx: RepositoryConte
     return TaskEntity(
         id = this.id,
         story = this.story,
-        sprintColumn = this.sprintColumn,
+        sprintColumn = ctx.sprintColumn.ref(update.sprintColumnId),
         title = update.title,
         description = update.description,
         estimateTshirt = update.estimateTshirt,

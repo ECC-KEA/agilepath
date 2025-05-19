@@ -53,9 +53,8 @@ export const useApi = () => {
         },
         body: JSON.stringify(data)
       })
-        .then(res => res.json())
-        .catch(console.error)
-      ,
+        .then((res) => res.json())
+        .catch(console.error),
     [fetchWithAuth]
   );
 
@@ -63,6 +62,9 @@ export const useApi = () => {
     (url: string, data: unknown) =>
       fetchWithAuth(url, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(data)
       })
         .then((res) => res.json())
@@ -74,20 +76,6 @@ export const useApi = () => {
     (url: string) => fetchWithAuth(url, { method: "DELETE" }).catch(console.error),
     [fetchWithAuth]
   );
-
-  // const postOpenAI = useCallback(
-  //   (url: string, data: unknown) =>
-  //     fetchOpenAI(url, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json"
-  //       },
-  //       body: JSON.stringify(data)
-  //     })
-  //       .then(res => res.json())
-  //       .catch(console.error),
-  //   [fetchOpenAI]
-  // );
 
   const postOpenAI = useCallback(
   async (url: string, data: unknown, onChunk?: (chunk: string) => void) => {
@@ -134,7 +122,7 @@ export const useApi = () => {
   },
   [fetchOpenAI]
 );
-  
+
 
   return { fetchWithAuth, fetchNoAuth, get, put, post, del, postOpenAI, api_url: API_URL };
 };

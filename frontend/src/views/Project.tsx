@@ -26,9 +26,9 @@ function Project() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full w-full flex flex-col">
       <ProjectHeader projectName={project.name} />
-      <div className="flex-1 flex overflow-auto">
+      <div className="flex-1 flex">
         <ProjectSidebar />
         <Outlet />
       </div>

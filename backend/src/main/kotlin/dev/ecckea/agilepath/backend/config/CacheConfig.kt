@@ -1,126 +1,119 @@
 package dev.ecckea.agilepath.backend.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import dev.ecckea.agilepath.backend.shared.logging.Logged
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.Cache
-import org.springframework.cache.CacheManager
-import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.cache.interceptor.SimpleCacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
-import org.springframework.data.redis.cache.RedisCacheConfiguration
-import org.springframework.data.redis.cache.RedisCacheManager
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
-import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import java.time.Duration
 
 /**
- * Configures Spring Cache using Redis as the underlying cache backend.
+ * Configuration class for Redis cache setup in the application.
+ *
+ * This class configures Redis as the caching provider and sets up error handling
+ * for cache operations. It is active in all profiles except the "test" profile,
+ * where an alternative caching solution may be used.
  */
 @Configuration
 @Profile("!test")
-@EnableCaching
-class CacheConfig(
-    @Qualifier("redisCacheObjectMapper") private val redisCacheObjectMapper: ObjectMapper,
-) : Logged() {
+class CacheConfig : Logged() {
+
     /**
-     * Configures the primary CacheManager bean using Redis as the backing store.
+     * Configures a Redis template for string key-value operations.
      *
-     * This method sets up a RedisCacheManager with the following configurations:
-     * - A default Time-To-Live (TTL) of 15 minutes for cache entries.
-     * - String serialization for cache keys.
-     * - JSON serialization for cache values using a custom ObjectMapper.
+     * Sets up a RedisTemplate that uses StringRedisSerializer for all serialization needs,
+     * making it suitable for simple string-based caching with readable keys and values in Redis.
      *
-     * @param connectionFactory the RedisConnectionFactory used to establish connections to the Redis server.
-     * @return a configured instance of CacheManager for managing application caches.
+     * @param connectionFactory The Redis connection factory to use
+     * @return A configured RedisTemplate instance for string operations
      */
     @Bean
-    fun cacheManager(connectionFactory: RedisConnectionFactory): CacheManager {
-        val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
-
-        val config = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(15))
-            .serializeKeysWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
-            )
-            .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(serializer)
-            )
-
-        return RedisCacheManager.builder(connectionFactory)
-            .cacheDefaults(config)
-            .build()
+    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, String> {
+        val template = RedisTemplate<String, String>()
+        template.connectionFactory = connectionFactory
+        template.keySerializer = StringRedisSerializer()
+        template.valueSerializer = StringRedisSerializer()
+        template.hashKeySerializer = StringRedisSerializer()
+        template.hashValueSerializer = StringRedisSerializer()
+        template.afterPropertiesSet()
+        return template
     }
 
+    /**
+     * Provides a cache error handler with enhanced logging.
+     *
+     * Extends the SimpleCacheErrorHandler to add detailed error logging for all cache operations
+     * while maintaining the default error handling behavior. This helps with troubleshooting
+     * cache-related issues in production environments.
+     *
+     * @return A custom CacheErrorHandler implementation with logging
+     */
     @Bean
     fun cacheErrorHandler(): CacheErrorHandler {
         return object : SimpleCacheErrorHandler() {
-            override fun handleCacheGetError(
-                exception: RuntimeException,
-                cache: Cache,
-                key: Any
-            ) {
+            /**
+             * Handles errors during cache retrieval operations.
+             *
+             * Logs the error details including the cache name and key before delegating
+             * to the parent handler.
+             *
+             * @param exception The runtime exception that occurred
+             * @param cache The cache where the error occurred
+             * @param key The key being accessed when the error occurred
+             */
+            override fun handleCacheGetError(exception: RuntimeException, cache: Cache, key: Any) {
                 log.error("Cache get error for key $key in cache ${cache.name}", exception)
                 super.handleCacheGetError(exception, cache, key)
             }
 
-            override fun handleCachePutError(
-                exception: RuntimeException,
-                cache: Cache,
-                key: Any,
-                value: Any?
-            ) {
+            /**
+             * Handles errors during cache update operations.
+             *
+             * Logs the error details including the cache name, key, and value before
+             * delegating to the parent handler.
+             *
+             * @param exception The runtime exception that occurred
+             * @param cache The cache where the error occurred
+             * @param key The key being updated when the error occurred
+             * @param value The value being stored when the error occurred
+             */
+            override fun handleCachePutError(exception: RuntimeException, cache: Cache, key: Any, value: Any?) {
                 log.error("Cache put error for key $key in cache ${cache.name}", exception)
                 super.handleCachePutError(exception, cache, key, value)
             }
 
-            override fun handleCacheEvictError(
-                exception: RuntimeException,
-                cache: Cache,
-                key: Any
-            ) {
+            /**
+             * Handles errors during cache entry removal operations.
+             *
+             * Logs the error details including the cache name and key before
+             * delegating to the parent handler.
+             *
+             * @param exception The runtime exception that occurred
+             * @param cache The cache where the error occurred
+             * @param key The key being removed when the error occurred
+             */
+            override fun handleCacheEvictError(exception: RuntimeException, cache: Cache, key: Any) {
                 log.error("Cache evict error for key $key in cache ${cache.name}", exception)
                 super.handleCacheEvictError(exception, cache, key)
             }
 
-            override fun handleCacheClearError(
-                exception: RuntimeException,
-                cache: Cache
-            ) {
+            /**
+             * Handles errors during complete cache clearing operations.
+             *
+             * Logs the error details including the cache name before
+             * delegating to the parent handler.
+             *
+             * @param exception The runtime exception that occurred
+             * @param cache The cache being cleared when the error occurred
+             */
+            override fun handleCacheClearError(exception: RuntimeException, cache: Cache) {
                 log.error("Cache clear error for cache ${cache.name}", exception)
                 super.handleCacheClearError(exception, cache)
             }
         }
-    }
-
-    /**
-     * Configures a RedisTemplate bean for direct access to Redis.
-     *
-     * This method sets up a RedisTemplate with the following configurations:
-     * - String serialization for keys and hash keys.
-     * - JSON serialization for values and hash values using a custom ObjectMapper.
-     * - The provided RedisConnectionFactory is used to establish connections to the Redis server.
-     *
-     * @param connectionFactory the RedisConnectionFactory used to connect to the Redis server.
-     * @return a configured instance of RedisTemplate for interacting with Redis.
-     */
-    @Bean
-    fun redisTemplate(connectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
-        val template = RedisTemplate<String, Any>()
-        val serializer = GenericJackson2JsonRedisSerializer(redisCacheObjectMapper)
-
-        template.connectionFactory = connectionFactory
-        template.keySerializer = StringRedisSerializer()
-        template.valueSerializer = serializer
-        template.hashKeySerializer = StringRedisSerializer()
-        template.hashValueSerializer = serializer
-        template.afterPropertiesSet()
-        return template
     }
 }

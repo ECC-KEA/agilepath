@@ -39,7 +39,7 @@ export interface ITask {
   assignees: IUser[];
 }
 
-export interface INewTask {
+export interface ITaskRequest {
   storyId: string;
   sprintColumnId: string;
   title: string;
@@ -47,6 +47,18 @@ export interface INewTask {
   estimateTshirt?: TshirtEstimate;
   estimatePoints?: PointEstimate;
   assigneeIds: string[];
+}
+
+export function convertTaskToRequest(task: ITask): ITaskRequest {
+  return {
+    storyId: task.storyId,
+    sprintColumnId: task.sprintColumnId,
+    title: task.title,
+    description: task.description,
+    estimateTshirt: task.estimateTshirt,
+    estimatePoints: task.estimatePoints,
+    assigneeIds: task.assignees.map((a) => a.id)
+  };
 }
 
 export interface ISubTask {
@@ -61,21 +73,21 @@ export interface ISubTask {
 }
 
 export enum TshirtEstimate {
-  XSMALL,
-  SMALL,
-  MEDIUM,
-  LARGE,
-  XLARGE
+  XSMALL = "XSMALL",
+  SMALL = "SMALL",
+  MEDIUM = "MEDIUM",
+  LARGE = "LARGE",
+  XLARGE = "XLARGE"
 }
 
 export enum PointEstimate {
-  POINT_1 = 1,
-  POINT_2 = 2,
-  POINT_3 = 3,
-  POINT_5 = 5,
-  POINT_8 = 8,
-  POINT_13 = 13,
-  POINT_21 = 21
+  POINT_1 = "POINT_1",
+  POINT_2 = "POINT_2",
+  POINT_3 = "POINT_3",
+  POINT_5 = "POINT_5",
+  POINT_8 = "POINT_8",
+  POINT_13 = "POINT_13",
+  POINT_21 = "POINT_21"
 }
 
 export interface INewStory {

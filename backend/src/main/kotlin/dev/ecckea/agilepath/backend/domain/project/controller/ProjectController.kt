@@ -12,11 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
+@Validated
 @Tag(name = "Project", description = "Endpoints related to project management")
 class ProjectController(
     private val projectApplication: ProjectApplication
@@ -85,7 +88,7 @@ class ProjectController(
         ]
     )
     @PostMapping
-    fun createProject(@RequestBody project: ProjectRequest): ProjectResponse {
+    fun createProject(@Valid @RequestBody project: ProjectRequest): ProjectResponse {
         log.info("POST /projects/ - Create project")
         return projectApplication.createProject(project.toModel(currentUser().id)).toDTO()
     }
@@ -132,7 +135,7 @@ class ProjectController(
         ]
     )
     @PutMapping("/{id}")
-    fun updateProject(@PathVariable id: UUID, @RequestBody project: ProjectRequest): ProjectResponse {
+    fun updateProject(@PathVariable id: UUID, @Valid @RequestBody project: ProjectRequest): ProjectResponse {
         log.info("PUT /projects/{} - Update project", id)
         return projectApplication.updateProject(id, project.toModel(currentUser().id)).toDTO()
     }

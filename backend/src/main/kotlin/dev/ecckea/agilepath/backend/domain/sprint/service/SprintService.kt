@@ -5,29 +5,53 @@ import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toModel
 import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.sprint.model.NewSprint
 import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
+import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
 class SprintService(
-    private val ctx: RepositoryContext
+    private val ctx: RepositoryContext,
+    private val cacheService: CacheService
 ) : Logged() {
 
+
+    @Transactional(readOnly = true)
     fun getSprints(projectId: UUID): List<Sprint> {
-        return ctx.sprint.findByProjectId(projectId).map { it.toModel() }
+        log.info("Fetching sprints for project $projectId")
+
+        // Check if the sprints are in the cache
+        cacheService.getProjectSprints(projectId)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        val sprints = ctx.sprint.findByProjectId(projectId)
+            .map { it.toModel() }
             .sortedBy { it.startDate }
+
+        cacheService.cacheProjectSprints(projectId, sprints)
+        return sprints
     }
 
+
+    @Transactional(readOnly = true)
     fun getSprint(sprintId: UUID): Sprint {
-        return ctx.sprint.findOneById(sprintId)?.toModel()
-            ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
+        log.info("Fetching sprint $sprintId")
+
+        // Check if the sprint is in the cache
+        cacheService.getSprint(sprintId)?.let { return it }
+
+        // If not in cache, get from database and cache it
+        return getFromDbAndCache(sprintId)
     }
 
+
+    @Transactional
     fun createSprint(newSprint: NewSprint): Sprint {
         log.info("Creating sprint with name ${newSprint.name}")
 
@@ -37,11 +61,19 @@ class SprintService(
 
         val entity = newSprint.toEntity(ctx, currentUser().id)
         val saved = ctx.sprint.save(entity)
-        return saved.toModel()
+        val sprint = saved.toModel()
+
+        // Invalidate project sprints cache
+        cacheService.invalidateProjectSprints(newSprint.projectId)
+
+        return sprint
     }
 
+
+    @Transactional
     fun updateSprint(sprintId: UUID, sprint: NewSprint): Sprint {
         log.info("Updating sprint with ID $sprintId")
+
         val existingSprint = ctx.sprint.findOneById(sprintId)
             ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
 
@@ -56,6 +88,21 @@ class SprintService(
         )
 
         val updated = ctx.sprint.save(updatedEntity)
-        return updated.toModel()
+        val updatedSprint = updated.toModel()
+
+        // Invalidate caches
+        cacheService.invalidateSprint(sprintId)
+        cacheService.invalidateProjectSprints(sprint.projectId)
+
+        return updatedSprint
+    }
+
+    private fun getFromDbAndCache(id: UUID): Sprint {
+        log.info("Fetching sprint $id from database")
+        val sprint = ctx.sprint.findOneById(id)?.toModel()
+            ?: throw ResourceNotFoundException("Sprint with ID $id not found")
+
+        cacheService.cacheSprint(sprint)
+        return sprint
     }
 }
