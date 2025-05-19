@@ -1,6 +1,9 @@
 package dev.ecckea.agilepath.backend.domain.user.repository.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.Instant
 
 @Entity
@@ -22,7 +25,6 @@ class UserEntity(
     @Column(name = "avatar_url", columnDefinition = "TEXT")
     val avatarUrl: String? = null,
 
-    // @JsonSerialize(using = InstantSerializer::class)
     @Column(name = "created_at", nullable = false)
     val createdAt: Instant = Instant.now(),
 )
