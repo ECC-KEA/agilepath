@@ -2,7 +2,9 @@ package dev.ecckea.agilepath.backend.domain.project.application
 
 import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
+import dev.ecckea.agilepath.backend.domain.project.model.ProjectRole
 import dev.ecckea.agilepath.backend.domain.project.service.ProjectService
+import dev.ecckea.agilepath.backend.domain.project.service.UserProjectService
 import dev.ecckea.agilepath.backend.domain.user.service.UserService
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
@@ -12,6 +14,7 @@ import java.util.*
 class ProjectApplication(
     private val projectService: ProjectService,
     private val userService: UserService,
+    private val userProjectService: UserProjectService
 ) {
 
     fun getProject(id: UUID): Project {
@@ -25,7 +28,9 @@ class ProjectApplication(
 
     fun createProject(project: NewProject): Project {
         val user = userService.get(currentUser())
-        return projectService.createProject(project, user)
+        val createdProject = projectService.createProject(project, user)
+        userProjectService.addUserToProject(user.id, createdProject.id, ProjectRole.OWNER)
+        return createdProject
     }
 
     fun deleteProject(id: UUID) {
