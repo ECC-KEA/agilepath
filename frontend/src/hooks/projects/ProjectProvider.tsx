@@ -4,15 +4,18 @@ import { useApi } from "../utils/useApi";
 import ProjectContext from "./ProjectContext";
 import toast from "react-hot-toast";
 import { useLoading } from "../utils/loading/useLoading";
+import useMe from "../me/useMe";
 
 function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
   const loader = useLoading();
   const { get, post } = useApi();
+  const { me } = useMe();
   const [projects, setProjects] = useState<IProject[]>([]);
 
   const loadProjects = useCallback(() => {
+    if (!me) return Promise.resolve();
     loader.add();
-    return get("/projects")
+    return get(`/projects/users/${me?.id}`)
       .then((res) => {
         if (Array.isArray(res)) {
           setProjects(res);
@@ -22,7 +25,7 @@ function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
         toast.error(e);
       })
       .finally(loader.done);
-  }, [get]);
+  }, [get, me]);
 
   const createProject = useCallback(
     (newProj: INewProject) => {

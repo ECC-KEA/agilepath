@@ -5,16 +5,17 @@ import { useApi } from "../utils/useApi";
 import CurrentProjectContext from "./CurrentProjectContext";
 import { useParams } from "react-router";
 import { IUser } from "../../types/user.types";
+import { IAddMemberRequest, IProjectMember, MemberRole } from "../../types/project.types";
 
 function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
   const { projectID } = useParams();
-  const { get, post, del } = useApi();
+  const { get, post, del, postNoRes, putNoRes } = useApi();
   const { projects } = useProjects();
   const project = useMemo(() => {
     return projects.find((p) => p.id === projectID);
   }, [projects, projectID]);
   const [sprints, setSprints] = useState<ISprint[]>([]);
-  const [members, setMembers] = useState<IUser[]>([]);
+  const [members, setMembers] = useState<IProjectMember[]>([]);
   const [owner, setOwner] = useState<IUser>();
 
   const getSprints = useCallback(() => {
@@ -30,13 +31,28 @@ function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
   }, [get, project]);
 
   const addMember = useCallback(
-    (user: IUser) => {
-      return post(`/projects/${projectID}/members`, user);
+    (user: IAddMemberRequest) => {
+      return postNoRes(`/projects/${projectID}/members`, user).then(getMembers);
     },
-    [post, projectID]
+    [postNoRes, projectID]
   );
 
-  const removeMember = useCallback((user: IUser) => {}, [del]);
+  const editMemberRole = useCallback(
+    (member: IProjectMember, newRole: MemberRole) => {
+      return putNoRes(
+        `/projects/${projectID}/members/${member.user.id}?role=${newRole}`,
+        undefined
+      ).then(getMembers);
+    },
+    [putNoRes, projectID]
+  );
+
+  const removeMember = useCallback(
+    (member: IProjectMember) => {
+      return del(`/projects/${projectID}/members/${member.user.id}`).then(getMembers);
+    },
+    [del, projectID]
+  );
 
   const addSprint = useCallback(
     (newSprint: INewSprint) => {
@@ -60,9 +76,11 @@ function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
       members,
       owner,
       addSprint,
-      addMember
+      addMember,
+      removeMember,
+      editMemberRole
     }),
-    [project, sprints, members, owner, addSprint, addMember]
+    [project, sprints, members, owner, addSprint, addMember, removeMember, editMemberRole]
   );
 
   return (
