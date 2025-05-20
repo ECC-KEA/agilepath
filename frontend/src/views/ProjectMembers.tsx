@@ -41,16 +41,20 @@ function ProjectMembers() {
   return (
     <div>
       <RequireRole role={MemberRole.ADMIN}>
-        <CustomAsyncSelect
-          loadOptions={loadOptions}
-          onChange={(o) => {
-            if (o) {
-              onAddMember(o.value);
-            }
-          }}
-          value={null}
-          className="w-96"
-        />
+        <div className="">
+          <CustomAsyncSelect
+            loadOptions={loadOptions}
+            onChange={(o) => {
+              if (o) {
+                onAddMember(o.value);
+              }
+            }}
+            value={null}
+            className="w-96"
+            placeholder="Add contributor"
+            noOptionsMessage={() => "Search by name, username or email"}
+          />
+        </div>
       </RequireRole>
       {!!owner && (
         <div className="p-2 flex flex-col gap-2">
