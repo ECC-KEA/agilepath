@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PathVariable
 
 @RestController
 @RequestMapping("/users")
@@ -42,5 +43,25 @@ class UserController (
       @RequestParam q: String
   ): List<UserResponse> {
       return userApplication.getUsersBySearch(q).map { it.toDTO() }
+  }
+
+  @Operation(
+    summary = "Get user by id",
+    description = "Returns a user by id.",
+    security = [SecurityRequirement(name = "bearerAuth")]
+  )
+  @ApiResponses(
+      value = [
+          ApiResponse(responseCode = "200", description = "Successfully returned user"),
+          ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+          ApiResponse(responseCode = "403", description = "Forbidden – Authenticated but not allowed"),
+          ApiResponse(responseCode = "500", description = "Internal server error")
+      ]
+  )
+  @GetMapping("/{id}")
+  fun getUserById(
+      @PathVariable id: String
+  ): UserResponse {
+      return userApplication.getUserById(id).toDTO()
   }
 }

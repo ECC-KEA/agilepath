@@ -4,19 +4,39 @@ import { INewSprint, ISprint } from "../../types/sprint.types";
 import { useApi } from "../utils/useApi";
 import CurrentProjectContext from "./CurrentProjectContext";
 import { useParams } from "react-router";
+import { IUser } from "../../types/user.types";
 
 function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
   const { projectID } = useParams();
-  const { get, post } = useApi();
+  const { get, post, del } = useApi();
   const { projects } = useProjects();
   const project = useMemo(() => {
     return projects.find((p) => p.id === projectID);
   }, [projects, projectID]);
   const [sprints, setSprints] = useState<ISprint[]>([]);
+  const [members, setMembers] = useState<IUser[]>([]);
+  const [owner, setOwner] = useState<IUser>();
 
   const getSprints = useCallback(() => {
     get(`/projects/${projectID}/sprints`).then(setSprints).catch(console.error);
-  }, [projectID]);
+  }, [get, projectID]);
+
+  const getMembers = useCallback(() => {
+    get(`/projects/${projectID}/members`).then(setMembers).catch(console.error);
+  }, [get, projectID]);
+
+  const getOwner = useCallback(() => {
+    get(`/users/${project?.createdBy}`).then(setOwner).catch(console.error);
+  }, [get, project]);
+
+  const addMember = useCallback(
+    (user: IUser) => {
+      return post(`/projects/${projectID}/members`, user);
+    },
+    [post, projectID]
+  );
+
+  const removeMember = useCallback((user: IUser) => {}, [del]);
 
   const addSprint = useCallback(
     (newSprint: INewSprint) => {
@@ -29,13 +49,21 @@ function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
 
   useEffect(() => {
     getSprints();
-  }, [projectID]);
+    getMembers();
+    getOwner();
+  }, [project]);
 
-  const contextValue = useMemo(() => ({
-    project,
-    sprints,
-    addSprint
-  }), [project, sprints, addSprint]);
+  const contextValue = useMemo(
+    () => ({
+      project,
+      sprints,
+      members,
+      owner,
+      addSprint,
+      addMember
+    }),
+    [project, sprints, members, owner, addSprint, addMember]
+  );
 
   return (
     <CurrentProjectContext.Provider value={contextValue}>
