@@ -16,4 +16,11 @@ interface UserRepository : JpaRepository<UserEntity, String> {
     fun existsByEmail(email: String): Boolean
 
     fun existsByGithubUsername(githubUsername: String): Boolean
+
+    fun findAllByFullNameContainsIgnoreCaseOrEmailContainsIgnoreCaseOrGithubUsernameContainsIgnoreCase(
+        fullname: String,
+        email: String,
+        githubUsername: String
+    ): List<UserEntity>
+
 }
