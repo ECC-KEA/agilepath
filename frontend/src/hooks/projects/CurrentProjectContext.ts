@@ -1,11 +1,17 @@
 import { createContext } from "react";
-import { IProject } from "../../types/project.types";
+import { IAddMemberRequest, IProject, IProjectMember, MemberRole } from "../../types/project.types";
 import { INewSprint, ISprint } from "../../types/sprint.types";
+import { IUser } from "../../types/user.types";
 
 interface ICurrentProjectContext {
   project: IProject | undefined;
   sprints: ISprint[];
-  addSprint: (newSprint: INewSprint) => Promise<void>;
+  members: IProjectMember[];
+  owner: IUser | undefined;
+  addSprint: (newSprint: INewSprint) => Promise<unknown>;
+  addMember: (newMember: IAddMemberRequest) => Promise<unknown>;
+  removeMember: (member: IProjectMember) => Promise<unknown>;
+  editMemberRole: (member: IProjectMember, role: MemberRole) => Promise<unknown>;
 }
 
 const CurrentProjectContext = createContext<ICurrentProjectContext | undefined>(undefined);
