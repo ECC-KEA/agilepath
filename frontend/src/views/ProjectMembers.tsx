@@ -40,34 +40,36 @@ function ProjectMembers() {
 
   return (
     <div>
-      <RequireRole role={MemberRole.ADMIN}>
-        <div className="">
-          <CustomAsyncSelect
-            loadOptions={loadOptions}
-            onChange={(o) => {
-              if (o) {
-                onAddMember(o.value);
-              }
-            }}
-            value={null}
-            className="w-96"
-            placeholder="Add contributor"
-            noOptionsMessage={() => "Search by name, username or email"}
-          />
-        </div>
-      </RequireRole>
       {!!owner && (
         <div className="p-2 flex flex-col gap-2">
           <div>Owner</div>
-          <MemberCard
-            role={MemberRole.OWNER}
-            user={owner}
-          />
+          <div className="flex items-center bg-white p-2 rounded shadow justify-between">
+            <div className="flex items-center gap-3">
+              <Avatar src={owner.avatarUrl} />
+              {name(owner)}
+            </div>
+          </div>
         </div>
       )}
       <ShowIf if={members.length > 0}>
-        <div className="p-2 flex flex-col gap-2">
-          <div>Members ({members.length})</div>
+        <div className="p-2 flex flex-col gap-2 mt-8">
+          <div>Contributors ({members.length})</div>
+          <RequireRole role={MemberRole.ADMIN}>
+            <div className="">
+              <CustomAsyncSelect
+                loadOptions={loadOptions}
+                onChange={(o) => {
+                  if (o) {
+                    onAddMember(o.value);
+                  }
+                }}
+                value={null}
+                className="w-xl"
+                placeholder="Add contributor"
+                noOptionsMessage={() => "Search by name, username or email"}
+              />
+            </div>
+          </RequireRole>
           {members.map((m) => (
             <MemberCard
               key={"member" + m.user.id}
