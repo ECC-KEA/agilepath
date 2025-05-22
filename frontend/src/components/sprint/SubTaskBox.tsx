@@ -6,20 +6,11 @@ interface SubTaskBoxProps {
 }
 
 function SubTaskBox(props: Readonly<SubTaskBoxProps>) {
-  const { updateSubTask } = useSubTask();
+  const { toggleSubTaskDone } = useSubTask();
   const handleCheck = () => {
-    const updatedSubTask = {
-      ...props.subtask,
-      isDone: !props.subtask.isDone,
-    };
-
-    void updateSubTask(updatedSubTask, props.subtask.id)
-      .then(() => {
-        console.log("Subtask updated successfully");
-      })
-      .catch((error) => {
-        console.error("Error updating subtask:", error);
-      });
+    toggleSubTaskDone(props.subtask.id)
+      .then(() => console.log("Subtask toggled"))
+      .catch((err) => console.error("Error toggling subtask", err));
   }
 
   return (

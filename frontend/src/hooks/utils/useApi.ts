@@ -72,6 +72,27 @@ export const useApi = () => {
     [fetchWithAuth]
   );
 
+const patch = useCallback(
+  (url: string, data: unknown) =>
+    fetchWithAuth(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const text = await res.text();
+        return text ? JSON.parse(text) : null;
+      })
+      .catch((err) => {
+        console.error("Patch error:", err);
+        return null;
+      }),
+  [fetchWithAuth]
+);
+
   const del = useCallback(
     (url: string) => fetchWithAuth(url, { method: "DELETE" }).catch(console.error),
     [fetchWithAuth]
@@ -124,5 +145,5 @@ export const useApi = () => {
 );
 
 
-  return { fetchWithAuth, fetchNoAuth, get, put, post, del, postOpenAI, api_url: API_URL };
+  return { fetchWithAuth, fetchNoAuth, get, put, post, del, patch, postOpenAI, api_url: API_URL };
 };

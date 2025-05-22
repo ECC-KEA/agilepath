@@ -10,7 +10,7 @@ function SubTaskProvider({ children }: Readonly<PropsWithChildren>)
 {
   const { taskId } = useParams();
   const loader = useLoading();
-  const { get, post, put } = useApi();
+  const { get, post, patch } = useApi();
   const [subtasks, setSubtasks] = useState<ISubTask[]>([]);
 
   const loadSubtasks = useCallback(async () => {
@@ -30,12 +30,15 @@ function SubTaskProvider({ children }: Readonly<PropsWithChildren>)
     }, [post]
   );
 
-  const updateSubTask = useCallback(
-    (subtask: ISubTask, id: string) => {
-      return put(`/subtasks/${id}`, subtask)
-        .then((res) => setSubtasks((prev) => prev.map((s) => (s.id === res.id ? res : s))))
+  const toggleSubTaskDone = useCallback(
+    (id: string) => {
+      return patch(`/subtasks/${id}/toggle`,"")
+        .then((res) => {
+          if (!res) return;
+          setSubtasks((prev) => prev.map((s) => (s.id === res.id ? res : s)));
+        })
         .catch(console.error);
-    }, [put]
+    }, [patch]
   );
 
   const contextValue = useMemo(
@@ -43,9 +46,9 @@ function SubTaskProvider({ children }: Readonly<PropsWithChildren>)
       subtasks,
       taskId,
       createSubTask,
-      updateSubTask
+      toggleSubTaskDone
     }),
-    [subtasks, createSubTask, updateSubTask, taskId]
+    [subtasks, createSubTask, toggleSubTaskDone, taskId]
   );
 
   return (
