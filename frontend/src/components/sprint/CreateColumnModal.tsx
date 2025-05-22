@@ -23,8 +23,6 @@ export default function CreateColumnModal(props: CreateColumnModalProps) {
     return name === "";
   }, [name]);
 
-  console.log(columns);
-
   const handleCreateColumn = async () => {
     const endIndex = columns.length === 0 ? 0 : Math.max(...columns.map((c) => c.columnIndex)) + 1;
 

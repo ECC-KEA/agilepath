@@ -12,6 +12,7 @@ function ColumnProvider({ children, sprintId }: Readonly<ColumnProviderProps>) {
   const loader = useLoading();
   const { get, post, del } = useApi();
   const [columns, setColumns] = useState<IColumn[]>([]);
+  console.log("ColumnProvider", columns);
 
   const loadColumns = useCallback(async () => {
     loader.add();

@@ -1,5 +1,6 @@
 package dev.ecckea.agilepath.backend.shared.context.repository
 
+import dev.ecckea.agilepath.backend.domain.assistant.repository.AssistantRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
@@ -64,4 +65,5 @@ class RepositoryContext(
 
     /** Repository for comment-related database operations */
     val comment: CommentRepository,
-)
+    val assistant: AssistantRepository,
+    )
