@@ -26,7 +26,6 @@ function StoryEdit() {
 
   const handleBreakdown = () => {
   loader.add();
-  console.log("Breakdown clicked");
 
   const systemMessage = {
     role: "system",

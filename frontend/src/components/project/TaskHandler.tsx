@@ -1,11 +1,12 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import useTask from "../../hooks/task/useTask";
-import { INewTask } from "../../types/story.types";
+import { ITaskRequest  } from "../../types/story.types";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
 import useStory from "../../hooks/story/useStory";
 import useColumn from "../../hooks/column/useColumn"
 import TextArea from "../generic/inputs/CustomTextArea";
+import { TshirtEstimate } from "../../types/story.types";
 
 interface TaskHandlerProps {
   show: boolean;
@@ -33,12 +34,13 @@ const TaskHandler = forwardRef<TaskHandlerHandle, TaskHandlerProps>((props, ref)
 
     const sprintColumnId = columns.find((c) => c.status === "TODO")?.id ?? columns[0].id;
     
-    const tmp: INewTask = {
+    const tmp: ITaskRequest = {
       assigneeIds: [], // TODO: select m. members i projekt,
       sprintColumnId: sprintColumnId,
       storyId: story.id,
       title,
-      description
+      description,
+      estimateTshirt: TshirtEstimate.MEDIUM
     };
     void createTask(tmp)
       .then(() => notifySuccess("Successfully created task"))
