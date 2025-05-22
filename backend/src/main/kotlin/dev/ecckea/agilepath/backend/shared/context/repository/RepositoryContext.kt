@@ -3,6 +3,7 @@ package dev.ecckea.agilepath.backend.shared.context.repository
 import dev.ecckea.agilepath.backend.domain.assistant.repository.AssistantRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
+import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
 import dev.ecckea.agilepath.backend.domain.story.repository.*
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
@@ -35,14 +36,34 @@ import org.springframework.stereotype.Component
  */
 @Component
 class RepositoryContext(
+    /** Repository for user-related database operations */
     val user: UserRepository,
+
+    /** Repository for project-related database operations */
     val project: ProjectRepository,
+
+    /** Repository for user-project relationship operations */
+    val userProject: UserProjectRepository,
+
+    /** Repository for sprint-related database operations */
     val sprint: SprintRepository,
+
+    /** Repository for sprint column-related database operations */
     val sprintColumn: SprintColumnRepository,
+
+    /** Repository for story-related database operations */
     val story: StoryRepository,
+
+    /** Repository for task-related database operations */
     val task: TaskRepository,
+
+    /** Repository for task assignee relationship operations */
     val taskAssinee: TaskAssigneeRepository,
+
+    /** Repository for subtask-related database operations */
     val subtask: SubtaskRepository,
+
+    /** Repository for comment-related database operations */
     val comment: CommentRepository,
     val assistant: AssistantRepository,
     )

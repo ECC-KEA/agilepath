@@ -37,10 +37,7 @@ export const useApi = () => {
   }
 
   const get = useCallback(
-    (url: string) =>
-      fetchWithAuth(url)
-        .then((res) => res.json())
-        .catch(console.error),
+    (url: string) => fetchWithAuth(url).then((res) => res.json()),
     [fetchWithAuth]
   );
 
@@ -52,9 +49,19 @@ export const useApi = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
-      })
-        .then((res) => res.json())
-        .catch(console.error),
+      }).then((res) => res.json()),
+    [fetchWithAuth]
+  );
+
+  const postNoRes = useCallback(
+    (url: string, data: unknown) =>
+      fetchWithAuth(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }),
     [fetchWithAuth]
   );
 
@@ -66,9 +73,19 @@ export const useApi = () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
-      })
-        .then((res) => res.json())
-        .catch(console.error),
+      }).then((res) => res.json()),
+    [fetchWithAuth]
+  );
+
+  const putNoRes = useCallback(
+    (url: string, data: unknown) =>
+      fetchWithAuth(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      }),
     [fetchWithAuth]
   );
 
@@ -94,7 +111,7 @@ const patch = useCallback(
 );
 
   const del = useCallback(
-    (url: string) => fetchWithAuth(url, { method: "DELETE" }).catch(console.error),
+    (url: string) => fetchWithAuth(url, { method: "DELETE" }),
     [fetchWithAuth]
   );
 
@@ -145,5 +162,5 @@ const patch = useCallback(
 );
 
 
-  return { fetchWithAuth, fetchNoAuth, get, put, post, del, patch, postOpenAI, api_url: API_URL };
+  return { fetchWithAuth, fetchNoAuth, get, put, putNoRes, post, postNoRes, del, patch, postOpenAI, api_url: API_URL };
 };

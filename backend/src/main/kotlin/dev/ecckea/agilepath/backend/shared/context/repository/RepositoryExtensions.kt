@@ -24,7 +24,10 @@ package dev.ecckea.agilepath.backend.shared.context.repository
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.entity.SprintColumnEntity
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
+import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
+import dev.ecckea.agilepath.backend.domain.project.repository.entity.UserProjectEntity
+import dev.ecckea.agilepath.backend.domain.project.repository.entity.UserProjectId
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.domain.story.repository.CommentRepository
@@ -76,6 +79,10 @@ fun UserRepository.ref(id: String): UserEntity = getReferenceById(id)
 
 /** Get a reference to a [ProjectEntity] by UUID. */
 fun ProjectRepository.ref(id: UUID): ProjectEntity = getReferenceById(id)
+
+/** Get a reference to a [UserProject] by String and UUID. */
+fun UserProjectRepository.ref(userId: String, projectId: UUID): UserProjectEntity =
+    getReferenceById(UserProjectId(userId, projectId))
 
 /** Get a reference to a [SprintEntity] by UUID. */
 fun SprintRepository.ref(id: UUID): SprintEntity = getReferenceById(id)

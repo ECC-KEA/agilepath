@@ -27,7 +27,7 @@ function ProjectHeader(props: Readonly<ProjectHeaderProps>) {
         <HeaderLink to={`${basePath}/overview`}>board</HeaderLink>
         <HeaderLink to={`${basePath}/stats`}>stats</HeaderLink>
         <ShowIf if={!sprintId}>
-          <HeaderLink to={`${basePath}/members`}>members</HeaderLink>
+          <HeaderLink to={`${basePath}/contributors`}>contributors</HeaderLink>
         </ShowIf>
       </div>
     </div>

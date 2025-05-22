@@ -1,11 +1,14 @@
 package dev.ecckea.agilepath.backend.domain.project.model.mapper
 
+import dev.ecckea.agilepath.backend.domain.project.dto.ProjectMemberResponse
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectRequest
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
 import dev.ecckea.agilepath.backend.domain.project.model.Framework
 import dev.ecckea.agilepath.backend.domain.project.model.NewProject
 import dev.ecckea.agilepath.backend.domain.project.model.Project
+import dev.ecckea.agilepath.backend.domain.project.model.ProjectMember
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toDTO
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.context.repository.ref
@@ -72,4 +75,9 @@ fun NewProject.toEntity(ctx: RepositoryContext): ProjectEntity = ProjectEntity(
     framework = framework,
     createdBy = ctx.user.ref(createdBy),
     createdAt = createdAt
+)
+
+fun ProjectMember.toDTO(): ProjectMemberResponse = ProjectMemberResponse(
+    user = user.toDTO(),
+    role = role
 )

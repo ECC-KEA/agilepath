@@ -1,6 +1,7 @@
 package dev.ecckea.agilepath.backend.domain.project.controller
 
 import dev.ecckea.agilepath.backend.domain.project.application.ProjectApplication
+import dev.ecckea.agilepath.backend.domain.project.application.ProjectMembershipApplication
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectRequest
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
 import dev.ecckea.agilepath.backend.domain.project.model.mapper.toDTO
@@ -22,7 +23,8 @@ import java.util.*
 @Validated
 @Tag(name = "Project", description = "Endpoints related to project management")
 class ProjectController(
-    private val projectApplication: ProjectApplication
+    private val projectApplication: ProjectApplication,
+    private val projectMembershipApplication: ProjectMembershipApplication
 ) : Logged() {
 
     @Operation(
@@ -68,6 +70,29 @@ class ProjectController(
     fun getProjects(): List<ProjectResponse> {
         log.info("GET /projects/ - Get projects")
         return projectApplication.getProjects().map { it.toDTO() }
+    }
+
+    @Operation(
+        summary = "Get projects for a specific user with a supplied id",
+        description = "Returns a list of project details for the user with the supplied id",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully returned project details"),
+            ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+            ApiResponse(
+                responseCode = "403",
+                description = "Forbidden – Authenticated but not allowed to access this project"
+            ),
+            ApiResponse(responseCode = "404", description = "Not Found – User with specified ID does not exist"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    @GetMapping("/users/{userId}")
+    fun getProjectsByUserId(@PathVariable userId: String): List<ProjectResponse> {
+        log.info("GET /projects/{} - Get projects by userId", userId)
+        return projectMembershipApplication.getProjectsForUser(userId).map { it.toDTO() }
     }
 
     @Operation(

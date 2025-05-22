@@ -79,7 +79,7 @@ function App() {
               element={<ProjectStats />}
             />
             <Route
-              path="members"
+              path="contributors"
               element={<ProjectMembers />}
             />
             <Route

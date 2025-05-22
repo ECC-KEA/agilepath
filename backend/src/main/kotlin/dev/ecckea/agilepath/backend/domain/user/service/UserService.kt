@@ -48,6 +48,18 @@ class UserService(
         return getFromDbAndCache(id)
     }
 
+    fun getBySearch(
+        fullname: String,
+        email: String,
+        githubUsername: String
+    ): List<User> {
+        return ctx.user.findAllByFullNameContainsIgnoreCaseOrEmailContainsIgnoreCaseOrGithubUsernameContainsIgnoreCase(
+            fullname,
+            email,
+            githubUsername
+        ).map { it.toModel() }
+    }
+
     private fun getFromDbAndCache(id: String): User {
         log.debug("Fetching user $id from database")
         val user = ctx.user.findOneById(id)?.toModel()
