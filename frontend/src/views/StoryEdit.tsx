@@ -26,7 +26,6 @@ function StoryEdit() {
 
   const handleBreakdown = () => {
   loader.add();
-
   const systemMessage = {
     role: "system",
     content: assistant?.prompt ?? "You are a helpful assistant.",
@@ -118,8 +117,8 @@ function StoryEdit() {
             onClose={() => setShowCreateNewTaskModal(false)}
           />
       </ShowIf>
-      
     </div>
   );
 }
+
 export default StoryEdit;
