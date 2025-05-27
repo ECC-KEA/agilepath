@@ -9,6 +9,8 @@ import {FaPlus} from "react-icons/fa";
 import useSubTask from "../hooks/subtask/useSubTask";
 import SubTaskBox from "../components/sprint/SubTaskBox";
 import NewSubTaskModal from "../components/sprint/NewSubTaskModal";
+import Comments from "../components/comment/Comments";
+import CommentProvider from "../hooks/comment/CommentProvider";
 
 
 function TaskEdit() {
@@ -20,7 +22,6 @@ function TaskEdit() {
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
   const [OpenAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
   if (!task) return <div>Loading...</div>;
-
 
   const handleBreakdown = () => {
     loader.add();
@@ -70,7 +71,7 @@ function TaskEdit() {
 
   return (
     <div className="flex flex-row gap-4">
-      <div className="flex flex-col gap-4 p-4 w-min-2/3">
+      <div className="flex flex-col gap-4 p-4 w-2/3">
         <div className="flex gap-4">
           <div className="text-ap-onyx-800 font-bold">{task.title}</div>
           {/* TODO: replace with issue id */}
@@ -109,13 +110,16 @@ function TaskEdit() {
           />
         </div>
       </div>
-      <div className="w-min-1/3">
+      <div className="w-min-1/3 h-[calc(100vh-200px)] overflow-y-auto">
         <ShowIf if={!!OpenAIResponse}>
           <div className="flex flex-col gap-4 border-l border-ap-onyx-50/50 p-4">
             <div className="font-bold">Breaking down task into subtasks</div>
             <div className="text-ap-onyx-800  border-ap-onyx-400 whitespace-pre-line text-sm">{OpenAIResponse}</div>
           </div>
-        </ShowIf> 
+        </ShowIf>
+        <CommentProvider taskId={task.id}>
+          <Comments task={task} />
+        </CommentProvider>
       </div>
 
       <ShowIf if={showCreateNewTaskModal}>
@@ -125,7 +129,6 @@ function TaskEdit() {
             onClose={() => setShowCreateNewTaskModal(false)}
           />
       </ShowIf>
-      
     </div>
   );
 }

@@ -18,12 +18,18 @@ export interface IStory {
 export interface IComment {
   id: string;
   content: string;
-  storyId: string;
-  taskId: string;
+  storyId?: string;
+  taskId?: string;
   createdBy: string;
   modifiedBy: string;
   createdAt: string;
   modifiedAt: string;
+}
+
+export interface INewComment {
+  content: string;
+  storyId?: string;
+  taskId?: string;
 }
 
 export interface ITask {
@@ -112,3 +118,4 @@ export enum Status {
   ARCHIVED = "ARCHIVED",
   IN_PROGRESS = "IN_PROGRESS"
 }
+

@@ -15,6 +15,7 @@ import AssistantProvider from "./hooks/assistant/AssistantProvider";
 import OpenAIProvider from "./hooks/openai/OpenAIProvider";
 import TaskEdit from "./views/TaskEdit";
 import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
+import CommentProvider from "./hooks/comment/CommentProvider";
 
 function App() {
   return (

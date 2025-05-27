@@ -2,6 +2,8 @@ import StatusLabel from "../components/status/StatusLabel";
 import { Status } from "../types/story.types";
 import Button from "../components/generic/buttons/Button";
 import NewStoryTaskModal from "../components/project/NewStoryTaskModal";
+import Comments from "../components/comment/Comments";
+import CommentProvider from "../hooks/comment/CommentProvider";
 import useAssistant from "../hooks/assistant/useAssistant";
 import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
@@ -102,13 +104,16 @@ function StoryEdit() {
           />
         </div>
       </div>
-      <div className="w-min-1/3">
+      <div className="w-min-1/3 h-[calc(100vh-200px)] overflow-y-auto">
         <ShowIf if={!!OpenAIResponse}>
           <div className="flex flex-col gap-4 border-l border-ap-onyx-50/50 p-4">
-            <div className="font-bold">Breaking down story into tasks</div>
+            <div className="font-bold">Breaking down task into subtasks</div>
             <div className="text-ap-onyx-800  border-ap-onyx-400 whitespace-pre-line text-sm">{OpenAIResponse}</div>
           </div>
-        </ShowIf> 
+        </ShowIf>
+        <CommentProvider storyId={story.id}>
+          <Comments story={story} />
+        </CommentProvider>
       </div>
 
       <ShowIf if={showCreateNewTaskModal}>
