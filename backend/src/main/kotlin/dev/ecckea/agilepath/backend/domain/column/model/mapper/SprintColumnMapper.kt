@@ -34,6 +34,13 @@ fun SprintColumn.toDTO(): SprintColumnResponse = SprintColumnResponse(
     columnIndex = columnIndex
 )
 
+fun SprintColumn.toNewSprintColumn(): NewSprintColumn = NewSprintColumn(
+    sprintId = sprintId,
+    name = name,
+    status = status,
+    columnIndex = columnIndex
+)
+
 // Request DTO -> NewSprintColumn (Domain Model)
 fun SprintColumnRequest.toModel(): NewSprintColumn = NewSprintColumn(
     sprintId = sprintId,

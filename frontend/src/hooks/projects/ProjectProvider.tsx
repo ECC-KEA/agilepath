@@ -32,9 +32,6 @@ function ProjectProvider({ children }: Readonly<PropsWithChildren>) {
       loader.add();
       return post("/projects", newProj)
         .then((proj) => setProjects([...projects, proj]))
-        .catch((e) => {
-          toast.error(e);
-        })
         .finally(loader.done);
     },
     [post, loader]

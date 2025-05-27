@@ -68,7 +68,8 @@ fun SprintRequest.toModel() = NewSprint(
     name = name,
     goal = goal,
     startDate = startDate,
-    endDate = endDate
+    endDate = endDate,
+    copyLastSprintColumns = copyLastSprintColumns
 )
 
 // Create new Entity from NewSprint

@@ -35,18 +35,16 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
 
   const createTask = useCallback(
     (task: ITaskRequest) => {
-      return post("/tasks", task)
-        .then((res) => setTasks((prev) => [...prev, res]))
-        .catch(console.error);
+      return post("/tasks", task).then((res) => setTasks((prev) => [...prev, res]));
     },
     [post]
   );
 
   const updateTask = useCallback(
     (task: ITaskRequest, id: string) => {
-      return put(`/tasks/${id}`, task)
-        .then((res) => setTasks((prev) => prev.map((t) => (t.id === res.id ? res : t))))
-        .catch(console.error);
+      return put(`/tasks/${id}`, task).then((res) =>
+        setTasks((prev) => prev.map((t) => (t.id === res.id ? res : t)))
+      );
     },
     [put]
   );
