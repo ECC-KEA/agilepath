@@ -1,12 +1,12 @@
 export interface ISprint {
-  id: string; 
+  id: string;
   projectId: string;
   name: string;
-  goal?: string; 
+  goal?: string;
   startDate: string;
   endDate: string;
   createdBy: string;
-};
+}
 
 export interface INewSprint {
   projectId: string;
@@ -14,4 +14,5 @@ export interface INewSprint {
   goal?: string;
   startDate: string;
   endDate: string;
+  copyLastSprintColumns: boolean;
 }

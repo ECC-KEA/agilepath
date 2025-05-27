@@ -6,13 +6,14 @@ import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
 import TextArea from "../generic/inputs/CustomTextArea";
 import { getNowDatePlusDays } from "../../helpers/timeHelpers";
+import ShowIf from "../generic/ShowIf";
 
 interface NewSprintModalProps {
   show: boolean;
   onClose: () => void;
 }
 function NewSprintModal(props: Readonly<NewSprintModalProps>) {
-  const { project, addSprint } = useCurrentProject();
+  const { project, sprints, addSprint } = useCurrentProject();
 
   const [name, setName] = useState<string>("");
   const [startDate, setStartDate] = useState<string>(new Date().toISOString().substring(0, 10));
@@ -20,6 +21,7 @@ function NewSprintModal(props: Readonly<NewSprintModalProps>) {
     getNowDatePlusDays(14).toISOString().substring(0, 10)
   );
   const [goal, setGoal] = useState<string>("");
+  const [copyLastSprintColumns, setCopyLastSprintColumns] = useState<boolean>(sprints.length > 0);
 
   const handleCreateNewSprint = () => {
     if (!project) return;
@@ -28,8 +30,10 @@ function NewSprintModal(props: Readonly<NewSprintModalProps>) {
       name: name,
       goal: goal,
       startDate: startDate,
-      endDate: endDate
+      endDate: endDate,
+      copyLastSprintColumns: copyLastSprintColumns
     };
+
     addSprint(tmp)
       .then(() => notifySuccess(`Successfully created sprint "${tmp.name}"`))
       .catch(() => notifyError("Something went wrong while creating sprint"));
@@ -86,6 +90,17 @@ function NewSprintModal(props: Readonly<NewSprintModalProps>) {
             className="w-full"
           />
         </div>
+        <ShowIf if={sprints.length > 0}>
+          <div className="flex items-center gap-1">
+            <Input
+              type="checkbox"
+              checked={copyLastSprintColumns}
+              onChange={(e) => setCopyLastSprintColumns(e.target.checked)}
+              className="size-5 accent-ap-lavender-900"
+            />
+            <div className="text-ap-onyx-400">Copy columns from last sprint</div>
+          </div>
+        </ShowIf>
       </div>
     </Modal>
   );

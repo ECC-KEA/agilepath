@@ -15,9 +15,7 @@ function StoryProvider({ children }: Readonly<PropsWithChildren>) {
 
   const createStory = useCallback(
     (story: INewStory) => {
-      return post(`/stories`, story)
-        .then((res) => setStories((prev) => [...prev, res]))
-        .catch(console.error);
+      return post(`/stories`, story).then((res) => setStories((prev) => [...prev, res]));
     },
     [post]
   );
