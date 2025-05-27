@@ -9,4 +9,5 @@ data class NewSprint(
     val goal: String? = null,
     val startDate: LocalDate,
     val endDate: LocalDate,
+    val copyLastSprintColumns: Boolean = false,
 )

@@ -5,6 +5,8 @@ import dev.ecckea.agilepath.backend.domain.column.model.SprintColumn
 import dev.ecckea.agilepath.backend.domain.column.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.column.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.column.model.mapper.updatedWith
+import dev.ecckea.agilepath.backend.domain.column.model.mapper.toNewSprintColumn
+import dev.ecckea.agilepath.backend.domain.column.model.SprintColumnStatus
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
@@ -95,6 +97,39 @@ class SprintColumnService(
         cacheService.invalidateSprintColumns(sprintId)
 
         ctx.sprintColumn.delete(sprintColumn)
+    }
+
+    @Transactional
+    fun copyColumnsFromLastSprint(lastSprintId: UUID, newSprintId: UUID): List<SprintColumn> {
+        log.info("Copying columns from last sprint $lastSprintId to new sprint $newSprintId")
+
+        val lastSprintColumns = ctx.sprintColumn.findBySprintId(lastSprintId)
+            .map { it.toModel() }
+
+        if (lastSprintColumns.isEmpty()) {
+            log.warn("No columns found in last sprint $lastSprintId")
+            return emptyList()
+        }
+
+        val copiedColumns = lastSprintColumns.map { column ->
+            val newColumn = column.copy(sprintId = newSprintId)
+            createSprintColumn(newColumn.toNewSprintColumn())
+        }
+
+        return copiedColumns
+    }
+
+    @Transactional
+    fun createDefaultColumns(sprintId: UUID): List<SprintColumn> {
+        log.info("Creating default columns for sprint $sprintId")
+
+        val defaultColumns = listOf(
+            NewSprintColumn(sprintId, "To Do", SprintColumnStatus.TODO, 0),
+            NewSprintColumn(sprintId, "In Progress", SprintColumnStatus.IN_PROGRESS, 1),
+            NewSprintColumn(sprintId, "Done", SprintColumnStatus.DONE, 2)
+        )
+
+        return defaultColumns.map { createSprintColumn(it) }
     }
 
     private fun getFromDbAndCache(id: UUID): SprintColumn {

@@ -56,9 +56,7 @@ function CurrentProjectProvider(props: Readonly<PropsWithChildren>) {
 
   const addSprint = useCallback(
     (newSprint: INewSprint) => {
-      return post("/sprints", newSprint)
-        .then((sprint) => setSprints((prev) => [...prev, sprint]))
-        .catch(console.error);
+      return post("/sprints", newSprint).then((sprint) => setSprints((prev) => [...prev, sprint]));
     },
     [projectID]
   );

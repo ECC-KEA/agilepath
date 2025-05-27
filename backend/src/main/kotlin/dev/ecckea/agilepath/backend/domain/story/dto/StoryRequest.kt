@@ -13,11 +13,12 @@ data class StoryRequest(
     @field:TrimmedNotBlank(message = "Title name must not be blank")
     @field:Size(min = 3, max = 100, message = "Title name must be between 3 and 100 characters")
     val title: String,
-    @field:TrimmedNotBlank(message = "Description must not be blank")
+    
     @field:Size(max = 2000, message = "Description must be at most 2000 characters")
     @field:NoHtml(message = "Description must not contain HTML")
     val description: String?,
-    @field:TrimmedNotBlank(message = "Description must not be blank")
+    
+    @field:TrimmedNotBlank(message = "Status must not be blank")
     val status: String,
     @field:PositiveOrZero(message = "Priority must be 0 or greater")
     val priority: Int

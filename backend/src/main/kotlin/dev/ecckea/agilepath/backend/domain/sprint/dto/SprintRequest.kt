@@ -28,4 +28,7 @@ data class SprintRequest(
 
     @field:NotNull(message = "End date must not be null")
     val endDate: LocalDate,
+
+    @field:NotNull(message = "Copy last sprint columns must not be null")
+    val copyLastSprintColumns: Boolean = true,
 )
