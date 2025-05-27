@@ -13,7 +13,6 @@ function SprintProvider({ children, sprintId }: Readonly<SprintProviderProps>) {
   const { get } = useApi();
   const [sprint, setSprint] = useState<ISprint>();
 
-
   const loadSprint = useCallback(async () => {
     loader.add();
     return get(`/sprints/${sprintId}`).then(setSprint).finally(loader.done);

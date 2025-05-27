@@ -18,12 +18,18 @@ export interface IStory {
 export interface IComment {
   id: string;
   content: string;
-  storyId: string;
-  taskId: string;
+  storyId?: string;
+  taskId?: string;
   createdBy: string;
   modifiedBy: string;
   createdAt: string;
   modifiedAt: string;
+}
+
+export interface INewComment {
+  content: string;
+  storyId?: string;
+  taskId?: string;
 }
 
 export interface ITask {
@@ -63,13 +69,21 @@ export function convertTaskToRequest(task: ITask): ITaskRequest {
 
 export interface ISubTask {
   id: string;
-  content: string;
-  storyId: string;
   taskId: string;
+  title: string;
+  description: string;
+  isDone: boolean;
   createdBy: string;
   modifiedBy: string;
   createdAt: string;
   modifiedAt: string;
+}
+
+export interface INewSubTask {
+  taskId: string;
+  title: string;
+  description: string;
+  isDone: boolean;
 }
 
 export enum TshirtEstimate {
@@ -104,3 +118,4 @@ export enum Status {
   ARCHIVED = "ARCHIVED",
   IN_PROGRESS = "IN_PROGRESS"
 }
+
