@@ -15,7 +15,6 @@ import AssistantProvider from "./hooks/assistant/AssistantProvider";
 import OpenAIProvider from "./hooks/openai/OpenAIProvider";
 import TaskEdit from "./views/TaskEdit";
 import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
-import CommentProvider from "./hooks/comment/CommentProvider";
 
 function App() {
   return (
@@ -60,7 +59,7 @@ function App() {
               <Route
                 path="edit/:taskId"
                 element={
-                  <AssistantProvider assistantId='e1111111-0000-0000-0000-000000000001'>
+                  <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
                     <OpenAIProvider>
                       <SubTaskProvider>
                         <TaskEdit />
@@ -86,14 +85,13 @@ function App() {
             <Route
               path="edit/:storyId"
               element={
-                <AssistantProvider assistantId='e1111111-0000-0000-0000-000000000001'>
+                <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
                   <OpenAIProvider>
                     <StoryEdit />
                   </OpenAIProvider>
                 </AssistantProvider>
               }
             />
-
           </Route>
         </Routes>
       </SignedIn>

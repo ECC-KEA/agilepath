@@ -80,4 +80,5 @@ class TaskApplication(
         log.info("Deleting task with id: {}", id)
         taskService.deleteTask(id)
     }
+
 }

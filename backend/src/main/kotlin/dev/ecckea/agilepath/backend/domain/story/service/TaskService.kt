@@ -30,6 +30,7 @@ class TaskService(
         require(columnExists) { throw ResourceNotFoundException("Sprint column with id ${newTask.sprintColumnId} not found") }
 
         // Invalidate related caches
+        cacheService.invalidateStory(newTask.storyId)
         cacheService.invalidateStoryTasks(newTask.storyId)
         cacheService.invalidateSprintColumnTasks(newTask.sprintColumnId)
 
@@ -93,6 +94,7 @@ class TaskService(
 
         // Invalidate caches
         cacheService.invalidateTask(id)
+        cacheService.invalidateStory(newTask.storyId)
         cacheService.invalidateStoryTasks(newTask.storyId)
         cacheService.invalidateSprintColumnTasks(newTask.sprintColumnId)
 
@@ -113,6 +115,8 @@ class TaskService(
         cacheService.invalidateTask(id)
         if (storyId != null) {
             cacheService.invalidateStoryTasks(storyId)
+            cacheService.invalidateStory(storyId)
+
         }
         if (sprintColumnId != null) {
             cacheService.invalidateSprintColumnTasks(sprintColumnId)
