@@ -1,5 +1,5 @@
 import StatusLabel from "../components/status/StatusLabel";
-import { Status } from "../types/story.types";
+import { ITask, Status } from "../types/story.types";
 import Button from "../components/generic/buttons/Button";
 import NewStoryTaskModal from "../components/project/NewStoryTaskModal";
 import Comments from "../components/comment/Comments";
@@ -13,14 +13,15 @@ import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { notifyError } from "../helpers/notify";
 import { PiOpenAiLogoDuotone } from "react-icons/pi";
+import Markdown from "react-markdown";
 
 function StoryEdit() {
   const { assistant } = useAssistant();
   const { sendMessage } = useOpenAI();
-  const { story, getStories } = useStory();
+  const { story } = useStory();
   const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
-  const [OpenAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
+  const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
 
   if (!story) {
     return <div>Loading...</div>;
@@ -68,23 +69,23 @@ function StoryEdit() {
         loader.done();
       });
   };
-  console.log(story);
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="flex">
-        <div className="flex flex-col gap-4 p-4 min-w-1/2 overflow-y-auto">
-          <div className="flex gap-4">
-            <div className="text-ap-onyx-800 font-bold">{story.title}</div>
-            {/* TODO: replace with issue id */}
+    <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full divide-x divide-ap-onyx-50/50 relative">
+      <div className="flex flex-col w-full h-full">
+        <div className="flex flex-col gap-4 p-4 min-w-1/2">
+          <div className="sticky top-0 bg-white border-b border-ap-onyx-50 pb-4 flex flex-col gap-4">
             <div className="text-ap-onyx-400 text-sm">{story.id}</div>
+            <div className="flex gap-2">
+              <StatusLabel
+                status={story.status as Status}
+                className="w-fit h-fit"
+              />
+              <div className="text-ap-onyx-800 font-bold">{story.title}</div>
+            </div>
           </div>
-          <StatusLabel
-            status={story.status as Status}
-            className="w-fit"
-          />
           <ShowIf if={!!story.description && story.description !== ""}>
-            <div className="text-ap-onyx-800 border-t border-b pt-2 pb-2 border-ap-onyx-50  whitespace-pre-line">
+            <div className="text-ap-onyx-800 border-b pb-2 border-ap-onyx-50  whitespace-pre-line">
               {story.description}
             </div>
           </ShowIf>
@@ -96,7 +97,7 @@ function StoryEdit() {
                   Add task
                 </span>
               }
-              className="bg-white px-10 border border-ap-onyx-50 w-fit"
+              className="bg-white px-10 border border-ap-onyx-50/50 w-fit"
               onClick={() => setShowCreateNewTaskModal(true)}
             />
             <Button
@@ -111,90 +112,65 @@ function StoryEdit() {
               onClick={handleBreakdown}
             />
           </div>
-          <div className="max-h-[calc(100vh-400px)]">
-            {story.tasks.map((t) => (
-              <div key={"storytask" + t.id}>{t.title}</div>
-            ))}
+          <div>
+            <div className="text-sm font-semibold">Tasks</div>
+            <div className="max-h-[calc(100vh-400px)] flex flex-col gap-2 overflow-y-auto">
+              {story.tasks.map((t) => (
+                <TaskListItem
+                  key={"storytask" + t.id}
+                  task={t}
+                />
+              ))}
+            </div>
           </div>
         </div>
-        <div className="w-min-1/3 max-h-[calc(100vh-400px)] overflow-y-auto">
-          <ShowIf if={!!OpenAIResponse || true}>
-            <div className="flex flex-col gap-4 border-l border-ap-onyx-50/50 p-4">
-              <div className="font-bold">Breaking down task into subtasks</div>
-              <div className="text-ap-onyx-800  border-ap-onyx-400 whitespace-pre-line text-sm">
-                {/* {OpenAIResponse} */}
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam
-                atque rerum beatae obcaecati ratione ad, veritatis provident dicta eos nostrum,
-                culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet
-                consectetur adipisicing elit. Pariatur doloremque magnam atque rerum beatae
-                obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam
-                nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing
-                elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis
-                provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis
-                aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione
-                ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod
-                nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione
-                ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod
-                nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione
-                ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod
-                nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione
-                ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod
-                nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam! Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Pariatur doloremque magnam atque rerum beatae obcaecati ratione
-                ad, veritatis provident dicta eos nostrum, culpa suscipit quisquam nisi quaerat quod
-                nobis aperiam! Lorem ipsum dolor sit amet consectetur adipisicing elit. Pariatur
-                doloremque magnam atque rerum beatae obcaecati ratione ad, veritatis provident dicta
-                eos nostrum, culpa suscipit quisquam nisi quaerat quod nobis aperiam! Lorem ipsum
-                dolor sit amet consectetur adipisicing elit. Pariatur doloremque magnam atque rerum
-                beatae obcaecati ratione ad, veritatis provident dicta eos nostrum, culpa suscipit
-                quisquam nisi quaerat quod nobis aperiam!
-              </div>
-            </div>
-          </ShowIf>
+        <div className="p-2 flex flex-col gap-2">
+          <CommentProvider storyId={story.id}>
+            <Comments story={story} />
+          </CommentProvider>
         </div>
       </div>
-      <CommentProvider storyId={story.id}>
-        <Comments story={story} />
-      </CommentProvider>
+      <div className="w-1/2 flex-shrink-0">
+        <ShowIf if={!!openAIResponse}>
+          <div className="flex flex-col">
+            <div className="sticky top-0 flex gap-4 text-xl items-center bg-gradient-to-br p-4 to-ap-lavender-900 from-ap-cyan-900 text-white">
+              <PiOpenAiLogoDuotone className="flex-shrink-0" />
+              Story breakdown help
+            </div>
+            <div className="p-2 text-sm whitespace-pre-line">
+              <Markdown>{openAIResponse}</Markdown>
+            </div>
+          </div>
+        </ShowIf>
+      </div>
 
       <ShowIf if={showCreateNewTaskModal}>
         <NewStoryTaskModal
           show={showCreateNewTaskModal}
           onClose={() => {
             setShowCreateNewTaskModal(false);
-            getStories();
           }}
         />
       </ShowIf>
+    </div>
+  );
+}
+
+interface TaskListItemProps {
+  task: ITask;
+}
+
+function TaskListItem(props: Readonly<TaskListItemProps>) {
+  return (
+    <div
+      className={`
+        p-2  rounded shadow w-80 h-20 bg-ap-onyx-50/20
+      `}
+    >
+      <div className="flex justify-between items-center text-sm">
+        <div className="truncate w-20">#{props.task.id}</div>
+      </div>
+      <div className="my-2 mx-4 max-w-64 line-clamp-2 text-left">{props.task.title}</div>
     </div>
   );
 }

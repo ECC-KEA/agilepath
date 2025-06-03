@@ -4,7 +4,6 @@ import TextArea from "../generic/inputs/CustomTextArea";
 import Button from "../generic/buttons/Button";
 import Comment from "./Comment";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
 
 interface ICommentsProps {
   task?: ITask;
@@ -13,14 +12,14 @@ interface ICommentsProps {
 
 function Comments(props: ICommentsProps) {
   const { comments, addComment } = useComment();
-  const [ newComment, setNewComment ] = useState("");
+  const [newComment, setNewComment] = useState("");
 
   const handleAddComment = () => {
-    let comment: INewComment = {
-        taskId: props.task?.id,
-        storyId: props.story?.id,
-        content: newComment.trim()
-    }
+    const comment: INewComment = {
+      taskId: props.task?.id,
+      storyId: props.story?.id,
+      content: newComment.trim()
+    };
     addComment(comment)
       .then(() => {
         setNewComment("");
@@ -41,23 +40,20 @@ function Comments(props: ICommentsProps) {
       <TextArea
         value={newComment}
         onChange={(e) => setNewComment(e.target.value)}
-        placeholder="Comment on this task..."
+        placeholder="Leave a comment..."
         rows={3}
         className="w-full"
       />
-      <Button
-        text={
-          <span className="flex items-center gap-2">
-            <FaPlus className="text-ap-lavender-900" />
-              Add Comment
-          </span>
-        }
-        className="bg-white px-10 border border-ap-onyx-50"
-        onClick={() => handleAddComment()}
-        disabled={newComment.trim() === ""}
-      />
+      <div className="w-full flex justify-end">
+        <Button
+          text="Comment"
+          className="bg-ap-lavender-900 text-white px-10 border border-ap-onyx-50 w-fit"
+          onClick={() => handleAddComment()}
+          disabled={newComment.trim() === ""}
+        />
+      </div>
     </>
-  )
+  );
 }
 
 export default Comments;
