@@ -5,8 +5,10 @@ import dev.ecckea.agilepath.backend.domain.story.dto.SubtaskResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskRequest
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
 import dev.ecckea.agilepath.backend.domain.story.model.NewTask
+import dev.ecckea.agilepath.backend.domain.story.model.Comment
 import dev.ecckea.agilepath.backend.domain.story.model.PointEstimate
 import dev.ecckea.agilepath.backend.domain.story.model.Task
+import dev.ecckea.agilepath.backend.domain.story.model.Subtask
 import dev.ecckea.agilepath.backend.domain.story.model.TshirtEstimate
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskEntity
 import dev.ecckea.agilepath.backend.domain.user.model.mapper.toDTO
@@ -17,7 +19,7 @@ import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.utils.now
 import dev.ecckea.agilepath.backend.shared.utils.toZonedDateTime
 
-fun TaskEntity.toModel(): Task {
+fun TaskEntity.toModel(comments: List<Comment>, subtasks: List<Subtask>): Task {
     val entityId = id ?: throw ResourceNotFoundException("Task entity id is missing")
     val storyId = story.id ?: throw ResourceNotFoundException("Story ID is missing in TaskEntity")
     val sprintColumnId = sprintColumn.id ?: throw ResourceNotFoundException("Sprint column ID is missing in TaskEntity")
@@ -33,7 +35,9 @@ fun TaskEntity.toModel(): Task {
         createdBy = createdBy.id,
         modifiedBy = modifiedBy?.id,
         createdAt = createdAt,
-        modifiedAt = modifiedAt
+        modifiedAt = modifiedAt,
+        comments = comments,
+        subtasks = subtasks,
     )
 }
 

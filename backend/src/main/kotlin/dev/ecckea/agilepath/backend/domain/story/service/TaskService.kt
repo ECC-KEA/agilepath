@@ -35,7 +35,7 @@ class TaskService(
         cacheService.invalidateSprintColumnTasks(newTask.sprintColumnId)
 
         val taskEntity = newTask.toEntity(ctx)
-        return ctx.task.save(taskEntity).toModel()
+        return ctx.task.save(taskEntity).toModel(emptyList(), emptyList())
     }
 
     @Transactional(readOnly = true)
@@ -59,7 +59,12 @@ class TaskService(
         val sprintColumnEntity = ctx.sprintColumn.findOneById(sprintColumnID)
             ?: throw ResourceNotFoundException("Sprint column with id $sprintColumnID not found")
 
-        val tasks = ctx.task.findBySprintColumn(sprintColumnEntity).map { it.toModel() }
+        val tasks = ctx.task.findBySprintColumn(sprintColumnEntity).map { 
+            val taskId = it.id!!
+            val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+            val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+            it.toModel(cmts, subtasks)
+        }
         cacheService.cacheSprintColumnTasks(sprintColumnID, tasks)
         return tasks
     }
@@ -72,7 +77,12 @@ class TaskService(
         cacheService.getStoryTasks(storyId)?.let { return it }
 
         // If not in cache, get from database and cache it
-        val tasks = ctx.task.findByStoryId(storyId).map { it.toModel() }
+        val tasks = ctx.task.findByStoryId(storyId).map { 
+            val taskId = it.id!!
+            val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+            val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+            it.toModel(cmts, subtasks)
+        }
         cacheService.cacheStoryTasks(storyId, tasks)
 
         return tasks
@@ -90,7 +100,9 @@ class TaskService(
 
         val updatedEntity = taskEntity.updatedWith(newTask, userId, ctx)
         val savedEntity = ctx.task.save(updatedEntity)
-        val task = savedEntity.toModel()
+        val cmts = ctx.comment.findByTaskId(id).map { it.toModel() }
+        val subtasks = ctx.subtask.findByTaskId(id).map { it.toModel() }
+        val task = savedEntity.toModel(cmts, subtasks)
 
         // Invalidate caches
         cacheService.invalidateTask(id)
@@ -127,7 +139,9 @@ class TaskService(
 
     private fun getFromDbAndCache(id: UUID): Task {
         log.info("Fetching task $id from database")
-        val task = ctx.task.findOneById(id)?.toModel()
+        val cmts = ctx.comment.findByTaskId(id).map { it.toModel() }
+        val subtasks = ctx.subtask.findByTaskId(id).map { it.toModel() }
+        val task = ctx.task.findOneById(id)?.toModel(cmts, subtasks)
             ?: throw ResourceNotFoundException("Task with id $id not found")
 
         cacheService.cacheTask(task)
