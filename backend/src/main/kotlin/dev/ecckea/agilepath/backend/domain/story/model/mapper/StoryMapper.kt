@@ -38,19 +38,6 @@ fun StoryEntity.toModel(comments: List<Comment>, tasks: List<Task>): Story {
     )
 }
 
-// fun Story.toDTO() = StoryResponse(
-//     id = id,
-//     projectId = projectId,
-//     title = title,
-//     description = description,
-//     status = status,
-//     priority = priority,
-//     createdBy = createdBy,
-//     modifiedBy = modifiedBy,
-//     createdAt = toZonedDateTime(createdAt),
-//     modifiedAt = modifiedAt?.let { toZonedDateTime(it) },
-// )
-
 fun Story.toDTO() = StoryResponse(
     id = id,
     projectId = projectId,
