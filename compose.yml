@@ -101,6 +101,7 @@ services:
     environment:
       - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY}
       - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+      - VITE_OPENAI_API_KEY=${VITE_OPENAI_API_KEY}
     container_name: agilepath_frontend_static
     build:
       context: ./frontend
