@@ -44,9 +44,8 @@ export default function Column({ column, ...props }: IColumnProps) {
       ref={setNodeRef}
       className="flex flex-col h-[calc(100vh-265px)] justify-between pb-2 flex-1 text-center border-ap-onyx-50/50 border rounded-md shadow-sm max-w-90 min-w-90 flex-shrink-0"
     >
-      <div className="flex items-center justify-between p-2 border-b border-ap-onyx-50/50">
-        <div className="w-8"></div>
-        <div className="text-xl">{column.name}</div>
+      <div className="flex items-center justify-between p-2 border-b border-ap-onyx-50/20 bg-ap-onyx-50/10">
+        <div className="font-semibold text-sm text-ap-onyx-300 ml-4">{column.name}</div>
         <div
           className="text-xl cursor-pointer hover:brightness-90"
           onClick={() => handleDeleteColumn()}
@@ -66,7 +65,7 @@ export default function Column({ column, ...props }: IColumnProps) {
         ))}
       </div>
 
-      <div className="p-2 border-t border-ap-onyx-50/50">
+      <div className="pt-2 border-t border-ap-onyx-50/50">
         <AddTaskButton
           onAddExistingClick={() => setShowAddExistingTaskModal(true)}
           onCreateNewClick={() => setShowCreateNewTaskModal(true)}
@@ -104,10 +103,9 @@ function AddTaskButton(props: Readonly<AddTaskButtonProps>) {
         text={
           <span className="flex gap-1 items-center">
             <FaPlus className="text-ap-lavender-800" />
-            Add
           </span>
         }
-        className="bg-white shadow border border-ap-onyx-50 px-4"
+        className="bg-white shadow border border-ap-onyx-50 px-8"
         onClick={(e) => setPopperAnchorEl(popperAnchorEl ? null : e.currentTarget)}
       />
       <AddTaskPopper
