@@ -1,6 +1,5 @@
 import { IColumn } from "../../types/column.types";
 import { FaPlus } from "react-icons/fa6";
-import { TiDelete } from "react-icons/ti";
 import useColumn from "../../hooks/column/useColumn";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import useTask from "../../hooks/task/useTask";
@@ -14,6 +13,7 @@ import ExistingTaskModal from "./ExistingTaskModal";
 import NewTaskModal from "./NewTaskModal";
 import { useDroppable } from "@dnd-kit/core";
 import { taskSearchPredicate } from "../../helpers/taskHelpers";
+import { PiTrash } from "react-icons/pi";
 
 interface IColumnProps {
   column: IColumn;
@@ -42,16 +42,17 @@ export default function Column({ column, ...props }: IColumnProps) {
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col h-[calc(100vh-265px)] justify-between pb-2 flex-1 text-center border-ap-onyx-200 border rounded-md shadow-sm shadow-ap-onyx-400 max-w-88 min-w-88 flex-shrink-0"
+      className="flex flex-col h-[calc(100vh-265px)] justify-between pb-2 flex-1 text-center border-ap-onyx-50/50 border rounded-md shadow-sm max-w-90 min-w-90 flex-shrink-0"
     >
       <div className="flex items-center justify-between p-2 border-b border-ap-onyx-50/50">
         <div className="w-8"></div>
         <div className="text-xl">{column.name}</div>
         <div
-          className="text-3xl cursor-pointer"
+          className="text-xl cursor-pointer hover:brightness-90"
           onClick={() => handleDeleteColumn()}
+          title="Delete column"
         >
-          <TiDelete className="text-red-500" />
+          <PiTrash className="text-ap-coral-500" />
         </div>
       </div>
 
