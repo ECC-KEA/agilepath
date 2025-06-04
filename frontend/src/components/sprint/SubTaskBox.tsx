@@ -8,10 +8,8 @@ interface SubTaskBoxProps {
 function SubTaskBox(props: Readonly<SubTaskBoxProps>) {
   const { toggleSubTaskDone } = useSubTask();
   const handleCheck = () => {
-    toggleSubTaskDone(props.subtask.id)
-      .then(() => console.log("Subtask toggled"))
-      .catch((err) => console.error("Error toggling subtask", err));
-  }
+    toggleSubTaskDone(props.subtask.id);
+  };
 
   return (
     <div className="p-2 bg-white rounded shadow">
@@ -22,7 +20,7 @@ function SubTaskBox(props: Readonly<SubTaskBoxProps>) {
           className="mr-2"
           onChange={handleCheck}
         />
-        <div className="font-bold">{props.subtask.title}</div>
+        <div className="">{props.subtask.title}</div>
         <div>{props.subtask.description}</div>
       </div>
     </div>

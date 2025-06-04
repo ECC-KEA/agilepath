@@ -71,9 +71,9 @@ function StoryEdit() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full divide-x divide-ap-onyx-50/50 relative">
+    <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full relative">
       <div className="flex flex-col w-full h-full">
-        <div className="flex flex-col gap-4 p-4 min-w-1/2">
+        <div className="flex flex-col gap-4 p-4 min-w-1/2 border-r border-ap-onyx-50/50">
           <div className="sticky top-0 bg-white border-b border-ap-onyx-50 pb-4 flex flex-col gap-4">
             <div className="text-ap-onyx-400 text-sm">{story.id}</div>
             <div className="flex gap-2">
@@ -124,7 +124,7 @@ function StoryEdit() {
             </div>
           </div>
         </div>
-        <div className="p-2 flex flex-col gap-2">
+        <div className="p-2 flex flex-col gap-2 border-r border-ap-onyx-50/50">
           <CommentProvider storyId={story.id}>
             <Comments story={story} />
           </CommentProvider>
@@ -137,7 +137,7 @@ function StoryEdit() {
               <PiOpenAiLogoDuotone className="flex-shrink-0" />
               Story breakdown help
             </div>
-            <div className="p-2 text-sm whitespace-pre-line">
+            <div className="p-2 text-sm">
               <Markdown>{openAIResponse}</Markdown>
             </div>
           </div>
