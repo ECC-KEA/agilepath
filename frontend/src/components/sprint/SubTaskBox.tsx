@@ -1,5 +1,6 @@
 import { ISubTask } from "../../types/story.types";
 import useSubTask from "../../hooks/subtask/useSubTask";
+import Input from "../generic/inputs/Input";
 
 interface SubTaskBoxProps {
   subtask: ISubTask;
@@ -14,10 +15,10 @@ function SubTaskBox(props: Readonly<SubTaskBoxProps>) {
   return (
     <div className="p-2 bg-white rounded shadow">
       <div className="flex items-center gap-2">
-        <input
+        <Input
           type="checkbox"
           checked={props.subtask.isDone}
-          className="mr-2"
+          className="mr-2 accent-ap-lavender-900"
           onChange={handleCheck}
         />
         <div className="">{props.subtask.title}</div>

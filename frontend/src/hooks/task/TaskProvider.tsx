@@ -58,9 +58,10 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
       tasks,
       task,
       createTask,
-      updateTask
+      updateTask,
+      refreshTasks: getAllSprintTasks
     }),
-    [tasks, createTask, updateTask, task]
+    [tasks, createTask, updateTask, task, getAllSprintTasks]
   );
 
   return <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>;

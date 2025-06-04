@@ -23,6 +23,7 @@ function TaskEdit() {
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
   const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
   if (!task) return <div>Loading...</div>;
+  console.log(task);
 
   const handleBreakdown = () => {
     loader.add();

@@ -30,9 +30,16 @@ class SubtaskService(
         val savedEntity = ctx.subtask.save(subtaskEntity)
         val subtask = savedEntity.toModel()
 
+        val taskColumnId = savedEntity.task.sprintColumn.id
+
         // Invalidate task subtasks cache
         cacheService.invalidateTaskSubtasks(newSubtask.taskId)
-
+        cacheService.invalidateTask(newSubtask.taskId)
+        // Invalidate sprint column tasks cache
+        if (taskColumnId != null) {
+            cacheService.invalidateSprintColumnTasks(taskColumnId)
+        }
+        
         return subtask
     }
 
@@ -76,8 +83,14 @@ class SubtaskService(
         val savedEntity = ctx.subtask.save(updatedEntity)
         val subtask = savedEntity.toModel()
 
+        val taskColumnId = savedEntity.task.sprintColumn.id
+        if (taskColumnId != null) {
+            cacheService.invalidateSprintColumnTasks(taskColumnId)
+        }
+
         // Invalidate caches
         cacheService.invalidateSubtask(id)
+        cacheService.invalidateTask(newSubtask.taskId)
         cacheService.invalidateTaskSubtasks(newSubtask.taskId)
 
         return subtask
@@ -92,9 +105,14 @@ class SubtaskService(
 
         val taskId = subtask.task.id
 
+        val taskColumnId = subtask.task.sprintColumn.id
+        if (taskColumnId != null) {
+            cacheService.invalidateSprintColumnTasks(taskColumnId)
+        }
         // Invalidate caches
         cacheService.invalidateSubtask(id)
         if (taskId != null) {
+            cacheService.invalidateTask(taskId)
             cacheService.invalidateTaskSubtasks(taskId)
         }
 
