@@ -4,6 +4,7 @@ import dev.ecckea.agilepath.backend.domain.story.model.NewStory
 import dev.ecckea.agilepath.backend.domain.story.model.Story
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toModel
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
@@ -58,7 +59,8 @@ class StoryService(
             val taskId = it.id!!
             val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
             val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
-            it.toModel(cmts, subtasks)
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
         }
         val comments = ctx.comment.findByStoryId(id).map{it.toModel()}
 
@@ -98,7 +100,8 @@ class StoryService(
                 val taskId = it.id!!
                 val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
                 val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
-                it.toModel(cmts, subtasks)
+                val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+                it.toModel(cmts, subtasks, assignees)
             }
             val comments = ctx.comment.findByStoryId(storyId).map{it.toModel()}
             it.toModel(comments, tasks)
@@ -111,7 +114,8 @@ class StoryService(
             val taskId = it.id!!
             val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
             val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
-            it.toModel(cmts, subtasks)
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
         }
         val comments = ctx.comment.findByStoryId(id).map{it.toModel()}
         val story = ctx.story.findOneById(id)?.toModel(comments, tasks)

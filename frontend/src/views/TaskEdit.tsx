@@ -13,6 +13,8 @@ import Comments from "../components/comment/Comments";
 import CommentProvider from "../hooks/comment/CommentProvider";
 import { PiOpenAiLogoDuotone } from "react-icons/pi";
 import Markdown from "react-markdown";
+import { Avatar, AvatarGroup } from "@mui/material";
+import AssigneeModal from "../components/sprint/AssigneeModal";
 
 function TaskEdit() {
   const { assistant } = useAssistant();
@@ -21,9 +23,9 @@ function TaskEdit() {
   const { subtasks } = useSubTask();
   const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
+  const [showAssigneeModal, setShowAssigneeModal] = useState(false);
   const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
   if (!task) return <div>Loading...</div>;
-  console.log(task);
 
   const handleBreakdown = () => {
     loader.add();
@@ -78,39 +80,69 @@ function TaskEdit() {
               {task.description}
             </div>
           </ShowIf>
-          <div className="flex flex-row gap-4">
-            <Button
-              text={
-                <span className="flex items-center gap-2 truncate">
-                  <FaPlus className="text-ap-lavender-800" />
-                  Add subtask
-                </span>
-              }
-              className="bg-white px-10 border border-ap-onyx-50/50 w-fit"
-              onClick={() => setShowCreateNewTaskModal(true)}
-            />
-            <Button
-              text={
-                <span className="flex items-center gap-2">
-                  <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
-                  Help
-                </span>
-              }
-              className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-              title="Click to get AI help for Story breakdown"
-              onClick={handleBreakdown}
-            />
+          <div className="flex justify-between items-center">
+            <div className="flex gap-4">
+              <Button
+                text={
+                  <span className="flex items-center gap-2 truncate">
+                    <FaPlus className="text-ap-lavender-800" />
+                    Add subtask
+                  </span>
+                }
+                className="bg-white px-10 border border-ap-onyx-50/50 w-fit"
+                onClick={() => setShowCreateNewTaskModal(true)}
+              />
+              <Button
+                text={
+                  <span className="flex items-center gap-2">
+                    <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                    Help
+                  </span>
+                }
+                className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                title="Click to get AI help for Story breakdown"
+                onClick={handleBreakdown}
+              />
+            </div>
+            <div className="flex gap-2">
+              <div
+                className="cursor-pointer"
+                onClick={() => setShowAssigneeModal(true)}
+              >
+                <ShowIf if={task.assignees.length > 0}>
+                  <div className="text-xs">Assignees</div>
+                  <AvatarGroup
+                    max={3}
+                    spacing={"small"}
+                  >
+                    {task.assignees.map((a) => (
+                      <Avatar
+                        key={"assignee" + a.id}
+                        src={a.avatarUrl}
+                      />
+                    ))}
+                  </AvatarGroup>
+                </ShowIf>
+                <ShowIf if={task.assignees.length === 0}>
+                  <div className="text-xs text-right text-ap-lavender-900 hover:underline">
+                    Assign
+                  </div>
+                </ShowIf>
+              </div>
+            </div>
           </div>
           <div>
-            <div className="text-sm font-semibold">Tasks</div>
-            <div className="max-h-[calc(100vh-400px)] flex flex-col gap-2 overflow-y-auto">
-              {subtasks.map((subtask) => (
-                <SubTaskBox
-                  key={subtask.id}
-                  subtask={subtask}
-                />
-              ))}
-            </div>
+            <ShowIf if={subtasks.length > 0}>
+              <div className="text-sm font-semibold">Subtasks</div>
+              <div className="max-h-[calc(100vh-400px)] flex flex-col gap-2 overflow-y-auto">
+                {subtasks.map((subtask) => (
+                  <SubTaskBox
+                    key={subtask.id}
+                    subtask={subtask}
+                  />
+                ))}
+              </div>
+            </ShowIf>
           </div>
         </div>
         <div className="p-2 flex flex-col gap-2 border-r border-ap-onyx-50/50">
@@ -138,6 +170,13 @@ function TaskEdit() {
           task={task}
           show={showCreateNewTaskModal}
           onClose={() => setShowCreateNewTaskModal(false)}
+        />
+      </ShowIf>
+      <ShowIf if={showAssigneeModal}>
+        <AssigneeModal
+          show={showAssigneeModal}
+          onClose={() => setShowAssigneeModal(false)}
+          task={task}
         />
       </ShowIf>
     </div>

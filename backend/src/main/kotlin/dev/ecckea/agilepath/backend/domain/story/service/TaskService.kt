@@ -4,6 +4,7 @@ import dev.ecckea.agilepath.backend.domain.story.model.NewTask
 import dev.ecckea.agilepath.backend.domain.story.model.Task
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toModel
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
@@ -35,7 +36,7 @@ class TaskService(
         cacheService.invalidateSprintColumnTasks(newTask.sprintColumnId)
 
         val taskEntity = newTask.toEntity(ctx)
-        return ctx.task.save(taskEntity).toModel(emptyList(), emptyList())
+        return ctx.task.save(taskEntity).toModel(emptyList(), emptyList(), emptyList())
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +64,8 @@ class TaskService(
             val taskId = it.id!!
             val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
             val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
-            it.toModel(cmts, subtasks)
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
         }
         cacheService.cacheSprintColumnTasks(sprintColumnID, tasks)
         return tasks
@@ -81,7 +83,8 @@ class TaskService(
             val taskId = it.id!!
             val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
             val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
-            it.toModel(cmts, subtasks)
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
         }
         cacheService.cacheStoryTasks(storyId, tasks)
 
@@ -102,7 +105,8 @@ class TaskService(
         val savedEntity = ctx.task.save(updatedEntity)
         val cmts = ctx.comment.findByTaskId(id).map { it.toModel() }
         val subtasks = ctx.subtask.findByTaskId(id).map { it.toModel() }
-        val task = savedEntity.toModel(cmts, subtasks)
+        val assignees = ctx.taskAssinee.getAssignees(id).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+        val task = savedEntity.toModel(cmts, subtasks, assignees)
 
         // Invalidate caches
         cacheService.invalidateTask(id)
@@ -141,7 +145,8 @@ class TaskService(
         log.info("Fetching task $id from database")
         val cmts = ctx.comment.findByTaskId(id).map { it.toModel() }
         val subtasks = ctx.subtask.findByTaskId(id).map { it.toModel() }
-        val task = ctx.task.findOneById(id)?.toModel(cmts, subtasks)
+        val assignees = ctx.taskAssinee.getAssignees(id).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+        val task = ctx.task.findOneById(id)?.toModel(cmts, subtasks, assignees)
             ?: throw ResourceNotFoundException("Task with id $id not found")
 
         cacheService.cacheTask(task)

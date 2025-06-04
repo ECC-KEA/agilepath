@@ -4,7 +4,7 @@ import { ITask } from "../../types/story.types";
 import StatusLabel from "../status/StatusLabel";
 import { FaGripLines } from "react-icons/fa6";
 import { useNavigate, useLocation } from "react-router";
-import { LinearProgress } from "@mui/material";
+import { Avatar, AvatarGroup, LinearProgress } from "@mui/material";
 import { useMemo } from "react";
 import ShowIf from "../generic/ShowIf";
 
@@ -42,7 +42,7 @@ function TaskBox(props: Readonly<TaskBoxProps>) {
       className={`
         ${props.isDragOverlay ? "absolute backdrop-blur-2xl" : ""} 
         ${isDragging ? "opacity-50" : ""}
-        p-2  rounded shadow w-80 h-28 bg-ap-onyx-50/20
+        p-2  rounded shadow w-80 bg-ap-onyx-50/20
       `}
       ref={setNodeRef}
       onClick={handleClick}
@@ -55,8 +55,19 @@ function TaskBox(props: Readonly<TaskBoxProps>) {
         <FaGripLines className="text-xl text-ap-onyx-50" />
       </div>
       <div className="flex justify-between items-center text-sm">
-        <div className="truncate w-20">#{props.task.id}</div>
         <StatusLabel status={props.column.status} />
+        <AvatarGroup
+          max={3}
+          spacing={"small"}
+        >
+          {props.task.assignees.map((a) => (
+            <Avatar
+              key={"assignee" + a.id}
+              src={a.avatarUrl}
+              sx={{ height: 28, width: 28 }}
+            />
+          ))}
+        </AvatarGroup>
       </div>
       <div className="my-2 mx-4 max-w-64 line-clamp-2 text-left">{props.task.title}</div>
       <ShowIf if={props.task.subtasks.length > 0}>
