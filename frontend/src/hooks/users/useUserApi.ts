@@ -7,7 +7,12 @@ export default function useUserApi() {
     return get(`/users?q=${search}`);
   };
 
+  const getUser = (id: string) => {
+    return get(`/users/${id}`);
+  };
+
   return {
-    searchUsers
+    searchUsers,
+    getUser
   };
 }

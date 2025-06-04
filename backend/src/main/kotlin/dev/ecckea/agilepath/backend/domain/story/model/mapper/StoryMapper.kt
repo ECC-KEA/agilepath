@@ -7,6 +7,8 @@ import dev.ecckea.agilepath.backend.domain.story.dto.StoryResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
 import dev.ecckea.agilepath.backend.domain.story.model.NewStory
 import dev.ecckea.agilepath.backend.domain.story.model.Story
+import dev.ecckea.agilepath.backend.domain.story.model.Comment
+import dev.ecckea.agilepath.backend.domain.story.model.Task
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.StoryEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
@@ -16,7 +18,7 @@ import dev.ecckea.agilepath.backend.shared.security.currentUser
 import dev.ecckea.agilepath.backend.shared.utils.now
 import dev.ecckea.agilepath.backend.shared.utils.toZonedDateTime
 
-fun StoryEntity.toModel(): Story {
+fun StoryEntity.toModel(comments: List<Comment>, tasks: List<Task>): Story {
     val entityId = id ?: throw ResourceNotFoundException("Story entity id is missing")
     val projectId = project.id ?: throw ResourceNotFoundException("Project ID is missing in StoryEntity")
 
@@ -31,6 +33,8 @@ fun StoryEntity.toModel(): Story {
         modifiedBy = modifiedBy?.id,
         createdAt = createdAt,
         modifiedAt = modifiedAt,
+        comments = comments,
+        tasks = tasks
     )
 }
 
@@ -41,21 +45,8 @@ fun Story.toDTO() = StoryResponse(
     description = description,
     status = status,
     priority = priority,
-    createdBy = createdBy,
-    modifiedBy = modifiedBy,
-    createdAt = toZonedDateTime(createdAt),
-    modifiedAt = modifiedAt?.let { toZonedDateTime(it) },
-)
-
-fun Story.toDTO(comments: List<CommentResponse>, tasks: List<TaskResponse>) = StoryResponse(
-    id = id,
-    projectId = projectId,
-    title = title,
-    description = description,
-    status = status,
-    priority = priority,
-    comments = comments,
-    tasks = tasks,
+    comments = comments?.map{it.toDTO()} ?: emptyList(),
+    tasks = tasks?.map { it.toDTO() } ?: emptyList(),
     createdBy = createdBy,
     modifiedBy = modifiedBy,
     createdAt = toZonedDateTime(createdAt),

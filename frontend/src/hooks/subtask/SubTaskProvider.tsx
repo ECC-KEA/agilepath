@@ -4,11 +4,11 @@ import { ISubTask, INewSubTask } from "../../types/story.types";
 import { useLoading } from "../utils/loading/useLoading";
 import { useParams } from "react-router";
 import SubTaskContext from "./SubTaskContext";
+import useTask from "../task/useTask";
 
-
-function SubTaskProvider({ children }: Readonly<PropsWithChildren>) 
-{
+function SubTaskProvider({ children }: Readonly<PropsWithChildren>) {
   const { taskId } = useParams();
+  const { refreshTasks } = useTask();
   const loader = useLoading();
   const { get, post, patch } = useApi();
   const [subtasks, setSubtasks] = useState<ISubTask[]>([]);
@@ -25,20 +25,24 @@ function SubTaskProvider({ children }: Readonly<PropsWithChildren>)
   const createSubTask = useCallback(
     (subtask: INewSubTask) => {
       return post("/subtasks", subtask)
-      .then((res) => setSubtasks((prev) => [...prev, res]))
-      .catch(console.error);
-    }, [post]
+        .then((res) => setSubtasks((prev) => [...prev, res]))
+        .then(refreshTasks)
+        .catch(console.error);
+    },
+    [post]
   );
 
   const toggleSubTaskDone = useCallback(
     (id: string) => {
-      return patch(`/subtasks/${id}/toggle`,"")
+      return patch(`/subtasks/${id}/toggle`, "")
         .then((res) => {
           if (!res) return;
           setSubtasks((prev) => prev.map((s) => (s.id === res.id ? res : s)));
         })
+        .then(refreshTasks)
         .catch(console.error);
-    }, [patch]
+    },
+    [patch]
   );
 
   const contextValue = useMemo(
@@ -51,11 +55,7 @@ function SubTaskProvider({ children }: Readonly<PropsWithChildren>)
     [subtasks, createSubTask, toggleSubTaskDone, taskId]
   );
 
-  return (
-    <SubTaskContext.Provider value={contextValue}>
-      {children}
-    </SubTaskContext.Provider>
-  );
+  return <SubTaskContext.Provider value={contextValue}>{children}</SubTaskContext.Provider>;
 }
 
 export default SubTaskProvider;

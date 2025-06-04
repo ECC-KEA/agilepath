@@ -4,10 +4,12 @@ import TaskContext from "./TaskContext";
 import { ITaskRequest, ITask } from "../../types/story.types";
 import { useApi } from "../utils/useApi";
 import { useParams } from "react-router";
+import useStory from "../story/useStory";
 
 function TaskProvider({ children }: Readonly<PropsWithChildren>) {
   const { taskId } = useParams();
   const { columns } = useColumn();
+  const { getStories } = useStory();
   const { get, post, put } = useApi();
   const [tasks, setTasks] = useState<ITask[]>([]);
 
@@ -35,7 +37,9 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
 
   const createTask = useCallback(
     (task: ITaskRequest) => {
-      return post("/tasks", task).then((res) => setTasks((prev) => [...prev, res]));
+      return post("/tasks", task)
+        .then((res) => setTasks((prev) => [...prev, res]))
+        .then(getStories);
     },
     [post]
   );
@@ -54,14 +58,13 @@ function TaskProvider({ children }: Readonly<PropsWithChildren>) {
       tasks,
       task,
       createTask,
-      updateTask
+      updateTask,
+      refreshTasks: getAllSprintTasks
     }),
-    [tasks, createTask, updateTask, task]
+    [tasks, createTask, updateTask, task, getAllSprintTasks]
   );
 
-  return <TaskContext.Provider value={contextValue}>
-    {children}
-  </TaskContext.Provider>;
+  return <TaskContext.Provider value={contextValue}>{children}</TaskContext.Provider>;
 }
 
 export default TaskProvider;

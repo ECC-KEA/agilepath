@@ -4,6 +4,7 @@ import dev.ecckea.agilepath.backend.domain.story.model.NewStory
 import dev.ecckea.agilepath.backend.domain.story.model.Story
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.toModel
+import dev.ecckea.agilepath.backend.domain.user.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.story.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
@@ -33,7 +34,7 @@ class StoryService(
         // Invalidate project stories cache
         cacheService.invalidateProjectStories(newStory.projectId)
 
-        return saved.toModel()
+        return saved.toModel(emptyList(), emptyList())
     }
 
     @Transactional(readOnly = true)
@@ -54,12 +55,20 @@ class StoryService(
             ?: throw ResourceNotFoundException("Story with id $id not found")
         val updatedEntity = existingEntity.updatedWith(updated, userId, ctx)
         val savedEntity = ctx.story.save(updatedEntity)
+        val tasks = ctx.task.findByStoryId(id).map{
+            val taskId = it.id!!
+            val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+            val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
+        }
+        val comments = ctx.comment.findByStoryId(id).map{it.toModel()}
 
         // Invalidate caches
         cacheService.invalidateStory(id)
         cacheService.invalidateProjectStories(updated.projectId)
 
-        return savedEntity.toModel()
+        return savedEntity.toModel(comments, tasks)
     }
 
     @Transactional
@@ -85,12 +94,31 @@ class StoryService(
         if (!ctx.project.existsById(projectId)) {
             throw ResourceNotFoundException("Project with ID $projectId not found")
         }
-        return ctx.story.findAllByProjectId(projectId).map { it.toModel() }
+        return ctx.story.findAllByProjectId(projectId).map { 
+            val storyId = it.id!!
+            val tasks = ctx.task.findByStoryId(storyId).map{
+                val taskId = it.id!!
+                val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+                val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+                val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+                it.toModel(cmts, subtasks, assignees)
+            }
+            val comments = ctx.comment.findByStoryId(storyId).map{it.toModel()}
+            it.toModel(comments, tasks)
+        }
     }
 
     private fun getFromDbAndCache(id: UUID): Story {
         log.info("Fetching story $id from database")
-        val story = ctx.story.findOneById(id)?.toModel()
+        val tasks = ctx.task.findByStoryId(id).map{
+            val taskId = it.id!!
+            val cmts = ctx.comment.findByTaskId(taskId).map { it.toModel() }
+            val subtasks = ctx.subtask.findByTaskId(taskId).map { it.toModel() }
+            val assignees = ctx.taskAssinee.getAssignees(taskId).map { ctx.user.findOneById(it)?.toModel() ?: throw ResourceNotFoundException("User with id $it not found") }
+            it.toModel(cmts, subtasks, assignees)
+        }
+        val comments = ctx.comment.findByStoryId(id).map{it.toModel()}
+        val story = ctx.story.findOneById(id)?.toModel(comments, tasks)
             ?: throw ResourceNotFoundException("Story with id $id not found")
 
         cacheService.cacheStory(story)

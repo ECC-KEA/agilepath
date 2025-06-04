@@ -5,6 +5,7 @@ interface IStoryContext {
   stories: IStory[];
   story?: IStory;
   createStory: (story: INewStory) => Promise<void>;
+  getStories: () => Promise<void>;
 }
 
 const StoryContext = createContext<IStoryContext | undefined>(undefined);

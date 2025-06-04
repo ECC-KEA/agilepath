@@ -9,4 +9,5 @@ import java.util.*
 interface AssistantRepository : JpaRepository<AssistantEntity, UUID> {
     fun findOneById(id: UUID): AssistantEntity?
     fun findByName(name: String): AssistantEntity?
+    fun existsByName(name: String): Boolean
 }

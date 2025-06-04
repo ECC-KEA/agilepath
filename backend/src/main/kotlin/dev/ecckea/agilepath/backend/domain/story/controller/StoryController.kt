@@ -132,7 +132,7 @@ class StoryController(
         ]
     )
     @GetMapping("/projects/{projectId}/stories")
-    fun getSprints(@PathVariable projectId: UUID): List<StoryResponse> {
+    fun getStories(@PathVariable projectId: UUID): List<StoryResponse> {
         log.info("GET /projects/{}/stories - Get stories for project", projectId)
         return storyApplication.getStoriesByProjectId(projectId).map { it.toDTO() }
     }

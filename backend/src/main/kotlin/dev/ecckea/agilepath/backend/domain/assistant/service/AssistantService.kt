@@ -25,7 +25,7 @@ class AssistantService(
 
     fun createAssistant(newAssistant: NewAssistant): Assistant {
         log.info("Creating assistant")
-        if(ctx.project.existsByName(newAssistant.name)) {
+        if(ctx.assistant.existsByName(newAssistant.name)) {
             throw IllegalArgumentException("Assistant with name ${newAssistant.name} already exists")
         }
         val entity = newAssistant.toEntity()

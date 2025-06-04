@@ -12,7 +12,6 @@ function ColumnProvider({ children, sprintId }: Readonly<ColumnProviderProps>) {
   const loader = useLoading();
   const { get, post, del } = useApi();
   const [columns, setColumns] = useState<IColumn[]>([]);
-  console.log("ColumnProvider", columns);
 
   const loadColumns = useCallback(async () => {
     loader.add();
@@ -45,18 +44,17 @@ function ColumnProvider({ children, sprintId }: Readonly<ColumnProviderProps>) {
     loadColumns();
   }, [loadColumns]);
 
-  const contextValue = useMemo(() => ({
-    columns,
-    loadColumns,
-    createColumn,
-    deleteColumn
-  }), [columns, loadColumns, createColumn, deleteColumn]);
-
-  return (
-    <ColumnContext.Provider value={contextValue}>
-      {children}
-    </ColumnContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      columns,
+      loadColumns,
+      createColumn,
+      deleteColumn
+    }),
+    [columns, loadColumns, createColumn, deleteColumn]
   );
+
+  return <ColumnContext.Provider value={contextValue}>{children}</ColumnContext.Provider>;
 }
 
 export default ColumnProvider;
