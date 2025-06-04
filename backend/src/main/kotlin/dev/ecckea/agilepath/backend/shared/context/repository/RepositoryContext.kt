@@ -4,6 +4,7 @@ import dev.ecckea.agilepath.backend.domain.assistant.repository.AssistantReposit
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
+import dev.ecckea.agilepath.backend.domain.retrospective.repository.RetrospectiveRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
 import dev.ecckea.agilepath.backend.domain.story.repository.*
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
@@ -65,5 +66,10 @@ class RepositoryContext(
 
     /** Repository for comment-related database operations */
     val comment: CommentRepository,
+
+    /** Repository for assistant-related database operations */
     val assistant: AssistantRepository,
+
+    /** Repository for retrospective-related database operations */
+    val retrospective: RetrospectiveRepository,
     )

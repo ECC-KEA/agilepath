@@ -9,4 +9,5 @@ import java.util.*
 interface SprintRepository : JpaRepository<SprintEntity, UUID> {
     fun findOneById(id: UUID): SprintEntity?
     fun findByProjectId(projectId: UUID): List<SprintEntity>
+
 }
