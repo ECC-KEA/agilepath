@@ -10,6 +10,6 @@ class UserAuthApplication(
     private val userService: UserService,
 ) {
     fun getCurrentUser(principal: UserPrincipal): User {
-        return userService.getById(principal.id)
+        return userService.getOrCreate(principal)
     }
 }
