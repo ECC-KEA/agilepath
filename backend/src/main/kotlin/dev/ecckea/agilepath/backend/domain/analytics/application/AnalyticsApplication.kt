@@ -38,7 +38,7 @@ class AnalyticsApplication(
         return analyticsService.compareSprintToPrevious(sprintId)
     }
 
-    fun getSprintTrends(sprintId: UUID, sprintCount: Int): SprintTrends {
-        return analyticsService.getSprintTrends(sprintId, sprintCount)
+    fun getSprintTrends(projectId: UUID, sprintCount: Int): SprintTrends {
+        return analyticsService.getSprintTrends(projectId, sprintCount)
     }
 }
