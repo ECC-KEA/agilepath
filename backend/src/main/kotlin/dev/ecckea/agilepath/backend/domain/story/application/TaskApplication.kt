@@ -35,13 +35,14 @@ class TaskApplication(
         log.info("Creating task with title: {}", newTask.title)
         val user = userService.get(currentUser())
         val created = taskService.createTask(newTask)
+        val sprintId = sprintColumnService.getSprintColumn(created.sprintColumnId).sprintId
 
         newTask.assigneeIds.forEach { taskAssigneeService.addAssignee(created.id, it) }
 
         val assignees = newTask.assigneeIds.map { userService.getById(it) }
 
         sprintEventLogger.logEvent(
-            entityId = created.id,
+            entityId = sprintId,
             eventType = SprintEventType.TASK_ADDED,
             triggeredBy = user,
             oldValue = null,
@@ -49,7 +50,7 @@ class TaskApplication(
         )
 
         storyEventLogger.logEvent(
-            entityId = created.id,
+            entityId = created.storyId,
             eventType = StoryEventType.TASK_ADDED,
             triggeredBy = user,
             oldValue = null,
@@ -122,9 +123,11 @@ class TaskApplication(
     }
 
     fun deleteTask(id: UUID) {
+        val task = taskService.getTask(id)
+        val sprintId = sprintColumnService.getSprintColumn(task.sprintColumnId).sprintId
         log.info("Deleting task with id: {}", id)
         sprintEventLogger.logEvent(
-            entityId = id,
+            entityId = sprintId,
             eventType = SprintEventType.TASK_REMOVED,
             triggeredBy = userService.get(currentUser()),
             oldValue = null,
@@ -132,7 +135,7 @@ class TaskApplication(
         )
 
         storyEventLogger.logEvent(
-            entityId = id,
+            entityId = task.storyId,
             eventType = StoryEventType.TASK_REMOVED,
             triggeredBy = userService.get(currentUser()),
             oldValue = null,

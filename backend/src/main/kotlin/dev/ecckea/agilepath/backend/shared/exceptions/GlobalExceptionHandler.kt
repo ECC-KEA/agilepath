@@ -115,9 +115,9 @@ class GlobalExceptionHandler : Logged() {
         return createErrorResponse(HttpStatus.BAD_REQUEST, message)
     }
 
-    @ExceptionHandler(ComparisonExeception::class)
+    @ExceptionHandler(ComparisonException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun handleComparisonException(ex: ComparisonExeception): ErrorResponse {
+    fun handleComparisonException(ex: ComparisonException): ErrorResponse {
         log.warn("Comparison error: ${ex.message}")
         return createErrorResponse(HttpStatus.BAD_REQUEST, ex.message)
     }
