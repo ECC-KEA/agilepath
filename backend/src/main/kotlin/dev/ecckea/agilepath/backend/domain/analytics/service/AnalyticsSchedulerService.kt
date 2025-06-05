@@ -1,7 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.analytics.service
 
 import dev.ecckea.agilepath.backend.domain.sprint.model.SprintEventType
-import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.toModel
 import dev.ecckea.agilepath.backend.domain.user.service.UserService
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.logging.Logged
@@ -24,7 +23,7 @@ class AnalyticsSchedulerService(
     fun autoCompleteOverdueSprints() {
         log.info("Running scheduled task to auto-complete overdue sprints")
         val systemUser = userService.getOrCreateSystemUser()
-        val sprints = ctx.sprint.findOverdueSprints().map { it.toModel() }
+        val sprints = ctx.sprint.findOverdueSprints()
 
         if (sprints.isEmpty()) {
             log.info("No overdue sprints found")
@@ -32,11 +31,12 @@ class AnalyticsSchedulerService(
         }
 
         sprints.forEach { sprint ->
+            val sprintId = sprint.id ?: throw IllegalStateException("Sprint ID is null for sprint: ${sprint.name}")
             log.info("Completing overdue sprint: ${sprint.name} (ID: ${sprint.id})")
 
             // Log the completion event
             eventLogger.logEvent(
-                entityId = sprint.id,
+                entityId = sprintId,
                 eventType = SprintEventType.COMPLETED,
                 triggeredBy = systemUser,
                 oldValue = sprint.name,
