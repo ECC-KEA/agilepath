@@ -4,7 +4,7 @@ import dev.ecckea.agilepath.backend.domain.analytics.model.*
 import dev.ecckea.agilepath.backend.domain.project.model.EstimationMethod
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
-import dev.ecckea.agilepath.backend.shared.exceptions.ComparisonExeception
+import dev.ecckea.agilepath.backend.shared.exceptions.ComparisonException
 import dev.ecckea.agilepath.backend.shared.exceptions.ResourceNotFoundException
 import org.springframework.stereotype.Service
 import java.util.*
@@ -107,7 +107,7 @@ class AnalyticsService(
             ?: throw IllegalArgumentException("Sprint does not belong to a project: $currentSprintId")
 
         val previousSprint = ctx.sprint.findPreviousSprintInProject(currentSprintProjectId, currentSprint.startDate)
-            ?: throw ComparisonExeception("No previous sprint found for comparison")
+            ?: throw ComparisonException("No previous sprint found for comparison")
 
         val currentMetrics = getSprintMetrics(currentSprintId)
         val previousMetrics = getSprintMetrics(previousSprint.id!!)
