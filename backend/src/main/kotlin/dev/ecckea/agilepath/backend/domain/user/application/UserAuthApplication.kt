@@ -6,7 +6,7 @@ import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
 import org.springframework.stereotype.Service
 
 @Service
-class UserAuthApplication (
+class UserAuthApplication(
     private val userService: UserService,
 ) {
     fun getCurrentUser(principal: UserPrincipal): User {

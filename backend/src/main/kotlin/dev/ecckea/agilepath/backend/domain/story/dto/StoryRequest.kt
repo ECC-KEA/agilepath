@@ -17,6 +17,10 @@ data class StoryRequest(
     @field:Size(max = 2000, message = "Description must be at most 2000 characters")
     @field:NoHtml(message = "Description must not contain HTML")
     val description: String?,
+
+    @field:Size(max = 2000, message = "Acceptance criteria must be at most 2000 characters")
+    @field:NoHtml(message = "Acceptance criteria must not contain HTML")
+    val acceptanceCriteria: String?,
     
     @field:TrimmedNotBlank(message = "Status must not be blank")
     val status: String,

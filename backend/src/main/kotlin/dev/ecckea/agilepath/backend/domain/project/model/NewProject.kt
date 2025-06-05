@@ -7,6 +7,7 @@ data class NewProject(
     val name: String,
     val description: String?,
     val framework: Framework,
+    val estimationMethod: EstimationMethod,
     val createdBy: String, // UserId
     val createdAt: Instant = now(),
 )

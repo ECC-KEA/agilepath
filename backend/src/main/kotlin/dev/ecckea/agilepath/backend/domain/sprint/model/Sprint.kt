@@ -10,6 +10,7 @@ data class Sprint(
     val projectId: UUID,
     val name: String,
     val goal: String?,
+    val teamCapacity: Int,
     val startDate: LocalDate,
     val endDate: LocalDate,
     val createdBy: String, // UserId

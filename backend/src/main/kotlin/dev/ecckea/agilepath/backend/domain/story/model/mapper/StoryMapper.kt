@@ -5,9 +5,9 @@ import dev.ecckea.agilepath.backend.domain.story.dto.CommentResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.StoryRequest
 import dev.ecckea.agilepath.backend.domain.story.dto.StoryResponse
 import dev.ecckea.agilepath.backend.domain.story.dto.TaskResponse
+import dev.ecckea.agilepath.backend.domain.story.model.Comment
 import dev.ecckea.agilepath.backend.domain.story.model.NewStory
 import dev.ecckea.agilepath.backend.domain.story.model.Story
-import dev.ecckea.agilepath.backend.domain.story.model.Comment
 import dev.ecckea.agilepath.backend.domain.story.model.Task
 import dev.ecckea.agilepath.backend.domain.story.repository.entity.StoryEntity
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
@@ -27,14 +27,15 @@ fun StoryEntity.toModel(comments: List<Comment>, tasks: List<Task>): Story {
         projectId = projectId,
         title = title,
         description = description,
+        acceptanceCriteria = acceptanceCriteria,
         status = status,
         priority = priority,
+        comments = comments,
+        tasks = tasks,
         createdBy = createdBy.id,
         modifiedBy = modifiedBy?.id,
         createdAt = createdAt,
-        modifiedAt = modifiedAt,
-        comments = comments,
-        tasks = tasks
+        modifiedAt = modifiedAt
     )
 }
 
@@ -43,10 +44,27 @@ fun Story.toDTO() = StoryResponse(
     projectId = projectId,
     title = title,
     description = description,
+    acceptanceCriteria = acceptanceCriteria,
     status = status,
     priority = priority,
     comments = comments?.map{it.toDTO()} ?: emptyList(),
     tasks = tasks?.map { it.toDTO() } ?: emptyList(),
+    createdBy = createdBy,
+    modifiedBy = modifiedBy,
+    createdAt = toZonedDateTime(createdAt),
+    modifiedAt = modifiedAt?.let { toZonedDateTime(it) },
+)
+
+fun Story.toDTO(comments: List<CommentResponse>, tasks: List<TaskResponse>) = StoryResponse(
+    id = id,
+    projectId = projectId,
+    title = title,
+    description = description,
+    acceptanceCriteria = acceptanceCriteria,
+    status = status,
+    priority = priority,
+    comments = comments,
+    tasks = tasks,
     createdBy = createdBy,
     modifiedBy = modifiedBy,
     createdAt = toZonedDateTime(createdAt),
@@ -63,6 +81,7 @@ fun Story.toEntity(
         project = project,
         title = title,
         description = description,
+        acceptanceCriteria = acceptanceCriteria,
         status = status,
         priority = priority,
         createdBy = createdBy,
@@ -76,6 +95,7 @@ fun StoryRequest.toModel(userId: String = currentUser().id) = NewStory(
     projectId = projectId,
     title = title,
     description = description,
+    acceptanceCriteria = acceptanceCriteria,
     status = status,
     priority = priority,
     createdBy = userId,
@@ -87,6 +107,7 @@ fun NewStory.toEntity(ctx: RepositoryContext): StoryEntity {
         project = ctx.project.ref(projectId),
         title = title,
         description = description,
+        acceptanceCriteria = acceptanceCriteria,
         status = status,
         priority = priority,
         createdBy = ctx.user.ref(createdBy),
@@ -100,6 +121,7 @@ fun StoryEntity.updatedWith(update: NewStory, userId: String, ctx: RepositoryCon
         project = this.project,
         title = update.title,
         description = update.description,
+        acceptanceCriteria = update.acceptanceCriteria,
         status = update.status,
         priority = update.priority,
         createdBy = this.createdBy,

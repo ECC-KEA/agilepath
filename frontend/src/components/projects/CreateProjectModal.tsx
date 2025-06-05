@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import useProjects from "../../hooks/projects/useProjects";
-import { Framework, INewProject } from "../../types/project.types";
+import { EstimationMethod, Framework, INewProject } from "../../types/project.types";
 import Modal from "../generic/Modal";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
@@ -16,6 +16,9 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [framework, setFramework] = useState<Framework>(Framework.NONE);
+  const [estimationMethod, setEstimationMethod] = useState<EstimationMethod>(
+    EstimationMethod.STORY_POINTS
+  );
 
   const disableCreate = useMemo(() => {
     return name === "";
@@ -25,7 +28,8 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
     const tmp: INewProject = {
       name,
       framework,
-      description
+      description,
+      estimationMethod
     };
     createProject(tmp)
       .then(() => notifySuccess(`Successfully created Project "${name}"`))
@@ -60,7 +64,6 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
               <Input
                 type="radio"
                 name="framework"
-                placeholder="Project title"
                 value={Framework.SCRUM}
                 onChange={() => setFramework(Framework.SCRUM)}
                 checked={framework === Framework.SCRUM}
@@ -72,7 +75,6 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
               <Input
                 type="radio"
                 name="framework"
-                placeholder="Project title"
                 value={Framework.XP}
                 onChange={() => setFramework(Framework.XP)}
                 checked={framework === Framework.XP}
@@ -84,13 +86,39 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
               <Input
                 type="radio"
                 name="framework"
-                placeholder="Project title"
                 value={Framework.NONE}
                 onChange={() => setFramework(Framework.NONE)}
                 checked={framework === Framework.NONE}
                 className="accent-ap-lavender-900"
               />
               None
+            </label>
+          </div>
+        </div>
+        <div>
+          <div className="text-ap-onyx-200">Estimation method</div>
+          <div className="flex items-center gap-4 select-none my-1">
+            <label className="flex items-center text-sm gap-1">
+              <Input
+                type="radio"
+                name="estimation"
+                value={EstimationMethod.STORY_POINTS}
+                onChange={() => setEstimationMethod(EstimationMethod.STORY_POINTS)}
+                checked={estimationMethod === EstimationMethod.STORY_POINTS}
+                className="accent-ap-lavender-900"
+              />
+              Story points
+            </label>
+            <label className="flex items-center text-sm gap-1">
+              <Input
+                type="radio"
+                name="estimation"
+                value={EstimationMethod.TSHIRT_SIZES}
+                onChange={() => setEstimationMethod(EstimationMethod.TSHIRT_SIZES)}
+                checked={estimationMethod === EstimationMethod.TSHIRT_SIZES}
+                className="accent-ap-lavender-900"
+              />
+              T-shirt sizes
             </label>
           </div>
         </div>

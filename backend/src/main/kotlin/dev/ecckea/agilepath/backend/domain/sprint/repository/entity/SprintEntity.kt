@@ -24,6 +24,9 @@ class SprintEntity (
     @Column(name = "goal", columnDefinition = "TEXT")
     val goal: String? = null,
 
+    @Column(name = "capacity", nullable = false)
+    val teamCapacity: Int,
+
     @Column(name = "start_date", nullable = false)
     val startDate: LocalDate,
 

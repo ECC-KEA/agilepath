@@ -23,21 +23,19 @@ package dev.ecckea.agilepath.backend.shared.context.repository
 
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.entity.SprintColumnEntity
+import dev.ecckea.agilepath.backend.domain.project.repository.ProjectEventRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
+import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEventEntity
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.UserProjectEntity
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.UserProjectId
+import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintEventRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
-import dev.ecckea.agilepath.backend.domain.story.repository.CommentRepository
-import dev.ecckea.agilepath.backend.domain.story.repository.StoryRepository
-import dev.ecckea.agilepath.backend.domain.story.repository.SubtaskRepository
-import dev.ecckea.agilepath.backend.domain.story.repository.TaskRepository
-import dev.ecckea.agilepath.backend.domain.story.repository.entity.CommentEntity
-import dev.ecckea.agilepath.backend.domain.story.repository.entity.StoryEntity
-import dev.ecckea.agilepath.backend.domain.story.repository.entity.SubtaskEntity
-import dev.ecckea.agilepath.backend.domain.story.repository.entity.TaskEntity
+import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEventEntity
+import dev.ecckea.agilepath.backend.domain.story.repository.*
+import dev.ecckea.agilepath.backend.domain.story.repository.entity.*
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import jakarta.persistence.EntityManager
@@ -71,6 +69,9 @@ fun <T, ID : Any> JpaRepository<T, ID>.ref(id: ID): T = getReferenceById(id)
 /** Get a reference to a [StoryEntity] by UUID. */
 fun StoryRepository.ref(id: UUID): StoryEntity = getReferenceById(id)
 
+/** Get a reference to a [StoryEventEntity] by UUID. */
+fun StoryEventRepository.ref(id: UUID): StoryEventEntity = getReferenceById(id)
+
 /** Get a reference to a [SprintColumnEntity] by UUID. */
 fun SprintColumnRepository.ref(id: UUID): SprintColumnEntity = getReferenceById(id)
 
@@ -80,6 +81,9 @@ fun UserRepository.ref(id: String): UserEntity = getReferenceById(id)
 /** Get a reference to a [ProjectEntity] by UUID. */
 fun ProjectRepository.ref(id: UUID): ProjectEntity = getReferenceById(id)
 
+/** Get a reference to a [StoryEventEntity] by UUID. */
+fun ProjectEventRepository.ref(id: UUID): ProjectEventEntity = getReferenceById(id)
+
 /** Get a reference to a [UserProject] by String and UUID. */
 fun UserProjectRepository.ref(userId: String, projectId: UUID): UserProjectEntity =
     getReferenceById(UserProjectId(userId, projectId))
@@ -87,8 +91,14 @@ fun UserProjectRepository.ref(userId: String, projectId: UUID): UserProjectEntit
 /** Get a reference to a [SprintEntity] by UUID. */
 fun SprintRepository.ref(id: UUID): SprintEntity = getReferenceById(id)
 
+/** Get a refence to a [SprintEventEntity] by UUID. */
+fun SprintEventRepository.refEvent(id: UUID): SprintEventEntity = getReferenceById(id)
+
 /** Get a reference to a [TaskEntity] by UUID. */
 fun TaskRepository.ref(id: UUID): TaskEntity = getReferenceById(id)
+
+/** Get a reference to a [TaskEventEntity] by UUID. */
+fun TaskEventRepository.ref(id: UUID): TaskEventEntity = getReferenceById(id)
 
 /** Get a reference to a [SubtaskEntity] by UUID. */
 fun SubtaskRepository.ref(id: UUID): SubtaskEntity = getReferenceById(id)
