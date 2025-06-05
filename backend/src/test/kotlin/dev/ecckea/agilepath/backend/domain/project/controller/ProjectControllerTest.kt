@@ -27,7 +27,8 @@ class ProjectControllerTest : IntegrationTestBase() {
     ) = ProjectRequest(
         name = name,
         description = description,
-        framework = framework.toString()
+        framework = framework.toString(),
+        estimationMethod = "STORY_POINTS"
     )
 
     private fun createProject(request: ProjectRequest = createProjectRequest()): ProjectResponse {
@@ -104,7 +105,8 @@ class ProjectControllerTest : IntegrationTestBase() {
         val updatedRequest = ProjectRequest(
             name = "AgilePath++",
             description = "Updated description",
-            framework = Framework.XP.toString()
+            framework = Framework.XP.toString(),
+            estimationMethod = "STORY_POINTS"
         )
 
         val updated = webTestClient

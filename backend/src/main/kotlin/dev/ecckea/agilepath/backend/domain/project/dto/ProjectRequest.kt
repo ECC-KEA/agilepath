@@ -1,5 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.project.dto
 
+import dev.ecckea.agilepath.backend.domain.project.model.EstimationMethod
 import dev.ecckea.agilepath.backend.domain.project.model.Framework
 import dev.ecckea.agilepath.backend.shared.validation.annotations.NoHtml
 import dev.ecckea.agilepath.backend.shared.validation.annotations.TrimmedNotBlank
@@ -19,4 +20,12 @@ data class ProjectRequest(
     @field:NotNull(message = "Framework must not be null")
     @field:ValidEnum(enumClass = Framework::class, ignoreCase = true, message = "must be SCRUM, XP, or NONE")
     val framework: String,
+
+    @field:NotNull(message = "Estimation method must not be null")
+    @field:ValidEnum(
+        enumClass = EstimationMethod::class,
+        ignoreCase = true,
+        message = "must be STORY_POINTS or TSHIRT_SIZES"
+    )
+    val estimationMethod: String,
 )

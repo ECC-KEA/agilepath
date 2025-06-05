@@ -31,7 +31,8 @@ class ProjectControllerValidationTest : IntegrationTestBase() {
         val request = ProjectRequest(
             name = "   ",
             description = "Valid description",
-            framework = "SCRUM"
+            framework = "SCRUM",
+            estimationMethod = "STORY_POINTS"
         )
         assertEquals(HttpStatus.BAD_REQUEST, postInvalidProject(request))
     }
@@ -41,7 +42,8 @@ class ProjectControllerValidationTest : IntegrationTestBase() {
         val request = ProjectRequest(
             name = "a",
             description = "Valid description",
-            framework = "SCRUM"
+            framework = "SCRUM",
+            estimationMethod = "STORY_POINTS"
         )
         assertEquals(HttpStatus.BAD_REQUEST, postInvalidProject(request))
     }
@@ -51,7 +53,8 @@ class ProjectControllerValidationTest : IntegrationTestBase() {
         val request = ProjectRequest(
             name = "Valid name",
             description = "<b>malicious</b>",
-            framework = "SCRUM"
+            framework = "SCRUM",
+            estimationMethod = "STORY_POINTS"
         )
         assertEquals(HttpStatus.BAD_REQUEST, postInvalidProject(request))
     }
@@ -61,7 +64,8 @@ class ProjectControllerValidationTest : IntegrationTestBase() {
         val request = ProjectRequest(
             name = "Valid name",
             description = "Valid description",
-            framework = "KANBAN" // not part of enum
+            framework = "KANBAN", // not part of enum
+            estimationMethod = "STORY_POINTS"
         )
         assertEquals(HttpStatus.BAD_REQUEST, postInvalidProject(request))
     }
