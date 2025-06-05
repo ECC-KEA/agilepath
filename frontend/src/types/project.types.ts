@@ -7,6 +7,7 @@ export interface IProject {
   framework: Framework;
   createdBy?: string;
   createdAt: string;
+  estimationMethod: EstimationMethod;
 }
 
 export interface INewProject {

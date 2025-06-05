@@ -5,7 +5,7 @@ import ShowIf from "../components/generic/ShowIf";
 import useTask from "../hooks/task/useTask";
 import { useLoading } from "../hooks/utils/loading/useLoading";
 import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTshirt } from "react-icons/fa";
 import useSubTask from "../hooks/subtask/useSubTask";
 import SubTaskBox from "../components/sprint/SubTaskBox";
 import NewSubTaskModal from "../components/sprint/NewSubTaskModal";
@@ -15,17 +15,77 @@ import { PiOpenAiLogoDuotone } from "react-icons/pi";
 import Markdown from "react-markdown";
 import { Avatar, AvatarGroup } from "@mui/material";
 import AssigneeModal from "../components/sprint/AssigneeModal";
+import CustomSelect from "../components/generic/select/CustomSelect";
+import useCurrentProject from "../hooks/projects/useCurrentProject";
+import { ITaskRequest, PointEstimate, TshirtEstimate } from "../types/story.types";
+import { EstimationMethod } from "../types/project.types";
 
 function TaskEdit() {
   const { assistant } = useAssistant();
   const { sendMessage } = useOpenAI();
-  const { task } = useTask();
+  const { task, updateTask } = useTask();
   const { subtasks } = useSubTask();
+  const { project } = useCurrentProject();
   const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
   const [showAssigneeModal, setShowAssigneeModal] = useState(false);
   const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
   if (!task) return <div>Loading...</div>;
+
+  const tshirtEstimateOptions = [
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />
+          XS
+        </span>
+      ),
+      value: TshirtEstimate.XSMALL
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />S
+        </span>
+      ),
+      value: TshirtEstimate.SMALL
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />M
+        </span>
+      ),
+      value: TshirtEstimate.MEDIUM
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />L
+        </span>
+      ),
+      value: TshirtEstimate.LARGE
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />
+          XL
+        </span>
+      ),
+      value: TshirtEstimate.XLARGE
+    }
+  ];
+
+  const storyPointEstimateOptions = [
+    { label: "1", value: PointEstimate.POINT_1 },
+    { label: "2", value: PointEstimate.POINT_2 },
+    { label: "3", value: PointEstimate.POINT_3 },
+    { label: "5", value: PointEstimate.POINT_5 },
+    { label: "8", value: PointEstimate.POINT_8 },
+    { label: "13", value: PointEstimate.POINT_13 },
+    { label: "21", value: PointEstimate.POINT_21 }
+  ];
 
   const handleBreakdown = () => {
     loader.add();
@@ -65,14 +125,76 @@ function TaskEdit() {
       .finally(loader.done);
   };
 
+  const handleUpdateEstimateTshirt = (estimate: TshirtEstimate) => {
+    const tmp: ITaskRequest = {
+      assigneeIds: task.assignees.map((a) => a.id),
+      sprintColumnId: task.sprintColumnId,
+      storyId: task.storyId,
+      title: task.title,
+      description: task.description,
+      estimateTshirt: estimate
+    };
+    updateTask(tmp, task.id);
+  };
+
+  const handleUpdateEstimatePoints = (estimate: PointEstimate) => {
+    const tmp: ITaskRequest = {
+      assigneeIds: task.assignees.map((a) => a.id),
+      sprintColumnId: task.sprintColumnId,
+      storyId: task.storyId,
+      title: task.title,
+      description: task.description,
+      estimatePoints: estimate
+    };
+    updateTask(tmp, task.id);
+  };
+
   return (
     <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full relative">
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col gap-4 p-4 min-w-1/2 border-r border-ap-onyx-50/50">
           <div className="sticky top-0 bg-white border-b border-ap-onyx-50 pb-4 flex flex-col gap-4">
             <div className="text-ap-onyx-400 text-sm">{task.id}</div>
-            <div className="flex gap-2">
-              <div className="text-ap-onyx-800 font-bold">{task.title}</div>
+            <div className="flex justify-between">
+              <div className="text-ap-onyx-800 font-bold truncate">{task.title}</div>
+              <ShowIf if={project?.estimationMethod === EstimationMethod.TSHIRT_SIZES}>
+                <label>
+                  <span className="text-xs">Estimate</span>
+                  <CustomSelect
+                    options={tshirtEstimateOptions}
+                    value={
+                      tshirtEstimateOptions.find((o) => o.value === task.estimateTshirt) ?? null
+                    }
+                    onChange={(o) => {
+                      if (o) {
+                        handleUpdateEstimateTshirt(o.value);
+                      }
+                    }}
+                    className="w-26"
+                  />
+                </label>
+              </ShowIf>
+              <ShowIf if={project?.estimationMethod === EstimationMethod.STORY_POINTS}>
+                <label>
+                  <span className="text-xs">Estimate (Story points)</span>
+                  <CustomSelect
+                    options={storyPointEstimateOptions}
+                    value={
+                      storyPointEstimateOptions.find((o) => o.value === task.estimatePoints) ?? null
+                    }
+                    onChange={(o) => {
+                      if (o) {
+                        handleUpdateEstimatePoints(o.value);
+                      }
+                    }}
+                    classNames={{
+                      menuList: (base) => `${base} text-right`
+                    }}
+                    className="w-34 text-right"
+                    isSearchable={false}
+                  />
+                </label>
+              </ShowIf>
             </div>
           </div>
           <ShowIf if={!!task.description && task.description !== ""}>
