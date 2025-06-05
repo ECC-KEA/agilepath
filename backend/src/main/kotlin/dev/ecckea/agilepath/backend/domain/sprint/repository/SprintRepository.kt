@@ -41,4 +41,15 @@ interface SprintRepository : JpaRepository<SprintEntity, UUID> {
         @Param("projectId") projectId: UUID,
         @Param("limit") limit: Int
     ): List<SprintEntity>
+
+
+    @Query(
+        value = """
+        SELECT * FROM sprints
+        WHERE end_date < CURRENT_DATE
+        ORDER BY end_date DESC
+    """,
+        nativeQuery = true
+    )
+    fun findOverdueSprints(): List<SprintEntity>
 }

@@ -1,9 +1,9 @@
 package dev.ecckea.agilepath.backend.domain.user.application
 
-import dev.ecckea.agilepath.backend.domain.user.service.UserService
-import org.springframework.stereotype.Service
 import dev.ecckea.agilepath.backend.domain.user.model.User
+import dev.ecckea.agilepath.backend.domain.user.service.UserService
 import dev.ecckea.agilepath.backend.shared.security.UserPrincipal
+import org.springframework.stereotype.Service
 
 @Service
 class UserApplication(
@@ -21,5 +21,5 @@ class UserApplication(
         search: String,
     ): List<User> {
         return userService.getBySearch(search, search, search)
-    }    
+    }
 }
