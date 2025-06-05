@@ -38,6 +38,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             name = "   ",
             goal = "Valid goal",
+            teamCapacity = 28,
             startDate = tomorrow,
             endDate = nextWeek
         )
@@ -50,6 +51,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             name = "ab",
             goal = "Valid goal",
+            teamCapacity = 28,
             startDate = tomorrow,
             endDate = nextWeek
         )
@@ -62,6 +64,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             name = "Valid Sprint Name",
             goal = "<script>alert('xss')</script>",
+            teamCapacity = 28,
             startDate = tomorrow,
             endDate = nextWeek
         )
@@ -74,6 +77,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
         {
             "name": "Valid Sprint Name",
             "goal": "Valid goal",
+            "teamCapacity" = 28,
             "startDate": "$tomorrow",
             "endDate": "$nextWeek"
         }
@@ -91,6 +95,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             name = "Valid Sprint Name",
             goal = "Valid goal",
+            teamCapacity = 28,
             startDate = LocalDate.now().minusDays(1), // Yesterday
             endDate = nextWeek
         )
@@ -104,6 +109,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
         "projectId": "$validProjectId",
         "name": "Valid Sprint Name",
         "goal": "Valid goal",
+        "teamCapacity" = 28,
         "endDate": "$nextWeek"
     }
     """
@@ -121,6 +127,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
         "projectId": "$validProjectId",
         "name": "Valid Sprint Name",
         "goal": "Valid goal",
+        "teamCapacity" = 28,
         "startDate": "$tomorrow"
     }
     """
@@ -137,6 +144,7 @@ class SprintControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             name = "Valid Sprint Name",
             goal = "Valid goal",
+            teamCapacity = 28,
             startDate = tomorrow,
             endDate = LocalDate.now() // Today (before start date)
         )

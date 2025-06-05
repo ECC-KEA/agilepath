@@ -29,12 +29,15 @@ class SprintControllerTest : IntegrationTestBase() {
     private fun createSprintRequest(
         projectId: UUID = existingProjectId,
         name: String = "Sprint-${UUID.randomUUID()}",
+        goal: String = "Complete the test features",
+        teamCapacity: Int = 28,
         startDate: LocalDate = LocalDate.now(),
         endDate: LocalDate = LocalDate.now().plusWeeks(2)
     ) = SprintRequest(
         projectId = projectId,
         name = name,
-        goal = "Complete the test features",
+        goal = goal,
+        teamCapacity = teamCapacity,
         startDate = startDate,
         endDate = endDate
     )
@@ -101,6 +104,7 @@ class SprintControllerTest : IntegrationTestBase() {
             projectId = created.projectId,
             name = "Updated Sprint Name",
             goal = "Updated goal",
+            teamCapacity = 28,
             startDate = created.startDate,
             endDate = created.endDate.plusWeeks(1)
         )
@@ -126,6 +130,7 @@ class SprintControllerTest : IntegrationTestBase() {
             projectId = otherProjectId,
             name = sprint.name,
             goal = sprint.goal,
+            teamCapacity = 28,
             startDate = sprint.startDate,
             endDate = sprint.endDate
         )
