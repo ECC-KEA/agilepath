@@ -10,3 +10,7 @@ export function isPast(dateString: string) {
 export function isFuture(dateString: string) {
   return new Date().getTime() < new Date(dateString).getTime();
 }
+
+export function createdAtSortPredicate<T extends { createdAt: string }>(a: T, b: T) {
+  return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+}

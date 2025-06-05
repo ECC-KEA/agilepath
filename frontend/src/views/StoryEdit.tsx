@@ -1,5 +1,5 @@
 import StatusLabel from "../components/status/StatusLabel";
-import { ITask, Status } from "../types/story.types";
+import { ITask, ITaskRequest, PointEstimate, Status, TshirtEstimate } from "../types/story.types";
 import Button from "../components/generic/buttons/Button";
 import NewStoryTaskModal from "../components/project/NewStoryTaskModal";
 import Comments from "../components/comment/Comments";
@@ -9,11 +9,16 @@ import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
 import useStory from "../hooks/story/useStory";
 import { useLoading } from "../hooks/utils/loading/useLoading";
-import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { useCallback, useState } from "react";
+import { FaPlus, FaTshirt } from "react-icons/fa";
 import { notifyError } from "../helpers/notify";
 import { PiOpenAiLogoDuotone } from "react-icons/pi";
 import Markdown from "react-markdown";
+import CustomSelect from "../components/generic/select/CustomSelect";
+import useCurrentProject from "../hooks/projects/useCurrentProject";
+import { EstimationMethod } from "../types/project.types";
+import { useApi } from "../hooks/utils/useApi";
+import { createdAtSortPredicate } from "../helpers/timeHelpers";
 
 function StoryEdit() {
   const { assistant } = useAssistant();
@@ -115,7 +120,7 @@ function StoryEdit() {
           <div>
             <div className="text-sm font-semibold">Tasks</div>
             <div className="max-h-[calc(100vh-400px)] flex flex-col gap-2 overflow-y-auto">
-              {story.tasks.map((t) => (
+              {story.tasks.sort(createdAtSortPredicate).map((t) => (
                 <TaskListItem
                   key={"storytask" + t.id}
                   task={t}
@@ -161,16 +166,149 @@ interface TaskListItemProps {
 }
 
 function TaskListItem(props: Readonly<TaskListItemProps>) {
+  const { put } = useApi();
+  const { project } = useCurrentProject();
+  const { getStories } = useStory();
+
+  const updateTask = useCallback(
+    (task: ITaskRequest, id: string) => {
+      return put(`/tasks/${id}`, task).then(getStories);
+    },
+    [put]
+  );
+
+  const tshirtEstimateOptions = [
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />
+          XS
+        </span>
+      ),
+      value: TshirtEstimate.XSMALL
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />S
+        </span>
+      ),
+      value: TshirtEstimate.SMALL
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />M
+        </span>
+      ),
+      value: TshirtEstimate.MEDIUM
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />L
+        </span>
+      ),
+      value: TshirtEstimate.LARGE
+    },
+    {
+      label: (
+        <span className="flex items-center gap-2">
+          <FaTshirt className="text-ap-lavender-500" />
+          XL
+        </span>
+      ),
+      value: TshirtEstimate.XLARGE
+    }
+  ];
+
+  const storyPointEstimateOptions = [
+    { label: "1", value: PointEstimate.POINT_1 },
+    { label: "2", value: PointEstimate.POINT_2 },
+    { label: "3", value: PointEstimate.POINT_3 },
+    { label: "5", value: PointEstimate.POINT_5 },
+    { label: "8", value: PointEstimate.POINT_8 },
+    { label: "13", value: PointEstimate.POINT_13 },
+    { label: "21", value: PointEstimate.POINT_21 }
+  ];
+  const handleUpdateEstimateTshirt = (estimate: TshirtEstimate) => {
+    const tmp: ITaskRequest = {
+      assigneeIds: props.task.assignees.map((a) => a.id),
+      sprintColumnId: props.task.sprintColumnId,
+      storyId: props.task.storyId,
+      title: props.task.title,
+      description: props.task.description,
+      estimateTshirt: estimate
+    };
+    updateTask(tmp, props.task.id);
+  };
+
+  const handleUpdateEstimatePoints = (estimate: PointEstimate) => {
+    const tmp: ITaskRequest = {
+      assigneeIds: props.task.assignees.map((a) => a.id),
+      sprintColumnId: props.task.sprintColumnId,
+      storyId: props.task.storyId,
+      title: props.task.title,
+      description: props.task.description,
+      estimatePoints: estimate
+    };
+    updateTask(tmp, props.task.id);
+  };
   return (
     <div
       className={`
-        p-2  rounded shadow w-80 h-20 bg-ap-onyx-50/20
+        p-2  rounded shadow w-lg h-20 bg-ap-onyx-50/20
       `}
     >
       <div className="flex justify-between items-center text-sm">
         <div className="truncate w-20">#{props.task.id}</div>
       </div>
-      <div className="my-2 mx-4 max-w-64 line-clamp-2 text-left">{props.task.title}</div>
+      <div className="flex justify-between">
+        <div
+          className="my-2
+         mx-4 max-w-80 line-clamp-2 truncate text-left"
+        >
+          {props.task.title}
+        </div>
+        <ShowIf if={project?.estimationMethod === EstimationMethod.TSHIRT_SIZES}>
+          <label className="flex items-center gap-2">
+            <span className="text-xs">Estimate</span>
+            <CustomSelect
+              options={tshirtEstimateOptions}
+              value={
+                tshirtEstimateOptions.find((o) => o.value === props.task.estimateTshirt) ?? null
+              }
+              onChange={(o) => {
+                if (o) {
+                  handleUpdateEstimateTshirt(o.value);
+                }
+              }}
+              className="w-26"
+            />
+          </label>
+        </ShowIf>
+        <ShowIf if={project?.estimationMethod === EstimationMethod.STORY_POINTS}>
+          <label className="flex items-center gap-2">
+            <span className="text-xs">Estimate</span>
+            <CustomSelect
+              options={storyPointEstimateOptions}
+              value={
+                storyPointEstimateOptions.find((o) => o.value === props.task.estimatePoints) ?? null
+              }
+              onChange={(o) => {
+                if (o) {
+                  handleUpdateEstimatePoints(o.value);
+                }
+              }}
+              classNames={{
+                menuList: (base) => `${base} text-right`
+              }}
+              className="w-20 text-right"
+              isSearchable={false}
+            />
+          </label>
+        </ShowIf>
+      </div>
     </div>
   );
 }
