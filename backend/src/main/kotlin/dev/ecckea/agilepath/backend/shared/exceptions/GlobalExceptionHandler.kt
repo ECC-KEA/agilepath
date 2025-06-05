@@ -95,7 +95,7 @@ class GlobalExceptionHandler : Logged() {
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ErrorResponse {
-        // Extract meaningful error message from the exception
+        // Extract a meaningful error message from the exception
         val message = when {
             ex.cause is MismatchedInputException -> {
                 val cause = ex.cause as MismatchedInputException
@@ -114,6 +114,15 @@ class GlobalExceptionHandler : Logged() {
 
         return createErrorResponse(HttpStatus.BAD_REQUEST, message)
     }
+
+    @ExceptionHandler(ComparisonExeception::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleComparisonException(ex: ComparisonExeception): ErrorResponse {
+        log.warn("Comparison error: ${ex.message}")
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.message)
+    }
+
+
 
     private fun createErrorResponse(status: HttpStatus, message: String?): ErrorResponse =
         ErrorResponse(
