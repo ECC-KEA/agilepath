@@ -9,7 +9,6 @@ import dev.ecckea.agilepath.backend.domain.project.service.UserProjectService
 import dev.ecckea.agilepath.backend.domain.user.service.UserService
 import dev.ecckea.agilepath.backend.shared.logging.events.ProjectEventLogger
 import dev.ecckea.agilepath.backend.shared.security.currentUser
-import dev.ecckea.agilepath.backend.shared.utils.ChangeDetector
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -52,19 +51,6 @@ class ProjectApplication(
 
     fun updateProject(id: UUID, project: NewProject): Project {
         val user = userService.get(currentUser())
-        val oldProject = projectService.getProject(id)
-        val changes = ChangeDetector.detectChanges(oldProject, project)
-
-        if (changes.hasChanges() && changes.contains("framework")) {
-            eventLogger.logEvent(
-                entityId = id,
-                eventType = ProjectEventType.FRAMEWORK_CHANGED,
-                triggeredBy = user,
-                oldValue = oldProject.framework.name,
-                newValue = project.framework.name
-            )
-        }
-
         return projectService.updateProject(id, project, user)
     }
 }

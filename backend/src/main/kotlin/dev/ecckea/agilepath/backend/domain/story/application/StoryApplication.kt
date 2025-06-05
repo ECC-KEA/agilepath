@@ -66,7 +66,6 @@ class StoryApplication(
     fun deleteStory(id: UUID) {
         val storyToDelete = storyService.getStory(id)
         val user = userService.get(currentUser())
-        storyService.deleteStory(id)
 
         eventLogger.logEvent(
             entityId = id,
@@ -75,6 +74,8 @@ class StoryApplication(
             oldValue = storyToDelete.title,
             newValue = null
         )
+
+        storyService.deleteStory(id)
     }
 
     fun getStoriesByProjectId(projectId: UUID): List<Story> {
