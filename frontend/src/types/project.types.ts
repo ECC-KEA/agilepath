@@ -13,6 +13,12 @@ export interface INewProject {
   name: string;
   description?: string;
   framework: Framework;
+  estimationMethod: EstimationMethod;
+}
+
+export enum EstimationMethod {
+  STORY_POINTS = "STORY_POINTS",
+  TSHIRT_SIZES = "TSHIRT_SIZES"
 }
 
 export enum Framework {

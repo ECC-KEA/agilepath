@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import useProjects from "../../hooks/projects/useProjects";
-import { Framework, INewProject } from "../../types/project.types";
+import { EstimationMethod, Framework, INewProject } from "../../types/project.types";
 import Modal from "../generic/Modal";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
@@ -25,7 +25,8 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
     const tmp: INewProject = {
       name,
       framework,
-      description
+      description,
+      estimationMethod: EstimationMethod.STORY_POINTS
     };
     createProject(tmp)
       .then(() => notifySuccess(`Successfully created Project "${name}"`))
