@@ -29,12 +29,14 @@ class StoryControllerTest : IntegrationTestBase() {
         projectId: UUID = existingProjectId,
         title: String = "Test Story ${UUID.randomUUID()}",
         description: String? = "Description for the story",
+        acceptanceCriteria: String? = "Acceptance criteria for the story",
         status: String = "TODO",
         priority: Int = 1
     ) = StoryRequest(
         projectId = projectId,
         title = title,
         description = description,
+        acceptanceCriteria = acceptanceCriteria,
         status = status,
         priority = priority
     )
@@ -78,6 +80,7 @@ class StoryControllerTest : IntegrationTestBase() {
         val updateRequest = createStoryRequest(
             title = "Updated Story Title",
             description = "Updated Description",
+            acceptanceCriteria = "Updated Acceptance Criteria",
             status = "IN_PROGRESS",
             priority = 2
         )

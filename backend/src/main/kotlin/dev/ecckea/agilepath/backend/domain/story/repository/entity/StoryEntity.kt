@@ -22,6 +22,9 @@ data class StoryEntity(
 
     val description: String? = null,
 
+    @Column(name = "acceptance_criteria", columnDefinition = "TEXT")
+    val acceptanceCriteria: String? = null,
+
     @Column(nullable = false)
     val status: String,
 

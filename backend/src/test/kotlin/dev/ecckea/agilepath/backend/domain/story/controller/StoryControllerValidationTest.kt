@@ -35,6 +35,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "   ",
             description = "Valid description",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = 0
         )
@@ -47,6 +48,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "ab", // Less than 3 characters
             description = "Valid description",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = 0
         )
@@ -59,6 +61,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "a".repeat(101), // 101 characters (exceeds 100 limit)
             description = "Valid description",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = 0
         )
@@ -71,6 +74,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "Valid Story Title",
             description = "<script>alert('xss')</script>",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = 0
         )
@@ -83,6 +87,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "Valid Story Title",
             description = "a".repeat(2001), // 2001 characters (exceeds 2000 limit)
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = 0
         )
@@ -95,6 +100,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "Valid Story Title",
             description = "Valid description",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "   ",
             priority = 0
         )
@@ -107,6 +113,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
             projectId = validProjectId,
             title = "Valid Story Title",
             description = "Valid description",
+            acceptanceCriteria = "Valid acceptance criteria",
             status = "TO_DO",
             priority = -1
         )
@@ -119,6 +126,7 @@ class StoryControllerValidationTest : IntegrationTestBase() {
         {
             "title": "Valid Story Title",
             "description": "Valid description",
+            "acceptanceCriteria": "Valid acceptance criteria",
             "status": "TO_DO",
             "priority": 0
         }
