@@ -1,9 +1,8 @@
-package dev.ecckea.agilepath.backend.domain.retrospective.dto
+package dev.ecckea.agilepath.backend.domain.retrospective.model
 
-import dev.ecckea.agilepath.backend.domain.retrospective.model.TalkingPoint
 import java.util.UUID
 
-data class RetrospectiveRequest(
+data class NewRetrospective(
     val sprintId: UUID,
     val talkingPoints: List<TalkingPoint> = emptyList(),
     val teamMood: String? = null,

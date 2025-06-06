@@ -1,6 +1,7 @@
 package dev.ecckea.agilepath.backend.domain.retrospective.service
 
 import dev.ecckea.agilepath.backend.domain.retrospective.dto.RetrospectiveResponse
+import dev.ecckea.agilepath.backend.domain.retrospective.model.NewRetrospective
 import dev.ecckea.agilepath.backend.domain.retrospective.model.Retrospective
 import dev.ecckea.agilepath.backend.domain.retrospective.model.mapper.toEntity
 import dev.ecckea.agilepath.backend.domain.retrospective.model.mapper.toModel
@@ -32,7 +33,7 @@ class RetrospectiveService(
     }
 
     @Transactional
-    fun createRetrospective(retrospective: Retrospective): Retrospective {
+    fun createRetrospective(retrospective: NewRetrospective): Retrospective {
         log.info("Creating retrospective for sprint ${retrospective.sprintId}")
 
         // Check if the sprint exists and save sprint entity in variable

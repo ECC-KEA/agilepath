@@ -40,4 +40,8 @@ class SprintApplication(
     fun updateSprint(sprintId: UUID, sprint: NewSprint): Sprint {
         return sprintService.updateSprint(sprintId, sprint)
     }
+
+    fun endSprint(sprintId: UUID): Sprint {
+        return sprintService.endSprint(sprintId)
+    }
 }

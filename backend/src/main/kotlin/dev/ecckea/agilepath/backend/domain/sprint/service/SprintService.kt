@@ -5,6 +5,7 @@ import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toModel
 import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.sprint.model.NewSprint
 import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
+import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
@@ -13,6 +14,8 @@ import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -93,6 +96,41 @@ class SprintService(
         // Invalidate caches
         cacheService.invalidateSprint(sprintId)
         cacheService.invalidateProjectSprints(sprint.projectId)
+
+        return updatedSprint
+    }
+
+    @Transactional
+    fun endSprint(sprintId: UUID): Sprint {
+        log.info("Ending sprint with ID $sprintId")
+
+        val existingSprint = ctx.sprint.findOneById(sprintId)
+            ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
+
+        require(existingSprint.endDate.isAfter(LocalDate.now())) {
+            throw BadRequestException("Sprint with ID $sprintId is already ended")
+        }
+
+        val existingSprintModel = existingSprint.toModel()
+
+        val updatedEntity = existingSprint.updatedWith(
+            update = NewSprint(
+                projectId = existingSprintModel.projectId,
+                name = existingSprintModel.name,
+                goal = existingSprintModel.goal,
+                startDate = existingSprintModel.startDate,
+                endDate = LocalDate.now()
+            ),
+            userId = currentUser().id,
+            ctx = ctx
+        )
+
+        val updated = ctx.sprint.save(updatedEntity)
+        val updatedSprint = updated.toModel()
+
+        // Invalidate caches
+        cacheService.invalidateSprint(sprintId)
+        cacheService.invalidateProjectSprints(existingSprintModel.projectId)
 
         return updatedSprint
     }

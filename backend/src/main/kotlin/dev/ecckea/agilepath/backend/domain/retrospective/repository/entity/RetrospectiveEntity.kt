@@ -19,33 +19,33 @@ import java.util.UUID
 class RetrospectiveEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
+    val id: UUID? = null,
 
     @OneToOne
     @JoinColumn(name = "sprint_id", nullable = false)
     val sprint: SprintEntity,
 
-    val completedAt: Instant? = null,
+    @Column(name = "completed_at", nullable = false)
+    val completedAt: Instant = Instant.now(),
 
     @ElementCollection
     @CollectionTable(name = "retrospective_talking_points", joinColumns = [JoinColumn(name = "retrospective_id")])
-    @Column(name = "talking_point")
     val talkingPoints: List<TalkingPointEmbeddable> = emptyList(),
 
     val teamMood: String? = null,
 
     @ElementCollection
     @CollectionTable(name = "retrospective_keep_doing", joinColumns = [JoinColumn(name = "retrospective_id")])
-    @Column(name = "keep_doing")
+    @Column(name = "item")
     val keepDoing: List<String> = emptyList(),
 
     @ElementCollection
     @CollectionTable(name = "retrospective_stop_doing", joinColumns = [JoinColumn(name = "retrospective_id")])
-    @Column(name = "stop_doing")
+    @Column(name = "item")
     val stopDoing: List<String> = emptyList(),
 
     @ElementCollection
     @CollectionTable(name = "retrospective_start_doing", joinColumns = [JoinColumn(name = "retrospective_id")])
-    @Column(name = "start_doing")
+    @Column(name = "item")
     val startDoing: List<String> = emptyList(),
 )
