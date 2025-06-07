@@ -5,7 +5,6 @@ import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toModel
 import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.sprint.model.NewSprint
 import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
-import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
@@ -14,7 +13,6 @@ import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
@@ -23,8 +21,6 @@ class SprintService(
     private val ctx: RepositoryContext,
     private val cacheService: CacheService
 ) : Logged() {
-
-
     @Transactional(readOnly = true)
     fun getSprints(projectId: UUID): List<Sprint> {
         log.info("Fetching sprints for project $projectId")
