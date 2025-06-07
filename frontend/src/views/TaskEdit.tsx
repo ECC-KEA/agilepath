@@ -3,7 +3,6 @@ import useAssistant from "../hooks/assistant/useAssistant";
 import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
 import useTask from "../hooks/task/useTask";
-import { useLoading } from "../hooks/utils/loading/useLoading";
 import { useState } from "react";
 import { FaPlus, FaTshirt } from "react-icons/fa";
 import useSubTask from "../hooks/subtask/useSubTask";
@@ -92,11 +91,11 @@ function TaskEdit() {
   const handleBreakdown = (assistantName: string) => {
     setOpenAIResponse(undefined);
     loadAssistant(assistantName)
-      .then((loadedAssistant) => {
-        console.log("Loaded AI assistant:", loadedAssistant);
+      .then((assistant) => {
+        console.log("Loaded AI assistant:", assistant);
         const systemMessage = {
           role: "system",
-          content: loadedAssistant?.prompt ?? "You are a helpful assistant."
+          content: assistant?.prompt ?? "You are a helpful assistant."
         };
 
         const userMessage = {
@@ -108,7 +107,7 @@ function TaskEdit() {
         };
 
         const body = {
-          model: loadedAssistant?.model ?? "gpt-4o-mini",
+          model: assistant?.model ?? "gpt-4o-mini",
           messages: [systemMessage, userMessage],
           stream: true
         };

@@ -16,6 +16,10 @@ import Markdown from "react-markdown";
 import AnalyticsProvider from '../hooks/analytics/AnalyticsProvider';
 import useAnalytics from '../hooks/analytics/useAnalytics';
 import { ISprintAnalysis } from '../types/analytics.types';
+import AssistantProvider from '../hooks/assistant/AssistantProvider';
+import useAssistant from '../hooks/assistant/useAssistant';
+import useOpenAI from '../hooks/openai/useOpenAI';
+import OpenAIProvider from '../hooks/openai/OpenAIProvider';
 
 
 export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
@@ -27,9 +31,13 @@ export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
 
   return (
     <RetrospectiveProvider sprintId={sprintId}>
-      <AnalyticsProvider>
-        {children}
-      </AnalyticsProvider>
+      <AssistantProvider>
+        <OpenAIProvider>
+          <AnalyticsProvider>
+            {children}
+          </AnalyticsProvider>
+        </OpenAIProvider>
+      </AssistantProvider>
     </RetrospectiveProvider>
   );
 }
@@ -38,6 +46,8 @@ export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
 function Retrospective() {
   const { retrospective, createRetrospective } = useRetrospective();
   const { getSprintAnalysis } = useAnalytics();
+  const { loadAssistant } = useAssistant();
+  const { sendMessage } = useOpenAI();
   const [sprintAnalysis, setSprintAnalysis] = useState<ISprintAnalysis>();
   const { sprintId } = useParams();
 
@@ -57,7 +67,7 @@ function Retrospective() {
   const [keepDoing, setKeepDoing] = useState<string[]>(['']);
   const [stopDoing, setStopDoing] = useState<string[]>(['']);
   const [startDoing, setStartDoing] = useState<string[]>(['']);
-  const [openAIResponse, setOpenAIResponse] = useState<string>('');
+  const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (retrospective) {
@@ -70,8 +80,40 @@ function Retrospective() {
   }, [retrospective]);
 
   const handleTalkingPointSuggestions = () => {
-    console.log('Fetching AI suggestions for talking points...');
-    console.log(sprintAnalysis);
+    setOpenAIResponse(undefined);
+    loadAssistant("talking_point_helper")
+      .then((assistant) => {
+        console.log("Loaded AI assistant:", assistant);
+        const systemMessage = {
+          role: "system",
+          content: assistant?.prompt ?? "You are a helpful assistant."
+        };
+
+        const userMessage = {
+          role: "user",
+          content: JSON.stringify({
+            sprintAnalysis: sprintAnalysis
+          })
+        };
+
+        const body = {
+          model: assistant?.model ?? "gpt-4o-mini",
+          messages: [systemMessage, userMessage],
+          stream: true
+        }
+
+        const handleChunk = (chunk: string) => {
+          setOpenAIResponse((prev) => (prev ? prev + chunk : chunk));
+        };
+
+        return sendMessage(body, handleChunk)
+          .then((response) => {
+            console.log("Final response from OpenAI:", response);
+          });
+      })
+      .catch(() => {
+      notifyError("Error loading AI assistant or sending message");
+    });
   }
 
   const addTalkingPoint = () => setTalkingPoints([...talkingPoints, { prompt: '', response: '' }]);
