@@ -113,7 +113,8 @@ class SprintService(
                 name = existingSprintModel.name,
                 goal = existingSprintModel.goal,
                 startDate = existingSprintModel.startDate,
-                endDate = LocalDate.now()
+                endDate = LocalDate.now(),
+                teamCapacity = existingSprintModel.teamCapacity,
             ),
             userId = currentUser().id,
             ctx = ctx

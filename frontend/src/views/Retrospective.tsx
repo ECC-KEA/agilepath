@@ -13,6 +13,9 @@ import ShowIf from '../components/generic/ShowIf';
 import { notifyError } from "../helpers/notify";
 import { PiOpenAiLogoDuotone } from 'react-icons/pi';
 import Markdown from "react-markdown";
+import AnalyticsProvider from '../hooks/analytics/AnalyticsProvider';
+import useAnalytics from '../hooks/analytics/useAnalytics';
+import { ISprintAnalysis } from '../types/analytics.types';
 
 
 export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
@@ -24,7 +27,9 @@ export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
 
   return (
     <RetrospectiveProvider sprintId={sprintId}>
-      {children}
+      <AnalyticsProvider>
+        {children}
+      </AnalyticsProvider>
     </RetrospectiveProvider>
   );
 }
@@ -32,7 +37,20 @@ export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
 
 function Retrospective() {
   const { retrospective, createRetrospective } = useRetrospective();
+  const { getSprintAnalysis } = useAnalytics();
+  const [sprintAnalysis, setSprintAnalysis] = useState<ISprintAnalysis>();
   const { sprintId } = useParams();
+
+  useEffect(() => {
+    if (sprintId) {
+      getSprintAnalysis(sprintId)
+        .then(setSprintAnalysis)
+        .catch((error) => {
+          console.error('Failed to fetch sprint analysis:', error);
+          notifyError('Failed to fetch sprint analysis.');
+        });
+    } 
+  }, [sprintId]);
   
   const [teamMood, setTeamMood] = useState<string>('');
   const [talkingPoints, setTalkingPoints] = useState<ITalkingPoint[]>([{ prompt: '', response: '' }]);
@@ -50,6 +68,11 @@ function Retrospective() {
       setStartDoing(retrospective.startDoing);
     }
   }, [retrospective]);
+
+  const handleTalkingPointSuggestions = () => {
+    console.log('Fetching AI suggestions for talking points...');
+    console.log(sprintAnalysis);
+  }
 
   const addTalkingPoint = () => setTalkingPoints([...talkingPoints, { prompt: '', response: '' }]);
   const removeTalkingPoint = (index: number) => setTalkingPoints(talkingPoints.filter((_, i) => i !== index));
@@ -153,7 +176,7 @@ function Retrospective() {
 
   return (
     <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full relative">
-      <div className="max-w-3xl p-6 space-y-8 bg-white rounded-lg shadow w-1/2 ">
+      <div className="max-w-3xl p-6 space-y-8 bg-white w-1/2 ">
         <div className="text-3xl font-bold">
           Retrospective
         </div>
@@ -232,11 +255,10 @@ function Retrospective() {
                   </span>
                 }
                 className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                title="Click to get AI help for Story breakdown"
-                onClick={() => {console.log('AI help clicked');} /* TODO: Implement AI help functionality */}
+                title="Click to get AI help for potential talking points"
+                onClick={() => {handleTalkingPointSuggestions()} /* TODO: Implement AI help functionality */}
               />
             </div>
-            
           </ShowIf>
         </div>
 
