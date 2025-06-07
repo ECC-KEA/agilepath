@@ -135,9 +135,9 @@ class SprintMetricsCalculator(
     }
 
     private fun categorizeTasksByComplexity(taskMetrics: List<TaskMetrics>): TaskComplexityBreakdown {
-        val simple = taskMetrics.count { it.subtaskCount <= 1 && it.commentCount <= 2 }
-        val moderate = taskMetrics.count { it.subtaskCount in 2..4 || it.commentCount in 3..6 }
         val complex = taskMetrics.count { it.subtaskCount > 4 || it.commentCount > 6 }
+        val simple = taskMetrics.count { it.subtaskCount <= 1 && it.commentCount <= 2 }
+        val moderate = taskMetrics.size - complex - simple  // Everything else
 
         return TaskComplexityBreakdown(
             simple = simple,
