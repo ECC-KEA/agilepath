@@ -68,7 +68,7 @@ function App() {
               <Route
                 path="edit/:taskId"
                 element={
-                  <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
+                  <AssistantProvider>
                     <OpenAIProvider>
                       <SubTaskProvider>
                         <TaskEdit />
@@ -94,7 +94,7 @@ function App() {
             <Route
               path="edit/:storyId"
               element={
-                <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
+                <AssistantProvider>
                   <OpenAIProvider>
                     <StoryEdit />
                   </OpenAIProvider>

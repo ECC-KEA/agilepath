@@ -11,6 +11,8 @@ import {FaPlus} from 'react-icons/fa';
 import { FaMinus } from 'react-icons/fa6';
 import ShowIf from '../components/generic/ShowIf';
 import { notifyError } from "../helpers/notify";
+import { PiOpenAiLogoDuotone } from 'react-icons/pi';
+import Markdown from "react-markdown";
 
 
 export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
@@ -37,6 +39,7 @@ function Retrospective() {
   const [keepDoing, setKeepDoing] = useState<string[]>(['']);
   const [stopDoing, setStopDoing] = useState<string[]>(['']);
   const [startDoing, setStartDoing] = useState<string[]>(['']);
+  const [openAIResponse, setOpenAIResponse] = useState<string>('');
 
   useEffect(() => {
     if (retrospective) {
@@ -149,206 +152,236 @@ function Retrospective() {
   };
 
   return (
-    <div className="max-w-3xl p-6 space-y-8 bg-white rounded-lg shadow w-1/2">
-      <div className="text-3xl font-bold">
-        Retrospective 
-      </div>
-      <ShowIf if={!!retrospective}> 
-        <div>
-          Completed at: {retrospective?.completedAt ? new Date(retrospective.completedAt).toLocaleString() : ''}
+    <div className="flex h-[calc(100vh-140px)] overflow-y-auto w-full relative">
+      <div className="max-w-3xl p-6 space-y-8 bg-white rounded-lg shadow w-1/2 ">
+        <div className="text-3xl font-bold">
+          Retrospective
         </div>
-      </ShowIf>
+        <ShowIf if={!!retrospective}> 
+          <div>
+            Completed at: {retrospective?.completedAt ? new Date(retrospective.completedAt).toLocaleString() : ''}
+          </div>
+        </ShowIf>
 
-      {/* Team Mood */}
-      <div className="space-y-2">
-        <div className="block font-medium">
-          Team Mood
+        {/* Team Mood */}
+        <div className="space-y-2">
+          <div className="text-xl font-semibold">
+            Team Mood
+          </div>
+          <CustomTextArea
+            id="teamMood"
+            placeholder="(Optional)"
+            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none"
+            value={teamMood}
+            disabled={!!retrospective}
+            onChange={(e) => setTeamMood(e.target.value)}
+          />
         </div>
-        <CustomTextArea
-          id="teamMood"
-          className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none"
-          value={teamMood}
-          disabled={!!retrospective}
-          onChange={(e) => setTeamMood(e.target.value)}
-        />
-      </div>
 
-      {/* Talking Points */}
-      <div className="space-y-4">
-        <div className="text-xl font-semibold">Talking Points</div>
-        {talkingPoints.map((point, index) => (
-          <div key={index} className="flex flex-row gap-2 items-end">
-            <div className="flex flex-col w-full gap-2">
-              <Input
-                placeholder="Title"
-                className="border border-gray-300 rounded px-3 py-2 w-full"
-                value={point.prompt}
-                disabled={!!retrospective}
-                onChange={(e) => updateTalkingPoint(index, 'prompt', e.target.value)}
+        {/* Talking Points */}
+        <div className="space-y-4">
+          <div className="text-xl font-semibold">Talking Points</div>
+          {talkingPoints.map((point, index) => (
+            <div key={index} className="flex flex-row gap-2 items-end">
+              <div className="flex flex-col w-full gap-2">
+                <Input
+                  placeholder="Title"
+                  className="border border-gray-300 rounded px-3 py-2 w-full"
+                  value={point.prompt}
+                  disabled={!!retrospective}
+                  onChange={(e) => updateTalkingPoint(index, 'prompt', e.target.value)}
+                />
+                <CustomTextArea
+                  rows={3}
+                  placeholder="Notes (Optional)"
+                  className="border border-gray-300 rounded px-3 py-2 w-full"
+                  value={point.response ?? ''}
+                  disabled={!!retrospective}
+                  onChange={(e) => updateTalkingPoint(index, 'response', e.target.value)}
+                />
+              </div>
+              <ShowIf if={!retrospective}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <FaMinus className="text-ap-lavender-800" />
+                    </span>
+                  }
+                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                  onClick={() => removeTalkingPoint(index)}
+                />
+              </ShowIf>
+            </div>
+          ))}
+          <ShowIf if={!retrospective}>
+            <div className="flex items-center gap-4">
+              <Button
+                text={
+                  <span className="flex items-center gap-2">
+                    <FaPlus className="text-ap-lavender-800" />
+                  </span>
+                }
+                className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                onClick={addTalkingPoint}
               />
-              <CustomTextArea
-                rows={3}
-                placeholder="Notes (Optional)"
-                className="border border-gray-300 rounded px-3 py-2 w-full"
-                value={point.response ?? ''}
-                disabled={!!retrospective}
-                onChange={(e) => updateTalkingPoint(index, 'response', e.target.value)}
+              <Button
+                text={
+                  <span className="flex items-center gap-2">
+                    <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                    Help
+                  </span>
+                }
+                className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                title="Click to get AI help for Story breakdown"
+                onClick={() => {console.log('AI help clicked');} /* TODO: Implement AI help functionality */}
               />
             </div>
-            <ShowIf if={!retrospective}>
-              <Button
-                text={
-                  <span className="flex items-center gap-2">
-                    <FaMinus className="text-ap-lavender-800" />
-                  </span>
-                }
-                className="bg-white px-5 border border-ap-onyx-50 w-fit"
-                onClick={() => removeTalkingPoint(index)}
-              />
-            </ShowIf>
-          </div>
-        ))}
-        <ShowIf if={!retrospective}>
-          <Button
-            text={
-              <span className="flex items-center gap-2">
-                <FaPlus className="text-ap-lavender-800" />
-              </span>
-            }
-            className="bg-white px-5 border border-ap-onyx-50 w-fit"
-            onClick={addTalkingPoint}
-          />
-        </ShowIf>
-      </div>
-
-      {/* Keep Doing */}
-      <div className="space-y-2">
-        <div className="text-xl font-semibold">Keep Doing</div>
-        {keepDoing.map((item, index) => (
-          <div key={index} className="flex flex-row gap-2 items-end">
-            <CustomTextArea
-              rows={2}
-              key={index}
-              disabled={!!retrospective}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              value={item}
-              onChange={(e) => updateKeepDoing(index, e.target.value)}
-            />
-            <ShowIf if={!retrospective}>
-              <Button
-                text={
-                  <span className="flex items-center gap-2">
-                    <FaMinus className="text-ap-lavender-800" />
-                  </span>
-                }
-                className="bg-white px-5 border border-ap-onyx-50 w-fit"
-                onClick={() => removeKeepDoing(index)}
-              />
-            </ShowIf>
-          </div>
-        ))}
-        <ShowIf if={!retrospective}>
-          <Button
-            text={
-              <span className="flex items-center gap-2">
-                <FaPlus className="text-ap-lavender-800" />
-                
-              </span>
-            }
-            className="bg-white px-5 border border-ap-onyx-50 w-fit"
-            onClick={addKeepDoing}
-          />
-        </ShowIf>
-      </div>
-
-      {/* Stop Doing */}
-      <div className="space-y-2">
-        <div className="text-xl font-semibold">Stop Doing</div>
-        {stopDoing.map((item, index) => (
-          <div key={index} className="flex flex-row gap-2 items-end">
-            <CustomTextArea
-              rows={2}
-              disabled={!!retrospective}
-              key={index}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              value={item}
-              onChange={(e) => updateStopDoing(index, e.target.value)}
-            />
-            <ShowIf if={!retrospective}>
-              <Button
-                text={
-                  <span className="flex items-center gap-2">
-                    <FaMinus className="text-ap-lavender-800" />
-                  </span>
-                }
-                className="bg-white px-5 border border-ap-onyx-50 w-fit"
-                onClick={() => removeStopDoing(index)}
-              />
-            </ShowIf>
-          </div>
-        ))}
-        <ShowIf if={!retrospective}>
-          <Button
-            text={
-              <span className="flex items-center gap-2">
-                <FaPlus className="text-ap-lavender-800" />
-              </span>
-            }
-            className="bg-white px-5 border border-ap-onyx-50 w-fit"
-            onClick={addStopDoing}
-          />
-        </ShowIf>
-      </div>
-
-      {/* Start Doing */}
-      <div className="space-y-2">
-        <div className="text-xl font-semibold">Start Doing</div>
-        {startDoing.map((item, index) => (
-          <div key={index} className="flex flex-row gap-2 items-end">
-            <CustomTextArea
-              rows={2}
-              key={index}
-              disabled={!!retrospective}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              value={item}
-              onChange={(e) => updateStartDoing(index, e.target.value)}
-            />
-            <ShowIf if={!retrospective}>
-              <Button
-                text={
-                  <span className="flex items-center gap-2">
-                    <FaMinus className="text-ap-lavender-800" />
-                  </span>
-                }
-                className="bg-white px-5 border border-ap-onyx-50 w-fit"
-                onClick={() => removeStartDoing(index)}
-              />
-            </ShowIf>
-          </div>
-        ))}
-        <ShowIf if={!retrospective}>
-          <Button
-            text={
-              <span className="flex items-center gap-2">
-                <FaPlus className="text-ap-lavender-800" />
-              </span>
-            }
-            className="bg-white px-5 border border-ap-onyx-50 w-fit"
-            onClick={addStartDoing}
-          />
-        </ShowIf>
-      </div>
-
-      <ShowIf if={!retrospective}>
-        {/* Submit */}
-        <div className="pt-4 text-center">
-          <Button
-            text="Submit"
-            onClick={handleSubmit}
-            className="bg-ap-lavender-800 text-white px-3 w-full justify-center shadow-xs sm:ml-3 sm:w-auto"
-          />
+            
+          </ShowIf>
         </div>
-      </ShowIf>
+
+        {/* Keep Doing */}
+        <div className="space-y-2">
+          <div className="text-xl font-semibold">Keep Doing</div>
+          {keepDoing.map((item, index) => (
+            <div key={index} className="flex flex-row gap-2 items-end">
+              <CustomTextArea
+                rows={2}
+                key={index}
+                disabled={!!retrospective}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={item}
+                onChange={(e) => updateKeepDoing(index, e.target.value)}
+              />
+              <ShowIf if={!retrospective}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <FaMinus className="text-ap-lavender-800" />
+                    </span>
+                  }
+                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                  onClick={() => removeKeepDoing(index)}
+                />
+              </ShowIf>
+            </div>
+          ))}
+          <ShowIf if={!retrospective}>
+            <Button
+              text={
+                <span className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800" />
+                  
+                </span>
+              }
+              className="bg-white px-5 border border-ap-onyx-50 w-fit"
+              onClick={addKeepDoing}
+            />
+          </ShowIf>
+        </div>
+
+        {/* Stop Doing */}
+        <div className="space-y-2">
+          <div className="text-xl font-semibold">Stop Doing</div>
+          {stopDoing.map((item, index) => (
+            <div key={index} className="flex flex-row gap-2 items-end">
+              <CustomTextArea
+                rows={2}
+                disabled={!!retrospective}
+                key={index}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={item}
+                onChange={(e) => updateStopDoing(index, e.target.value)}
+              />
+              <ShowIf if={!retrospective}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <FaMinus className="text-ap-lavender-800" />
+                    </span>
+                  }
+                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                  onClick={() => removeStopDoing(index)}
+                />
+              </ShowIf>
+            </div>
+          ))}
+          <ShowIf if={!retrospective}>
+            <Button
+              text={
+                <span className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800" />
+                </span>
+              }
+              className="bg-white px-5 border border-ap-onyx-50 w-fit"
+              onClick={addStopDoing}
+            />
+          </ShowIf>
+        </div>
+
+        {/* Start Doing */}
+        <div className="space-y-2">
+          <div className="text-xl font-semibold">Start Doing</div>
+          {startDoing.map((item, index) => (
+            <div key={index} className="flex flex-row gap-2 items-end">
+              <CustomTextArea
+                rows={2}
+                key={index}
+                disabled={!!retrospective}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={item}
+                onChange={(e) => updateStartDoing(index, e.target.value)}
+              />
+              <ShowIf if={!retrospective}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <FaMinus className="text-ap-lavender-800" />
+                    </span>
+                  }
+                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                  onClick={() => removeStartDoing(index)}
+                />
+              </ShowIf>
+            </div>
+          ))}
+          <ShowIf if={!retrospective}>
+            <Button
+              text={
+                <span className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800" />
+                </span>
+              }
+              className="bg-white px-5 border border-ap-onyx-50 w-fit"
+              onClick={addStartDoing}
+            />
+          </ShowIf>
+        </div>
+
+        <ShowIf if={!retrospective}>
+          {/* Submit */}
+          <div className="pt-4 text-center">
+            <Button
+              text="Submit"
+              onClick={handleSubmit}
+              className="bg-ap-lavender-800 text-white px-3 w-full justify-center shadow-xs sm:ml-3 sm:w-auto"
+            />
+          </div>
+        </ShowIf>
+      </div>
+      <div className="w-1/2 flex-shrink-0">
+        <ShowIf if={!!openAIResponse}>
+          <div className="flex flex-col">
+            <div className="sticky top-0 flex gap-4 text-xl items-center bg-gradient-to-br p-4 to-ap-lavender-900 from-ap-cyan-900 text-white">
+              <PiOpenAiLogoDuotone className="flex-shrink-0" />
+              Story breakdown help
+            </div>
+            <div className="p-2 text-sm">
+              <Markdown>{openAIResponse}</Markdown>
+            </div>
+          </div>
+        </ShowIf>
+      </div>
     </div>
   );
 }

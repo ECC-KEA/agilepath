@@ -8,7 +8,6 @@ import useAssistant from "../hooks/assistant/useAssistant";
 import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
 import useStory from "../hooks/story/useStory";
-import { useLoading } from "../hooks/utils/loading/useLoading";
 import { useCallback, useState } from "react";
 import { FaPlus, FaTshirt } from "react-icons/fa";
 import { notifyError } from "../helpers/notify";
@@ -21,57 +20,52 @@ import { useApi } from "../hooks/utils/useApi";
 import { createdAtSortPredicate } from "../helpers/timeHelpers";
 
 function StoryEdit() {
-  const { assistant } = useAssistant();
+  const { loadAssistant } = useAssistant();
   const { sendMessage } = useOpenAI();
   const { story } = useStory();
-  const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
   const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
+  const [helperAsked, setHelperAsked] = useState(false);
 
   if (!story) {
     return <div>Loading...</div>;
   }
 
-  const handleBreakdown = () => {
-    loader.add();
-    const systemMessage = {
-      role: "system",
-      content: assistant?.prompt ?? "You are a helpful assistant."
-    };
+  const handleBreakdown = (assistantName: string) => {
+    setOpenAIResponse(undefined);
+    loadAssistant(assistantName)
+      .then((loadedAssistant) => {
+        console.log("Loaded AI assistant:", loadedAssistant);
+        const systemMessage = {
+          role: "system",
+          content: loadedAssistant?.prompt ?? "You are a helpful assistant."
+        };
 
-    const userMessage = {
-      role: "user",
-      content: JSON.stringify({
-        task_header: story.title,
-        task_description: story.description
-      })
-    };
+        const userMessage = {
+          role: "user",
+          content: JSON.stringify({
+            task_header: story.title,
+            task_description: story.description
+          })
+        };
 
-    const body = {
-      model: assistant?.model ?? "gpt-4o-mini",
-      messages: [systemMessage, userMessage],
-      stream: true
-    };
+        const body = {
+          model: loadedAssistant?.model ?? "gpt-4o-mini",
+          messages: [systemMessage, userMessage],
+          stream: true
+        };
 
-    const handleChunk = (chunk: string) => {
-      setOpenAIResponse((prev) => {
-        if (prev) {
-          return prev + chunk;
-        } else {
-          return chunk;
-        }
-      });
-    };
+        const handleChunk = (chunk: string) => {
+          setOpenAIResponse((prev) => (prev ? prev + chunk : chunk));
+        };
 
-    sendMessage(body, handleChunk)
-      .then((response) => {
-        console.log("Final response from OpenAI:", response);
+        return sendMessage(body, handleChunk)
+          .then((response) => {
+            console.log("Final response from OpenAI:", response);
+          });
       })
       .catch(() => {
-        notifyError("Error getting AI assistance");
-      })
-      .finally(() => {
-        loader.done();
+        notifyError("Error loading AI assistant or sending message");
       });
   };
 
@@ -105,17 +99,37 @@ function StoryEdit() {
               className="bg-white px-10 border border-ap-onyx-50/50 w-fit"
               onClick={() => setShowCreateNewTaskModal(true)}
             />
-            <Button
-              text={
-                <span className="flex items-center gap-2">
-                  <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
-                  Help
-                </span>
-              }
-              className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-              title="Click to get AI help for Story breakdown"
-              onClick={handleBreakdown}
-            />
+            <ShowIf if={!helperAsked}>
+              <Button
+                text={
+                  <span className="flex items-center gap-2">
+                    <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                    Help
+                  </span>
+                }
+                className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                title="Click to get AI help for Story breakdown"
+                onClick={() => {
+                  handleBreakdown("story_helper");
+                  setHelperAsked(true);
+                }}
+              />
+            </ShowIf>
+            <ShowIf if={helperAsked}>
+              <Button
+                text={
+                  <span className="flex items-center gap-2">
+                    <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                    More help
+                  </span>
+                }
+                className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                title="Click to ask AI to break down the story into concrete tasks"
+                onClick={() => {
+                  handleBreakdown("story_break_the_glass");
+                }}
+              />
+            </ShowIf>
           </div>
           <div>
             <div className="text-sm font-semibold">Tasks</div>
