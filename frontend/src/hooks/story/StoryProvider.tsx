@@ -32,10 +32,11 @@ function StoryProvider({ children }: Readonly<PropsWithChildren>) {
   const contextValue = useMemo(
     () => ({
       stories,
+      getStories,
       story,
       createStory
     }),
-    [stories, story, createStory]
+    [stories, story, createStory, getStories]
   );
 
   return <StoryContext.Provider value={contextValue}>{children}</StoryContext.Provider>;

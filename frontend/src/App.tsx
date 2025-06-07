@@ -57,18 +57,18 @@ function App() {
                 path="stats"
                 element={<SprintStats />}
               />
-              <Route 
+              <Route
                 path="retrospective"
                 element={
                   <RetrospectiveWrapper>
                     <Retrospective />
                   </RetrospectiveWrapper>
-                } 
+                }
               />
               <Route
                 path="edit/:taskId"
                 element={
-                  <AssistantProvider assistantId='e1111111-0000-0000-0000-000000000001'>
+                  <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
                     <OpenAIProvider>
                       <SubTaskProvider>
                         <TaskEdit />
@@ -94,14 +94,13 @@ function App() {
             <Route
               path="edit/:storyId"
               element={
-                <AssistantProvider assistantId='e1111111-0000-0000-0000-000000000001'>
+                <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
                   <OpenAIProvider>
                     <StoryEdit />
                   </OpenAIProvider>
                 </AssistantProvider>
               }
             />
-
           </Route>
         </Routes>
       </SignedIn>

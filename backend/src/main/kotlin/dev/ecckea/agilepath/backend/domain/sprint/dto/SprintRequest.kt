@@ -22,6 +22,9 @@ data class SprintRequest(
     @field:NoHtml(message = "Goal must not contain HTML")
     val goal: String? = null,
 
+    @field:NotNull(message = "Team capacity must not be null")
+    val teamCapacity: Int,
+
     @field:NotNull(message = "Start date must not be null")
     @field:FutureOrPresent(message = "Start date cannot be in the past")
     val startDate: LocalDate,

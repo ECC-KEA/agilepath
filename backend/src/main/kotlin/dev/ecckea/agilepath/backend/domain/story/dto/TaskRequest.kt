@@ -19,7 +19,7 @@ data class TaskRequest(
     @field:TrimmedNotBlank(message = "Title name must not be blank")
     @field:Size(min = 3, max = 100, message = "Title name must be between 3 and 100 characters")
     val title: String,
-    @field:TrimmedNotBlank(message = "Description must not be blank")
+    
     @field:Size(max = 2000, message = "Description must be at most 2000 characters")
     @field:NoHtml(message = "Description must not contain HTML")
     val description: String?,

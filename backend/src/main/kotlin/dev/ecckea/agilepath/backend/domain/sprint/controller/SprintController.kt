@@ -3,8 +3,8 @@ package dev.ecckea.agilepath.backend.domain.sprint.controller
 import dev.ecckea.agilepath.backend.domain.sprint.application.SprintApplication
 import dev.ecckea.agilepath.backend.domain.sprint.dto.SprintRequest
 import dev.ecckea.agilepath.backend.domain.sprint.dto.SprintResponse
-import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toDTO
-import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toModel
+import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.toDTO
+import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.toModel
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse

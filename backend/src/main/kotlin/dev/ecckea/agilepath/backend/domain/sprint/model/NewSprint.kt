@@ -7,6 +7,7 @@ data class NewSprint(
     val projectId: UUID,
     val name: String,
     val goal: String? = null,
+    val teamCapacity: Int,
     val startDate: LocalDate,
     val endDate: LocalDate,
     val copyLastSprintColumns: Boolean = false,

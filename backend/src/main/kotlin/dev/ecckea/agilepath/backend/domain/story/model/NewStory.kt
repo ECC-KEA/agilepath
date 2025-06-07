@@ -7,6 +7,7 @@ data class NewStory(
     val projectId: UUID,
     val title: String,
     val description: String?,
+    val acceptanceCriteria: String?,
     val status: String,
     val priority: Int,
     val createdBy: String,

@@ -1,10 +1,10 @@
 package dev.ecckea.agilepath.backend.domain.sprint.service
 
-import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toEntity
-import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.toModel
-import dev.ecckea.agilepath.backend.domain.sprint.model.Mapper.updatedWith
 import dev.ecckea.agilepath.backend.domain.sprint.model.NewSprint
 import dev.ecckea.agilepath.backend.domain.sprint.model.Sprint
+import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.toEntity
+import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.toModel
+import dev.ecckea.agilepath.backend.domain.sprint.model.mapper.updatedWith
 import dev.ecckea.agilepath.backend.infrastructure.cache.*
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.exceptions.BadRequestException
@@ -28,7 +28,7 @@ class SprintService(
         // Check if the sprints are in the cache
         cacheService.getProjectSprints(projectId)?.let { return it }
 
-        // If not in cache, get from database and cache it
+        // If not in cache, get from the database and cache it
         val sprints = ctx.sprint.findByProjectId(projectId)
             .map { it.toModel() }
             .sortedBy { it.startDate }
@@ -45,10 +45,9 @@ class SprintService(
         // Check if the sprint is in the cache
         cacheService.getSprint(sprintId)?.let { return it }
 
-        // If not in cache, get from database and cache it
+        // If not in cache, get from the database and cache it
         return getFromDbAndCache(sprintId)
     }
-
 
     @Transactional
     fun createSprint(newSprint: NewSprint): Sprint {
@@ -67,7 +66,6 @@ class SprintService(
 
         return sprint
     }
-
 
     @Transactional
     fun updateSprint(sprintId: UUID, sprint: NewSprint): Sprint {

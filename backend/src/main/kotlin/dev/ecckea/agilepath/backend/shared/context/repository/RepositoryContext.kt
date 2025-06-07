@@ -2,9 +2,11 @@ package dev.ecckea.agilepath.backend.shared.context.repository
 
 import dev.ecckea.agilepath.backend.domain.assistant.repository.AssistantRepository
 import dev.ecckea.agilepath.backend.domain.column.repository.SprintColumnRepository
+import dev.ecckea.agilepath.backend.domain.project.repository.ProjectEventRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.ProjectRepository
 import dev.ecckea.agilepath.backend.domain.project.repository.UserProjectRepository
 import dev.ecckea.agilepath.backend.domain.retrospective.repository.RetrospectiveRepository
+import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintEventRepository
 import dev.ecckea.agilepath.backend.domain.sprint.repository.SprintRepository
 import dev.ecckea.agilepath.backend.domain.story.repository.*
 import dev.ecckea.agilepath.backend.domain.user.repository.UserRepository
@@ -43,8 +45,14 @@ class RepositoryContext(
     /** Repository for project-related database operations */
     val project: ProjectRepository,
 
+    /** Repository for project event-related database operations */
+    val projectEvent: ProjectEventRepository,
+
     /** Repository for user-project relationship operations */
     val userProject: UserProjectRepository,
+
+    /** Repository for sprint event-related database operations */
+    val sprintEvent: SprintEventRepository,
 
     /** Repository for sprint-related database operations */
     val sprint: SprintRepository,
@@ -52,8 +60,14 @@ class RepositoryContext(
     /** Repository for sprint column-related database operations */
     val sprintColumn: SprintColumnRepository,
 
+    /** Repository for story event-related database operations */
+    val storyEvent: StoryEventRepository,
+
     /** Repository for story-related database operations */
     val story: StoryRepository,
+
+    /** Repository for task event-related database operations */
+    val taskEvent: TaskEventRepository,
 
     /** Repository for task-related database operations */
     val task: TaskRepository,

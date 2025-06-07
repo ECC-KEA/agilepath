@@ -43,6 +43,7 @@ export interface ITask {
   comments: IComment[];
   subtasks: ISubTask[];
   assignees: IUser[];
+  createdAt: string;
 }
 
 export interface ITaskRequest {
@@ -118,4 +119,3 @@ export enum Status {
   ARCHIVED = "ARCHIVED",
   IN_PROGRESS = "IN_PROGRESS"
 }
-

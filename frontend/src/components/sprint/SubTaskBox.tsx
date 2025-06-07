@@ -1,5 +1,6 @@
 import { ISubTask } from "../../types/story.types";
 import useSubTask from "../../hooks/subtask/useSubTask";
+import Input from "../generic/inputs/Input";
 
 interface SubTaskBoxProps {
   subtask: ISubTask;
@@ -8,21 +9,19 @@ interface SubTaskBoxProps {
 function SubTaskBox(props: Readonly<SubTaskBoxProps>) {
   const { toggleSubTaskDone } = useSubTask();
   const handleCheck = () => {
-    toggleSubTaskDone(props.subtask.id)
-      .then(() => console.log("Subtask toggled"))
-      .catch((err) => console.error("Error toggling subtask", err));
-  }
+    toggleSubTaskDone(props.subtask.id);
+  };
 
   return (
     <div className="p-2 bg-white rounded shadow">
       <div className="flex items-center gap-2">
-        <input
+        <Input
           type="checkbox"
           checked={props.subtask.isDone}
-          className="mr-2"
+          className="mr-2 accent-ap-lavender-900"
           onChange={handleCheck}
         />
-        <div className="font-bold">{props.subtask.title}</div>
+        <div className="">{props.subtask.title}</div>
         <div>{props.subtask.description}</div>
       </div>
     </div>

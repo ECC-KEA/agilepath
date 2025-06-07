@@ -8,6 +8,7 @@ data class Story(
     val projectId: UUID,
     val title: String,
     val description: String?,
+    val acceptanceCriteria: String?,
     val status: String,
     val priority: Int,
     val comments: List<Comment>? = emptyList(),

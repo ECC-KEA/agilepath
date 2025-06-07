@@ -1,4 +1,4 @@
-package dev.ecckea.agilepath.backend.domain.sprint.model.Mapper
+package dev.ecckea.agilepath.backend.domain.sprint.model.mapper
 
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
 import dev.ecckea.agilepath.backend.domain.sprint.dto.SprintRequest
@@ -22,6 +22,7 @@ fun SprintEntity.toModel(): Sprint {
         projectId = projectId,
         name = name,
         goal = goal,
+        teamCapacity = teamCapacity,
         startDate = startDate,
         endDate = endDate,
         createdBy = createdBy.id,
@@ -53,6 +54,7 @@ fun Sprint.toEntity(
         project = project,
         name = name,
         goal = goal,
+        teamCapacity = teamCapacity,
         startDate = startDate,
         endDate = endDate,
         createdBy = createdBy,
@@ -67,6 +69,7 @@ fun SprintRequest.toModel() = NewSprint(
     projectId = projectId,
     name = name,
     goal = goal,
+    teamCapacity = teamCapacity,
     startDate = startDate,
     endDate = endDate,
     copyLastSprintColumns = copyLastSprintColumns
@@ -78,6 +81,7 @@ fun NewSprint.toEntity(ctx: RepositoryContext, userId: String): SprintEntity = S
     project = ctx.project.ref(projectId),
     name = name,
     goal = goal,
+    teamCapacity = teamCapacity,
     startDate = startDate,
     endDate = endDate,
     createdBy = ctx.user.ref(userId),
@@ -91,6 +95,7 @@ fun SprintEntity.updatedWith(update: NewSprint, userId: String, ctx: RepositoryC
         project = this.project,
         name = update.name,
         goal = update.goal,
+        teamCapacity = update.teamCapacity,
         startDate = update.startDate,
         endDate = update.endDate,
         createdBy = this.createdBy,

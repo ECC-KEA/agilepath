@@ -140,4 +140,5 @@ class TaskController(
         log.info("DELETE /tasks/$id - Delete task")
         taskApplication.deleteTask(id)
     }
+
 }

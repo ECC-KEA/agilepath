@@ -1,5 +1,6 @@
 package dev.ecckea.agilepath.backend.domain.project.repository.entity
 
+import dev.ecckea.agilepath.backend.domain.project.model.EstimationMethod
 import dev.ecckea.agilepath.backend.domain.project.model.Framework
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
 import dev.ecckea.agilepath.backend.shared.utils.now
@@ -23,6 +24,10 @@ class ProjectEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "framework", nullable = false, length = 50)
     val framework: Framework,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estimation_method", nullable = false, length = 50)
+    val estimationMethod: EstimationMethod,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)

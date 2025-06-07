@@ -30,7 +30,7 @@ function ProjectMembers() {
           label: (
             <span className="flex items-center gap-3">
               <Avatar src={u.avatarUrl} />
-              {u.fullName ?? u.githubUsername ?? u.email}
+              {name(u)}
             </span>
           ),
           value: u

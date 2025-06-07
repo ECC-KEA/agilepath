@@ -3,10 +3,7 @@ package dev.ecckea.agilepath.backend.domain.project.model.mapper
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectMemberResponse
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectRequest
 import dev.ecckea.agilepath.backend.domain.project.dto.ProjectResponse
-import dev.ecckea.agilepath.backend.domain.project.model.Framework
-import dev.ecckea.agilepath.backend.domain.project.model.NewProject
-import dev.ecckea.agilepath.backend.domain.project.model.Project
-import dev.ecckea.agilepath.backend.domain.project.model.ProjectMember
+import dev.ecckea.agilepath.backend.domain.project.model.*
 import dev.ecckea.agilepath.backend.domain.project.repository.entity.ProjectEntity
 import dev.ecckea.agilepath.backend.domain.user.model.mapper.toDTO
 import dev.ecckea.agilepath.backend.domain.user.repository.entity.UserEntity
@@ -22,6 +19,7 @@ fun ProjectEntity.toModel(): Project {
             name = name,
             description = description,
             framework = framework,
+            estimationMethod = estimationMethod,
             createdBy = createdBy.id,
             createdAt = createdAt,
             modifiedBy = modifiedBy?.id,
@@ -36,6 +34,7 @@ fun ProjectEntity.updatedWith(update: NewProject, userId: String, ctx: Repositor
         name = update.name,
         description = update.description,
         framework = update.framework,
+        estimationMethod = this.estimationMethod,
         createdBy = this.createdBy,
         modifiedBy = ctx.user.ref(userId),
         createdAt = this.createdAt,
@@ -46,6 +45,7 @@ fun ProjectRequest.toModel(userId: String): NewProject = NewProject(
     name = name,
     description = description,
     framework = Framework.fromString(framework),
+    estimationMethod = EstimationMethod.fromString(estimationMethod),
     createdBy = userId
 )
 
@@ -54,6 +54,7 @@ fun Project.toEntity(user: UserEntity): ProjectEntity = ProjectEntity(
     name = name,
     description = description,
     framework = framework,
+    estimationMethod = estimationMethod,
     createdBy = user,
     createdAt = createdAt,
     modifiedBy = user,
@@ -65,6 +66,7 @@ fun Project.toDTO(): ProjectResponse = ProjectResponse(
     name = name,
     description = description,
     framework = framework,
+    estimationMethod = estimationMethod,
     createdBy = createdBy,
     createdAt = toZonedDateTime(createdAt)
 )
@@ -73,6 +75,7 @@ fun NewProject.toEntity(ctx: RepositoryContext): ProjectEntity = ProjectEntity(
     name = name,
     description = description,
     framework = framework,
+    estimationMethod = estimationMethod,
     createdBy = ctx.user.ref(createdBy),
     createdAt = createdAt
 )

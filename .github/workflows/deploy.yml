@@ -45,6 +45,7 @@ jobs:
             echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> .env
             echo "VITE_BACKEND_URL=${{ secrets.VITE_BACKEND_URL }}" >> .env
             echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" >> .env
+            echo "VITE_OPENAI_API_KEY=${{ secrets.VITE_OPENAI_API_KEY }}" >> .env
             echo "CERTBOT_EMAIL=${{ secrets.CERTBOT_EMAIL }}" >> .env
             echo "SPRING_PROFILES_ACTIVE=prod" >> .env
             echo "LOG_LEVEL=INFO" >> .env
@@ -52,7 +53,7 @@ jobs:
             # Start Docker services for production
             echo "Starting Docker services for production..."
             sudo docker compose --profile prod down
-            sudo docker compose --profile prod up --build -d
+            NODE_OPTIONS=--max_old_space_size=4096 sudo docker compose --profile prod up --build -d
           EOF
 
       - name: clean up unused images
