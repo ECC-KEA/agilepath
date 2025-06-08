@@ -3,7 +3,6 @@ import useAssistant from "../hooks/assistant/useAssistant";
 import useOpenAI from "../hooks/openai/useOpenAI";
 import ShowIf from "../components/generic/ShowIf";
 import useTask from "../hooks/task/useTask";
-import { useLoading } from "../hooks/utils/loading/useLoading";
 import { useState } from "react";
 import { FaPlus, FaTshirt } from "react-icons/fa";
 import useSubTask from "../hooks/subtask/useSubTask";
@@ -19,17 +18,19 @@ import CustomSelect from "../components/generic/select/CustomSelect";
 import useCurrentProject from "../hooks/projects/useCurrentProject";
 import { ITaskRequest, PointEstimate, TshirtEstimate } from "../types/story.types";
 import { EstimationMethod } from "../types/project.types";
+import { notifyError } from "../helpers/notify";
 
 function TaskEdit() {
-  const { assistant } = useAssistant();
+  const { loadAssistant } = useAssistant();
   const { sendMessage } = useOpenAI();
   const { task, updateTask } = useTask();
   const { subtasks } = useSubTask();
   const { project } = useCurrentProject();
-  const loader = useLoading();
   const [showCreateNewTaskModal, setShowCreateNewTaskModal] = useState(false);
   const [showAssigneeModal, setShowAssigneeModal] = useState(false);
   const [openAIResponse, setOpenAIResponse] = useState<string | undefined>(undefined);
+  const [helperAsked, setHelperAsked] = useState(false);
+
   if (!task) return <div>Loading...</div>;
 
   const tshirtEstimateOptions = [
@@ -87,42 +88,42 @@ function TaskEdit() {
     { label: "21", value: PointEstimate.POINT_21 }
   ];
 
-  const handleBreakdown = () => {
-    loader.add();
-    const systemMessage = {
-      role: "system",
-      content: assistant?.prompt ?? "You are a helpful assistant."
-    };
+  const handleBreakdown = (assistantName: string) => {
+    setOpenAIResponse(undefined);
+    loadAssistant(assistantName)
+      .then((assistant) => {
+        console.log("Loaded AI assistant:", assistant);
+        const systemMessage = {
+          role: "system",
+          content: assistant?.prompt ?? "You are a helpful assistant."
+        };
 
-    const userMessage = {
-      role: "user",
-      content: JSON.stringify({
-        task_header: task.title,
-        task_description: task.description
+        const userMessage = {
+          role: "user",
+          content: JSON.stringify({
+            task_header: task.title,
+            task_description: task.description
+          })
+        };
+
+        const body = {
+          model: assistant?.model ?? "gpt-4o-mini",
+          messages: [systemMessage, userMessage],
+          stream: true
+        };
+
+        const handleChunk = (chunk: string) => {
+          setOpenAIResponse((prev) => (prev ? prev + chunk : chunk));
+        };
+
+        return sendMessage(body, handleChunk)
+          .then((response) => {
+            console.log("Final response from OpenAI:", response);
+          });
       })
-    };
-
-    const body = {
-      model: assistant?.model ?? "gpt-4o-mini",
-      messages: [systemMessage, userMessage],
-      stream: true
-    };
-
-    const handleChunk = (chunk: string) => {
-      setOpenAIResponse((prev) => {
-        if (prev) {
-          return prev + chunk;
-        } else {
-          return chunk;
-        }
+      .catch(() => {
+        notifyError("Error loading AI assistant or sending message");
       });
-    };
-
-    sendMessage(body, handleChunk)
-      .catch((error) => {
-        console.error("Error sending message to OpenAI:", error);
-      })
-      .finally(loader.done);
   };
 
   const handleUpdateEstimateTshirt = (estimate: TshirtEstimate) => {
@@ -214,17 +215,37 @@ function TaskEdit() {
                 className="bg-white px-10 border border-ap-onyx-50/50 w-fit"
                 onClick={() => setShowCreateNewTaskModal(true)}
               />
-              <Button
-                text={
-                  <span className="flex items-center gap-2">
-                    <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
-                    Help
-                  </span>
-                }
-                className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                title="Click to get AI help for Story breakdown"
-                onClick={handleBreakdown}
-              />
+              <ShowIf if={!helperAsked}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                      Help
+                    </span>
+                  }
+                  className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                  title="Click to get AI help for Story breakdown"
+                  onClick={() => {
+                    handleBreakdown("task_helper");
+                    setHelperAsked(true);
+                  }}
+                />
+              </ShowIf>
+              <ShowIf if={helperAsked}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <PiOpenAiLogoDuotone className="flex-shrink-0 text-xl" />
+                      More help
+                    </span>
+                  }
+                  className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
+                  title="Click to ask AI to break down the task into concrete subtasks"
+                  onClick={() => {
+                    handleBreakdown("task_break_the_glass");
+                  }}
+                />
+              </ShowIf>
             </div>
             <div className="flex gap-2">
               <div

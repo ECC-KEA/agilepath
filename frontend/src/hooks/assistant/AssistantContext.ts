@@ -3,7 +3,7 @@ import { IAssistant } from '../../types/assistant.types';
 
 interface IAssistantContext {
   assistant: IAssistant | undefined;
-  assistantId: string;
+  loadAssistant: (assistantName: string) => Promise<IAssistant>;
 }
 
 const AssistantContext = createContext<IAssistantContext | undefined>(undefined);

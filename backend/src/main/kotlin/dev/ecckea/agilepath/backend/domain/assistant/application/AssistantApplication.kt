@@ -4,7 +4,6 @@ import dev.ecckea.agilepath.backend.domain.assistant.model.Assistant
 import dev.ecckea.agilepath.backend.domain.assistant.model.NewAssistant
 import dev.ecckea.agilepath.backend.domain.assistant.service.AssistantService
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AssistantApplication(
@@ -14,8 +13,8 @@ class AssistantApplication(
         return assistantService.getAssistants()
     }
 
-    fun getAssistant(assistantId: UUID): Assistant {
-        return assistantService.getAssistant(assistantId)
+    fun getAssistant(assistantName: String): Assistant {
+        return assistantService.getAssistant(assistantName)
     }
 
     fun createAssistant(newAssistant: NewAssistant): Assistant {

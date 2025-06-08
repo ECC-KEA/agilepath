@@ -15,6 +15,7 @@ import AssistantProvider from "./hooks/assistant/AssistantProvider";
 import OpenAIProvider from "./hooks/openai/OpenAIProvider";
 import TaskEdit from "./views/TaskEdit";
 import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
+import Retrospective, { RetrospectiveWrapper } from "./views/Retrospective";
 import AnalyticsProvider from "./hooks/analytics/AnalyticsProvider.tsx";
 
 function App() {
@@ -60,9 +61,17 @@ function App() {
                 element={<SprintStats />}
               />
               <Route
+                path="retrospective"
+                element={
+                  <RetrospectiveWrapper>
+                    <Retrospective />
+                  </RetrospectiveWrapper>
+                }
+              />
+              <Route
                 path="edit/:taskId"
                 element={
-                  <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
+                  <AssistantProvider>
                     <OpenAIProvider>
                       <SubTaskProvider>
                         <TaskEdit />
@@ -88,7 +97,7 @@ function App() {
             <Route
               path="edit/:storyId"
               element={
-                <AssistantProvider assistantId="e1111111-0000-0000-0000-000000000001">
+                <AssistantProvider>
                   <OpenAIProvider>
                     <StoryEdit />
                   </OpenAIProvider>

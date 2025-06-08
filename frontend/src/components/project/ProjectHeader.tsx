@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import { NavLink, To, useNavigate, useParams } from "react-router";
 import ShowIf from "../generic/ShowIf";
+import useSprint from "../../hooks/sprint/useSprint";
 
 interface ProjectHeaderProps {
   projectName: string;

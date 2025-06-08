@@ -95,4 +95,8 @@ class SprintApplication(
         }
         return updatedSprint
     }
+
+    fun endSprint(sprintId: UUID): Sprint {
+        return sprintService.endSprint(sprintId)
+    }
 }

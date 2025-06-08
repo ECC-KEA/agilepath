@@ -35,6 +35,7 @@ object CacheKeys {
     private const val COMMENT = "${VERSION}comment:"
     private const val STORY_COMMENTS = "${VERSION}story:comments:"
     private const val TASK_COMMENTS = "${VERSION}task:comments:"
+    private const val RETROSPECTIVE = "${VERSION}retrospective:"
 
     // Single entity cache keys
 
@@ -90,4 +91,7 @@ object CacheKeys {
 
     /** Cache key for all comments on a task */
     fun taskCommentsKey(taskId: String) = "$TASK_COMMENTS$taskId"
+
+    /** Cache key for a retrospective */
+    fun retrospectiveKey(sprintId: String) = "$RETROSPECTIVE$sprintId"
 }

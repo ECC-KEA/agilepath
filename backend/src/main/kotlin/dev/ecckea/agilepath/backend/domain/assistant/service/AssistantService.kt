@@ -7,7 +7,6 @@ import dev.ecckea.agilepath.backend.domain.assistant.model.mapper.toModel
 import dev.ecckea.agilepath.backend.shared.context.repository.RepositoryContext
 import dev.ecckea.agilepath.backend.shared.logging.Logged
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class AssistantService(
@@ -17,10 +16,10 @@ class AssistantService(
         return ctx.assistant.findAll().map { it.toModel() }
     }
 
-    fun getAssistant(assistantId: UUID): Assistant {
-        return ctx.assistant.findById(assistantId)
-            .orElseThrow { IllegalArgumentException("Assistant with ID $assistantId not found") }
-            .toModel()
+    fun getAssistant(assistantName: String): Assistant {
+        return ctx.assistant.findByName(assistantName)
+            ?.toModel()
+            ?: throw IllegalArgumentException("Assistant with name $assistantName not found")
     }
 
     fun createAssistant(newAssistant: NewAssistant): Assistant {

@@ -114,4 +114,28 @@ class SprintController(
         log.info("PUT /sprints/{} - Update sprint", id)
         return sprintApplication.updateSprint(id, sprint.toModel()).toDTO()
     }
+
+
+    @Operation(
+        summary = "End sprint, sets end date to now",
+        description = "Ends the specified sprint by setting its end date to the current date",
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successfully ended sprint"),
+            ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
+            ApiResponse(
+                responseCode = "403",
+                description = "Forbidden – Authenticated but not allowed to end this sprint"
+            ),
+            ApiResponse(responseCode = "404", description = "Not Found – Sprint with specified ID does not exist"),
+            ApiResponse(responseCode = "500", description = "Internal server error")
+        ]
+    )
+    @PatchMapping("/sprints/{id}/end")
+    fun endSprint(@PathVariable id: UUID): SprintResponse {
+        log.info("PATCH /sprints/{} - End sprint", id)
+        return sprintApplication.endSprint(id).toDTO()
+    }
 }

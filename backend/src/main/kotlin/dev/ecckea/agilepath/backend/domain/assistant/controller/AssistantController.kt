@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 @Tag(name = "Assistant", description = "Endpoints related to LLM assistant management")
@@ -25,10 +24,10 @@ class AssistantController(
         return assistantApplication.getAssistants().map { it.toDTO() }
     }
 
-    @GetMapping("/assistants/{assistantId}")
-    fun getAssistant(@PathVariable assistantId: UUID): AssistantResponse {
-        log.info("GET /assistants/{} - Get assistant", assistantId)
-        return assistantApplication.getAssistant(assistantId).toDTO()
+    @GetMapping("/assistants/{assistantName}")
+    fun getAssistant(@PathVariable assistantName: String): AssistantResponse {
+        log.info("GET /assistants/{} - Get assistant", assistantName)
+        return assistantApplication.getAssistant(assistantName).toDTO()
     }
 
     @PostMapping("/assistants")

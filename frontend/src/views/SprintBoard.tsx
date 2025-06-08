@@ -10,10 +10,18 @@ import { ITask, convertTaskToRequest } from "../types/story.types";
 import { notifyError } from "../helpers/notify";
 import TaskBox from "../components/sprint/TaskBox";
 import SearchInput from "../components/generic/inputs/SearchInput";
+import Button from "../components/generic/buttons/Button";
+import { useNavigate, useLocation } from "react-router";
+import useSprint from "../hooks/sprint/useSprint";
+import EndSprintModal from "../components/sprint/EndSprintModal";
 
 function SprintBoard() {
+  const { sprint } = useSprint();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { columns } = useColumn();
   const { updateTask } = useTask();
+  const [showEndSprintModal, setShowEndSprintModal] = useState(false);
   const [draggedTask, setDraggedTask] = useState<ITask | null>(null);
   const [showCreateColumnModal, setShowCreateColumnModal] = useState(false);
   const [search, setSearch] = useState<string>("");
@@ -38,6 +46,11 @@ function SprintBoard() {
     setDraggedTask(null);
   };
 
+  const navigateToRetrospective = () => {
+    const baseUrl = location.pathname.substring(0, location.pathname.lastIndexOf("/"));
+    navigate(`${baseUrl}/retrospective`);
+  }
+
   return (
     <div className="sprint-board w-full overflow-auto">
       <div className="flex w-full h-full">
@@ -49,10 +62,29 @@ function SprintBoard() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <FaPlus
-              className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
+            <Button
+              text={
+                <div className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800"/> Add Column
+                </div>
+              }
+              className="m-4 border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
               onClick={() => setShowCreateColumnModal(true)}
             />
+            <ShowIf if={(sprint?.endDate) ? new Date(sprint.endDate) < new Date() : false}>
+              <Button 
+                text="Go to Retrospective"
+                className="m-4  border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
+                onClick={() => navigateToRetrospective()}
+              />
+            </ShowIf>
+            <ShowIf if={(sprint?.endDate) ? new Date(sprint.endDate) >= new Date() : true}>
+              <Button
+                text="End Sprint"
+                className="m-4  border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
+                onClick={() => setShowEndSprintModal(true)}
+              />
+            </ShowIf>
           </div>
           <div className="flex gap-6 w-full max-h-full overflow-auto relative">
             <DndContext
@@ -88,6 +120,12 @@ function SprintBoard() {
         <CreateColumnModal
           show={showCreateColumnModal}
           onClose={() => setShowCreateColumnModal(false)}
+        />
+      </ShowIf>
+      <ShowIf if={showEndSprintModal}>
+        <EndSprintModal 
+          show={showEndSprintModal}
+          onClose={() => setShowEndSprintModal(false)}
         />
       </ShowIf>
     </div>

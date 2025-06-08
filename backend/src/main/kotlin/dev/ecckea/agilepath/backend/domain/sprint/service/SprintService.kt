@@ -13,6 +13,7 @@ import dev.ecckea.agilepath.backend.shared.logging.Logged
 import dev.ecckea.agilepath.backend.shared.security.currentUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -20,8 +21,6 @@ class SprintService(
     private val ctx: RepositoryContext,
     private val cacheService: CacheService
 ) : Logged() {
-
-
     @Transactional(readOnly = true)
     fun getSprints(projectId: UUID): List<Sprint> {
         log.info("Fetching sprints for project $projectId")
@@ -91,6 +90,42 @@ class SprintService(
         // Invalidate caches
         cacheService.invalidateSprint(sprintId)
         cacheService.invalidateProjectSprints(sprint.projectId)
+
+        return updatedSprint
+    }
+
+    @Transactional
+    fun endSprint(sprintId: UUID): Sprint {
+        log.info("Ending sprint with ID $sprintId")
+
+        val existingSprint = ctx.sprint.findOneById(sprintId)
+            ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
+
+        if (existingSprint.endDate.isBefore(LocalDate.now()) || existingSprint.endDate == LocalDate.now()) {
+            throw BadRequestException("Sprint with ID $sprintId is already ended")
+        }
+
+        val existingSprintModel = existingSprint.toModel()
+
+        val updatedEntity = existingSprint.updatedWith(
+            update = NewSprint(
+                projectId = existingSprintModel.projectId,
+                name = existingSprintModel.name,
+                goal = existingSprintModel.goal,
+                startDate = existingSprintModel.startDate,
+                endDate = LocalDate.now(),
+                teamCapacity = existingSprintModel.teamCapacity,
+            ),
+            userId = currentUser().id,
+            ctx = ctx
+        )
+
+        val updated = ctx.sprint.save(updatedEntity)
+        val updatedSprint = updated.toModel()
+
+        // Invalidate caches
+        cacheService.invalidateSprint(sprintId)
+        cacheService.invalidateProjectSprints(existingSprintModel.projectId)
 
         return updatedSprint
     }
