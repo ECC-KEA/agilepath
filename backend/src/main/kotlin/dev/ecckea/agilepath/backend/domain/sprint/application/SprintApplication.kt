@@ -29,14 +29,13 @@ class SprintApplication(
     }
 
     fun createSprint(sprint: NewSprint): Sprint {
+        val lastSprint = if (sprint.copyLastSprintColumns) {
+            sprintService.getSprints(sprint.projectId).lastOrNull()
+        } else null
+
         val createdSprint = sprintService.createSprint(sprint)
-        if(sprint.copyLastSprintColumns) {
-            val lastSprint = sprintService.getSprints(sprint.projectId).lastOrNull()
-            if (lastSprint != null) {
-                sprintColumnService.copyColumnsFromLastSprint(lastSprint.id, createdSprint.id)
-            } else {
-                sprintColumnService.createDefaultColumns(createdSprint.id)
-            }
+        if (sprint.copyLastSprintColumns && lastSprint != null) {
+            sprintColumnService.copyColumnsFromLastSprint(lastSprint.id, createdSprint.id)
         } else {
             sprintColumnService.createDefaultColumns(createdSprint.id)
         }
