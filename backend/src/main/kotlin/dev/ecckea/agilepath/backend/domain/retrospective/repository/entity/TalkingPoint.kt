@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-data class TalkingPointEmbeddable(
+data class TalkingPoint(
     @Column(name = "prompt")
     val prompt: String,
 

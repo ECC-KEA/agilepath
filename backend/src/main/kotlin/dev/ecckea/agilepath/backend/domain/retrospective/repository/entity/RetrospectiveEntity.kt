@@ -30,7 +30,7 @@ class RetrospectiveEntity (
 
     @ElementCollection
     @CollectionTable(name = "retrospective_talking_points", joinColumns = [JoinColumn(name = "retrospective_id")])
-    val talkingPoints: List<TalkingPointEmbeddable> = emptyList(),
+    val talkingPoints: List<TalkingPoint> = emptyList(),
 
     val teamMood: String? = null,
 

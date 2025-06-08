@@ -6,7 +6,7 @@ import dev.ecckea.agilepath.backend.domain.retrospective.model.NewRetrospective
 import dev.ecckea.agilepath.backend.domain.retrospective.model.Retrospective
 import dev.ecckea.agilepath.backend.domain.retrospective.model.TalkingPoint
 import dev.ecckea.agilepath.backend.domain.retrospective.repository.entity.RetrospectiveEntity
-import dev.ecckea.agilepath.backend.domain.retrospective.repository.entity.TalkingPointEmbeddable
+import dev.ecckea.agilepath.backend.domain.retrospective.repository.entity.TalkingPoint as TalkingPointEntity
 import dev.ecckea.agilepath.backend.domain.sprint.repository.entity.SprintEntity
 
 
@@ -25,7 +25,7 @@ fun RetrospectiveEntity.toModel(): Retrospective {
     )
 }
 
-fun TalkingPointEmbeddable.toModel(): TalkingPoint {
+fun TalkingPointEntity.toModel(): TalkingPoint {
     return TalkingPoint(
         prompt =  this.prompt,
         response = this.response,
@@ -55,8 +55,8 @@ fun Retrospective.toDTO() = RetrospectiveResponse (
     startDoing = startDoing
 )
 
-fun TalkingPoint.toEmbeddable(): TalkingPointEmbeddable {
-    return TalkingPointEmbeddable(
+fun TalkingPoint.toEmbeddable(): TalkingPointEntity {
+    return TalkingPointEntity(
         prompt = this.prompt,
         response = this.response
     )
