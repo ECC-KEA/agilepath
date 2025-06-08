@@ -25,7 +25,9 @@ function ProjectHeader(props: Readonly<ProjectHeaderProps>) {
       </div>
       <div className="flex flex-row gap-2 pl-58">
         <HeaderLink to={`${basePath}/overview`}>board</HeaderLink>
-        <HeaderLink to={`${basePath}/stats`}>stats</HeaderLink>
+        <ShowIf if={!!sprintId}>
+          <HeaderLink to={`${basePath}/stats`}>stats</HeaderLink>
+        </ShowIf>
         <ShowIf if={!sprintId}>
           <HeaderLink to={`${basePath}/contributors`}>contributors</HeaderLink>
         </ShowIf>
