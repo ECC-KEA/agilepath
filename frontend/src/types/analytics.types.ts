@@ -103,19 +103,3 @@ export interface ISprintTrends {
     velocityTrend: string;
     completionRateTrend: string;
 }
-
-// Helper function for working with insights
-export function handleSprintInsight(insight: ISprintInsight): string {
-    switch (insight.type) {
-        case 'LowCompletionRate':
-            return `Low completion rate: ${insight.completionRate}%`;
-        case 'HighReopenRate':
-            return `High reopen rate: ${insight.reopenedTasks} tasks reopened`;
-        case 'LowCollaboration':
-            return `Low collaboration score: ${insight.score}`;
-        case 'FrequentReassignments':
-            return `Frequent reassignments: ${insight.reassignedTasks} tasks reassigned`;
-        case 'ScopeIncrease':
-            return `Scope increase: ${insight.addedTasks} tasks added`;
-    }
-}
