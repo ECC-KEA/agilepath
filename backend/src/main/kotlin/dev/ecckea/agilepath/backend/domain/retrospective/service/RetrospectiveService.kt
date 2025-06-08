@@ -44,10 +44,10 @@ class RetrospectiveService(
 
         // Create the retrospective entity
         val retrospectiveEntity = retrospective.toEntity(sprintEntity)
-        ctx.retrospective.save(retrospectiveEntity)
+        val savedRetrospectiveEntity = ctx.retrospective.save(retrospectiveEntity)
 
         // Convert to model and cache it
-        val createdRetrospective = retrospectiveEntity.toModel()
+        val createdRetrospective = savedRetrospectiveEntity.toModel()
         cacheService.cacheRetrospective(createdRetrospective, 15)
         return createdRetrospective
     }
