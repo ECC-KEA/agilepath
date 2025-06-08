@@ -103,8 +103,3 @@ export interface ISprintTrends {
     velocityTrend: string;
     completionRateTrend: string;
 }
-
-export interface MetricThreshold {
-    min: number;
-    color: string;
-}
