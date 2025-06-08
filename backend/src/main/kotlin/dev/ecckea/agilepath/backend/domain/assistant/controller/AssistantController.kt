@@ -25,10 +25,10 @@ class AssistantController(
         return assistantApplication.getAssistants().map { it.toDTO() }
     }
 
-    @GetMapping("/assistants/{assistantId}")
-    fun getAssistant(@PathVariable assistantId: UUID): AssistantResponse {
-        log.info("GET /assistants/{} - Get assistant", assistantId)
-        return assistantApplication.getAssistant(assistantId).toDTO()
+    @GetMapping("/assistants/{assistantName}")
+    fun getAssistant(@PathVariable assistantName: String): AssistantResponse {
+        log.info("GET /assistants/{} - Get assistant", assistantName)
+        return assistantApplication.getAssistant(assistantName).toDTO()
     }
 
     @PostMapping("/assistants")

@@ -62,6 +62,15 @@ function SprintBoard() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <Button
+              text={
+                <div className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800"/> Add Column
+                </div>
+              }
+              className="m-4 border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
+              onClick={() => setShowCreateColumnModal(true)}
+            />
             <ShowIf if={(sprint?.endDate) ? new Date(sprint.endDate) < new Date() : false}>
               <Button 
                 text="Go to Retrospective"
@@ -76,10 +85,6 @@ function SprintBoard() {
                 onClick={() => setShowEndSprintModal(true)}
               />
             </ShowIf>
-            <FaPlus
-              className="m-4 text-4xl text-ap-lavender-800 border-ap-onyx-200 border rounded-md p-2 cursor-pointer flex-shrink-0"
-              onClick={() => setShowCreateColumnModal(true)}
-            />
           </div>
           <div className="flex gap-6 w-full max-h-full overflow-auto relative">
             <DndContext

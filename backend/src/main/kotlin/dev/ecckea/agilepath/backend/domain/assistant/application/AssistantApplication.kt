@@ -14,8 +14,8 @@ class AssistantApplication(
         return assistantService.getAssistants()
     }
 
-    fun getAssistant(assistantId: UUID): Assistant {
-        return assistantService.getAssistant(assistantId)
+    fun getAssistant(assistantName: String): Assistant {
+        return assistantService.getAssistant(assistantName)
     }
 
     fun createAssistant(newAssistant: NewAssistant): Assistant {

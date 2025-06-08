@@ -20,6 +20,7 @@ import AssistantProvider from '../hooks/assistant/AssistantProvider';
 import useAssistant from '../hooks/assistant/useAssistant';
 import useOpenAI from '../hooks/openai/useOpenAI';
 import OpenAIProvider from '../hooks/openai/OpenAIProvider';
+import Tooltip from '../components/generic/tooltips/Tooltip';
 
 
 export function RetrospectiveWrapper({children}: Readonly<PropsWithChildren>) {
@@ -230,9 +231,18 @@ function Retrospective() {
 
         {/* Team Mood */}
         <div className="space-y-2">
-          <div className="text-xl font-semibold">
-            Team Mood
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-semibold">
+              Team Mood
+            </div>
+            <ShowIf if={!retrospective}>
+              <Tooltip
+                id="teamMoodTooltip"
+                text="You could use fist of five and write the average score here."
+              />
+            </ShowIf>
           </div>
+          
           <CustomTextArea
             id="teamMood"
             placeholder="(Optional)"
