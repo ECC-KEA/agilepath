@@ -19,7 +19,7 @@ class AssistantService(
     fun getAssistant(assistantName: String): Assistant {
         return ctx.assistant.findByName(assistantName)
             ?.toModel()
-            ?: throw IllegalArgumentException("Assistant with ID $assistantName not found")
+            ?: throw IllegalArgumentException("Assistant with name $assistantName not found")
     }
 
     fun createAssistant(newAssistant: NewAssistant): Assistant {
