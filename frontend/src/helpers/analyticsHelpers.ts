@@ -91,7 +91,7 @@ export const getMetricColor = (value: number, thresholds: readonly MetricThresho
 export const METRIC_COLOR_THRESHOLDS = {
     completionRate: [
         {min: 0.8, color: "ap-mint"},
-        {min: 0.6, color: "ap-coral"},
+        {min: 0.6, color: "ap-cyan"},
         {min: 0, color: "ap-coral"}
     ],
     collaborationScore: [

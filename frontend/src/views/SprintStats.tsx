@@ -200,7 +200,7 @@ function SprintStats() {
                 {/* Sprint Insights */}
                 <div className="bg-white p-6 rounded shadow border border-ap-onyx-50">
                     <h2 className="text-lg font-semibold text-ap-onyx-800 mb-4">Key Insights</h2>
-                    <ShowIf if={analysis.insights.length == 0}>
+                    <ShowIf if={analysis.insights.length === 0}>
                         <div className="text-ap-mint-600 text-sm">🎉 No issues detected - great sprint!</div>
                     </ShowIf>
                     <ShowIf if={analysis.insights.length > 0}>

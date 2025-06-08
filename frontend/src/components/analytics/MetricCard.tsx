@@ -1,4 +1,4 @@
-import {ColorKey, getColorClasses} from "../../helpers/analyticsHelpers.ts";
+import {ColorKey, getColorClasses} from "../../helpers/analyticsHelpers";
 
 interface MetricCardProps {
     title: string;
