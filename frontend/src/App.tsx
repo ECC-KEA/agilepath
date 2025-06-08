@@ -1,10 +1,10 @@
-import { Route, Routes } from "react-router";
+import {Route, Routes} from "react-router";
 import Layout from "./components/Layout";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
+import {SignedIn, SignedOut} from "@clerk/clerk-react";
 import Login from "./views/Login";
 import Projects from "./views/Projects";
 import Sprint from "./views/Sprint";
-import Project, { ProjectWrapper } from "./views/Project";
+import Project, {ProjectWrapper} from "./views/Project";
 import ProjectOverview from "./views/ProjectOverview";
 import SprintBoard from "./views/SprintBoard";
 import SprintStats from "./views/SprintStats";
@@ -16,6 +16,7 @@ import OpenAIProvider from "./hooks/openai/OpenAIProvider";
 import TaskEdit from "./views/TaskEdit";
 import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
 import Retrospective, { RetrospectiveWrapper } from "./views/Retrospective";
+import AnalyticsProvider from "./hooks/analytics/AnalyticsProvider.tsx";
 import AnalyticsProvider from "./hooks/analytics/AnalyticsProvider.tsx";
 
 function App() {
