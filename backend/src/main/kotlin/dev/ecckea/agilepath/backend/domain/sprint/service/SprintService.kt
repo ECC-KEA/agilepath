@@ -101,7 +101,7 @@ class SprintService(
         val existingSprint = ctx.sprint.findOneById(sprintId)
             ?: throw ResourceNotFoundException("Sprint with ID $sprintId not found")
 
-        require(existingSprint.endDate.isAfter(LocalDate.now())) {
+        if (!existingSprint.endDate.isAfter(LocalDate.now())) {
             throw BadRequestException("Sprint with ID $sprintId is already ended")
         }
 
