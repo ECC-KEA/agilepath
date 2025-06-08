@@ -1,4 +1,4 @@
-import {IBurndownData, ISprintInsight, MetricThreshold} from "../types/analytics.types.ts";
+import {IBurndownData, ISprintInsight} from "../types/analytics.types.ts";
 
 export function formatBurndownData(burndownData: IBurndownData) {
     const optimalMap = new Map(burndownData.optimalPath.map(point => [point.date, point.remainingWork]));
@@ -32,7 +32,56 @@ export function handleSprintInsight(insight: ISprintInsight): string {
     }
 }
 
-export const getMetricColor = (value: number, thresholds: readonly MetricThreshold[]): string => {
+export interface MetricThreshold {
+    readonly min: number;
+    readonly color: ColorKey;
+}
+
+export const COLOR_CLASS_MAP = {
+    'ap-mint': {
+        bg: 'bg-ap-mint-100',
+        bgDark: 'bg-ap-mint-600',
+        border: 'border-ap-mint-200',
+        text: 'text-ap-mint-800',
+        textLight: 'text-ap-mint-600'
+    },
+    'ap-coral': {
+        bg: 'bg-ap-coral-100',
+        bgDark: 'bg-ap-coral-600',
+        border: 'border-ap-coral-200',
+        text: 'text-ap-coral-800',
+        textLight: 'text-ap-coral-600'
+    },
+    'ap-cyan': {
+        bg: 'bg-ap-cyan-100',
+        bgDark: 'bg-ap-cyan-600',
+        border: 'border-ap-cyan-200',
+        text: 'text-ap-cyan-800',
+        textLight: 'text-ap-cyan-600'
+    },
+    'ap-lavender': {
+        bg: 'bg-ap-lavender-100',
+        bgDark: 'bg-ap-lavender-600',
+        border: 'border-ap-lavender-200',
+        text: 'text-ap-lavender-800',
+        textLight: 'text-ap-lavender-600'
+    },
+    'ap-onyx': {
+        bg: 'bg-ap-onyx-100',
+        bgDark: 'bg-ap-onyx-600',
+        border: 'border-ap-onyx-200',
+        text: 'text-ap-onyx-800',
+        textLight: 'text-ap-onyx-600'
+    }
+} as const;
+
+export type ColorKey = keyof typeof COLOR_CLASS_MAP;
+
+// Helper function to get classes for a color
+export const getColorClasses = (color: ColorKey) => COLOR_CLASS_MAP[color];
+
+// Generic metric color mapper
+export const getMetricColor = (value: number, thresholds: readonly MetricThreshold[]): ColorKey => {
     for (const {min, color} of thresholds) {
         if (value >= min) return color;
     }
@@ -61,14 +110,14 @@ export const METRIC_COLOR_THRESHOLDS = {
 } as const;
 
 // Convenience functions for common metrics
-export const getCompletionRateColor = (rate: number) =>
+export const getCompletionRateColor = (rate: number): ColorKey =>
     getMetricColor(rate, METRIC_COLOR_THRESHOLDS.completionRate);
 
-export const getCollaborationScoreColor = (score: number) =>
+export const getCollaborationScoreColor = (score: number): ColorKey =>
     getMetricColor(score, METRIC_COLOR_THRESHOLDS.collaborationScore);
 
-export const getReopenedTasksColor = (count: number) =>
+export const getReopenedTasksColor = (count: number): ColorKey =>
     getMetricColor(count, METRIC_COLOR_THRESHOLDS.reopenedTasks);
 
-export const getReassignmentsColor = (count: number) =>
+export const getReassignmentsColor = (count: number): ColorKey =>
     getMetricColor(count, METRIC_COLOR_THRESHOLDS.reassignments);
