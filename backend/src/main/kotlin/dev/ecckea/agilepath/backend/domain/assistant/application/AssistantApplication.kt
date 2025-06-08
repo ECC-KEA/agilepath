@@ -4,7 +4,6 @@ import dev.ecckea.agilepath.backend.domain.assistant.model.Assistant
 import dev.ecckea.agilepath.backend.domain.assistant.model.NewAssistant
 import dev.ecckea.agilepath.backend.domain.assistant.service.AssistantService
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class AssistantApplication(
