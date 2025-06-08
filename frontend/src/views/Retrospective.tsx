@@ -238,7 +238,7 @@ function Retrospective() {
             <ShowIf if={!retrospective}>
               <Tooltip
                 id="teamMoodTooltip"
-                text="You could use fist of five and write the average score here."
+                text="How is the team feeling overall? Share your general mood or any emotional highlights from the sprint. You could use fist of five and write the average score here, or any other mood indicator."
               />
             </ShowIf>
           </div>
@@ -255,7 +255,17 @@ function Retrospective() {
 
         {/* Talking Points */}
         <div className="space-y-4">
-          <div className="text-xl font-semibold">Talking Points</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-semibold">
+              Talking Points
+            </div>
+            <ShowIf if={!retrospective}>
+              <Tooltip
+                id="talkingPointsTooltip"
+                text="What topics should we discuss together? This can include blockers, feedback, or anything worth addressing as a group."
+              />
+            </ShowIf>
+          </div>
           {talkingPoints.map((point, index) => (
             <div key={index} className="flex flex-row gap-2 items-end">
               <div className="flex flex-col w-full gap-2">
@@ -316,7 +326,17 @@ function Retrospective() {
 
         {/* Keep Doing */}
         <div className="space-y-2">
-          <div className="text-xl font-semibold">Keep Doing</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-semibold">
+              Keep Doing
+            </div>
+            <ShowIf if={!retrospective}>
+              <Tooltip
+                id="keepDoingTooltip"
+                text="What went well that we should continue doing? Highlight habits, practices, or approaches that are working."
+              />
+            </ShowIf>
+          </div>
           {keepDoing.map((item, index) => (
             <div key={index} className="flex flex-row gap-2 items-end">
               <CustomTextArea
@@ -354,48 +374,19 @@ function Retrospective() {
           </ShowIf>
         </div>
 
-        {/* Stop Doing */}
-        <div className="space-y-2">
-          <div className="text-xl font-semibold">Stop Doing</div>
-          {stopDoing.map((item, index) => (
-            <div key={index} className="flex flex-row gap-2 items-end">
-              <CustomTextArea
-                rows={2}
-                disabled={!!retrospective}
-                key={index}
-                className="w-full border border-gray-300 rounded px-3 py-2"
-                value={item}
-                onChange={(e) => updateStopDoing(index, e.target.value)}
-              />
-              <ShowIf if={!retrospective}>
-                <Button
-                  text={
-                    <span className="flex items-center gap-2">
-                      <FaMinus className="text-ap-lavender-800" />
-                    </span>
-                  }
-                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
-                  onClick={() => removeStopDoing(index)}
-                />
-              </ShowIf>
-            </div>
-          ))}
-          <ShowIf if={!retrospective}>
-            <Button
-              text={
-                <span className="flex items-center gap-2">
-                  <FaPlus className="text-ap-lavender-800" />
-                </span>
-              }
-              className="bg-white px-5 border border-ap-onyx-50 w-fit"
-              onClick={addStopDoing}
-            />
-          </ShowIf>
-        </div>
-
         {/* Start Doing */}
         <div className="space-y-2">
-          <div className="text-xl font-semibold">Start Doing</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-semibold">
+              Start Doing
+            </div>
+            <ShowIf if={!retrospective}>
+              <Tooltip
+                id="startDoingTooltip"
+                text="What new things should we try? Suggest improvements, tools, or processes that could help the team."
+              />
+            </ShowIf>
+          </div>
           {startDoing.map((item, index) => (
             <div key={index} className="flex flex-row gap-2 items-end">
               <CustomTextArea
@@ -428,6 +419,55 @@ function Retrospective() {
               }
               className="bg-white px-5 border border-ap-onyx-50 w-fit"
               onClick={addStartDoing}
+            />
+          </ShowIf>
+        </div>
+
+        {/* Stop Doing */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-semibold">
+              Stop Doing
+            </div>
+            <ShowIf if={!retrospective}>
+              <Tooltip
+                id="stopDoingTooltip"
+                text="What is not working or is slowing us down? Call out behaviors or practices we should reconsider or drop."
+              />
+            </ShowIf>
+          </div>
+          {stopDoing.map((item, index) => (
+            <div key={index} className="flex flex-row gap-2 items-end">
+              <CustomTextArea
+                rows={2}
+                disabled={!!retrospective}
+                key={index}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={item}
+                onChange={(e) => updateStopDoing(index, e.target.value)}
+              />
+              <ShowIf if={!retrospective}>
+                <Button
+                  text={
+                    <span className="flex items-center gap-2">
+                      <FaMinus className="text-ap-lavender-800" />
+                    </span>
+                  }
+                  className="bg-white px-5 border border-ap-onyx-50 w-fit"
+                  onClick={() => removeStopDoing(index)}
+                />
+              </ShowIf>
+            </div>
+          ))}
+          <ShowIf if={!retrospective}>
+            <Button
+              text={
+                <span className="flex items-center gap-2">
+                  <FaPlus className="text-ap-lavender-800" />
+                </span>
+              }
+              className="bg-white px-5 border border-ap-onyx-50 w-fit"
+              onClick={addStopDoing}
             />
           </ShowIf>
         </div>
