@@ -488,7 +488,7 @@ function Retrospective() {
           <div className="flex flex-col">
             <div className="sticky top-0 flex gap-4 text-xl items-center bg-gradient-to-br p-4 to-ap-lavender-900 from-ap-cyan-900 text-white">
               <PiOpenAiLogoDuotone className="flex-shrink-0" />
-              Story breakdown help
+              Talking point suggestions
             </div>
             <div className="p-2 text-sm">
               <Markdown>{openAIResponse}</Markdown>

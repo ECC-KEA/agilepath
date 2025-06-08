@@ -17,7 +17,6 @@ import TaskEdit from "./views/TaskEdit";
 import SubTaskProvider from "./hooks/subtask/SubTaskProvider";
 import Retrospective, { RetrospectiveWrapper } from "./views/Retrospective";
 import AnalyticsProvider from "./hooks/analytics/AnalyticsProvider.tsx";
-import AnalyticsProvider from "./hooks/analytics/AnalyticsProvider.tsx";
 
 function App() {
   return (
