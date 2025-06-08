@@ -36,7 +36,7 @@ interface TaskRepository : JpaRepository<TaskEntity, UUID> {
 
     @Query(
         value = """
-        SELECT * FROM tasks t
+        SELECT t.* FROM tasks t
         JOIN sprint_columns sc ON t.sprint_column_id = sc.id
         WHERE sc.sprint_id = :sprintId
     """,
@@ -46,7 +46,7 @@ interface TaskRepository : JpaRepository<TaskEntity, UUID> {
 
     @Query(
         value = """
-        SELECT COUNT(*) FROM tasks t
+        SELECT COUNT(t.*) FROM tasks t
         JOIN sprint_columns sc ON t.sprint_column_id = sc.id
         WHERE sc.sprint_id = :sprintId
     """,
