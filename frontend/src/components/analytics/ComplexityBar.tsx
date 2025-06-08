@@ -1,12 +1,15 @@
+import {ColorKey, getColorClasses} from "../../helpers/analyticsHelpers.ts";
+
 interface ComplexityBarProps {
     label: string;
     count: number;
     total: number;
-    color: string;
+    color: ColorKey;
 }
 
 function ComplexityBar({label, count, total, color}: Readonly<ComplexityBarProps>) {
     const percentage = total > 0 ? (count / total) * 100 : 0;
+    const colorClasses = getColorClasses(color);
 
     return (
         <div>
@@ -16,7 +19,7 @@ function ComplexityBar({label, count, total, color}: Readonly<ComplexityBarProps
             </div>
             <div className="w-full bg-ap-onyx-100 rounded-full h-2">
                 <div
-                    className={`bg-${color}-600 h-2 rounded-full transition-all duration-300`}
+                    className={`${colorClasses.bgDark} h-2 rounded-full transition-all duration-300`}
                     style={{width: `${percentage}%`}}
                 />
             </div>
