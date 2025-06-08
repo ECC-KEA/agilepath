@@ -34,7 +34,7 @@ class RetrospectiveController(
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully returned list of sprints"),
+            ApiResponse(responseCode = "200", description = "Successfully returned retrospective details"),
             ApiResponse(responseCode = "401", description = "Unauthorized – Missing or invalid JWT"),
             ApiResponse(
                 responseCode = "403",
