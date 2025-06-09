@@ -78,7 +78,7 @@ function NewStoryModal(props: Readonly<NewStoryModalProps>) {
             <div className="flex items-center gap-1">
               Acceptance Criteria
               <Tooltip
-                text="Define clear acceptance criteria to ensure<br /> the story meets the requirements and expectations."
+                text="Acceptance criteria help clarify what 'done' means.<br />You can use the 'Given-When-Then' format to describe<br />expected behavior clearly."
                 className="ml-1"
                 id="storyAcceptanceCriteriaTooltip"
               />

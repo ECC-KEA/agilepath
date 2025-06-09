@@ -13,7 +13,7 @@ function Nav() {
           onClick={() => navigate("/")}
         >
           <Logo size={25} />
-          <div className="text-xl">AgilePath123</div>
+          <div className="text-xl">AgilePath</div>
         </button>
         <div>{/* Breadcrumbs go here */}</div>
       </div>
