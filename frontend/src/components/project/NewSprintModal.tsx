@@ -7,6 +7,7 @@ import Input from "../generic/inputs/Input";
 import TextArea from "../generic/inputs/CustomTextArea";
 import { getNowDatePlusDays } from "../../helpers/timeHelpers";
 import ShowIf from "../generic/ShowIf";
+import Tooltip from "../generic/tooltips/Tooltip";
 
 interface NewSprintModalProps {
   show: boolean;
@@ -81,7 +82,14 @@ function NewSprintModal(props: Readonly<NewSprintModalProps>) {
         </div>
         <div>
           <div className="text-ap-onyx-400 flex justify-between">
-            Goal<div className="italic">Optional</div>
+            <div className="flex items-center gap-1">
+              Goal
+              <Tooltip
+                text="A clear sprint goal keeps the team focused<br />on a shared outcome, helping prioritize work<br />and measure progress."
+                id="sprintGoalTooltip"
+              />
+            </div>
+            <div className="italic">Optional</div>
           </div>
           <TextArea
             value={goal}

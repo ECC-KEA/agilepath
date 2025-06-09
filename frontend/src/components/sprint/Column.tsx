@@ -6,8 +6,6 @@ import useTask from "../../hooks/task/useTask";
 import { useMemo, useState } from "react";
 import TaskBox from "./TaskBox";
 import Button from "../generic/buttons/Button";
-import AddTaskPopper from "./AddTaskPopper";
-import { useOutsideClick } from "../../hooks/utils/useOutsideClick";
 import ShowIf from "../generic/ShowIf";
 import ExistingTaskModal from "./ExistingTaskModal";
 import NewTaskModal from "./NewTaskModal";
@@ -66,9 +64,15 @@ export default function Column({ column, ...props }: IColumnProps) {
       </div>
 
       <div className="pt-2 border-t border-ap-onyx-50/50">
-        <AddTaskButton
-          onAddExistingClick={() => setShowAddExistingTaskModal(true)}
-          onCreateNewClick={() => setShowCreateNewTaskModal(true)}
+        <Button
+          text={
+            <span className="flex gap-1 items-center">
+              <FaPlus className="text-ap-lavender-800" />
+              Add Task
+            </span>
+          }
+          onClick={() => setShowCreateNewTaskModal(true)}
+          className="bg-white shadow border border-ap-onyx-50 px-8"
         />
       </div>
       <ShowIf if={showAddExistingTaskModal}>
@@ -85,34 +89,6 @@ export default function Column({ column, ...props }: IColumnProps) {
           onClose={() => setShowCreateNewTaskModal(false)}
         />
       </ShowIf>
-    </div>
-  );
-}
-
-interface AddTaskButtonProps {
-  onCreateNewClick: () => void;
-  onAddExistingClick: () => void;
-}
-
-function AddTaskButton(props: Readonly<AddTaskButtonProps>) {
-  const [popperAnchorEl, setPopperAnchorEl] = useState<null | HTMLElement>(null);
-  const outsideClickRef = useOutsideClick(() => setPopperAnchorEl(null));
-  return (
-    <div ref={outsideClickRef}>
-      <Button
-        text={
-          <span className="flex gap-1 items-center">
-            <FaPlus className="text-ap-lavender-800" />
-          </span>
-        }
-        className="bg-white shadow border border-ap-onyx-50 px-8"
-        onClick={(e) => setPopperAnchorEl(popperAnchorEl ? null : e.currentTarget)}
-      />
-      <AddTaskPopper
-        anchorEl={popperAnchorEl}
-        onAddExistingClick={props.onAddExistingClick}
-        onCreateNewClick={props.onCreateNewClick}
-      />
     </div>
   );
 }

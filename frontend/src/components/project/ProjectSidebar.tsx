@@ -21,16 +21,8 @@ function ProjectSidebar() {
           border-b-2 border-ap-lavender-700 p-4 text-center`
         }
       >
-        Overview
+        Project Overview
       </NavLink>
-      {/* <div className="flex text-ap-lavender-600 gap-2 items-center">
-        <div className="text-sm pl-4 underline cursor-pointer">Sprint 5</div>
-        <div className="text-xs">current</div>
-      </div>
-      <div className="text-sm pl-4 cursor-pointer">Sprint 4</div>
-      <div className="text-sm pl-4 cursor-pointer">Sprint 3</div>
-      <div className="text-sm pl-4 cursor-pointer">Sprint 2</div>
-      <div className="text-sm pl-4 cursor-pointer">Sprint 1</div> */}
       <Button
         text="New Sprint"
         className="bg-ap-lavender-900 text-white m-2"

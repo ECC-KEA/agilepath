@@ -5,6 +5,7 @@ import Modal from "../generic/Modal";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
 import TextArea from "../generic/inputs/CustomTextArea";
+import Tooltip from "../generic/tooltips/Tooltip";
 
 interface CreateProjectModalProps {
   show: boolean;
@@ -69,7 +70,11 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
                 checked={framework === Framework.SCRUM}
                 className="accent-ap-lavender-900"
               />
-              SCRUM
+              <div>SCRUM</div>
+              <Tooltip
+                text="Scrum offers a simple, structured approach<br />to managing work in short, focused cycles."
+                id="scrumTooltip"
+              />
             </label>
             <label className="flex items-center text-sm gap-1">
               <Input
@@ -80,7 +85,11 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
                 checked={framework === Framework.XP}
                 className="accent-ap-lavender-900"
               />
-              XP
+              <div>XP</div>
+              <Tooltip
+                text="XP focuses on writing high-quality code<br />through constant feedback, pair programming,<br />and frequent releases."
+                id="xpTooltip"
+              />
             </label>
             <label className="flex items-center text-sm gap-1">
               <Input
@@ -107,7 +116,13 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
                 checked={estimationMethod === EstimationMethod.STORY_POINTS}
                 className="accent-ap-lavender-900"
               />
-              Story points
+              <div>
+                Story points
+              </div>
+              <Tooltip
+                text="Story points use numbers (like Fibonacci)<br />to estimate effort more precisely.<br />Gives finer control, but harder to grasp at first."
+                id="storyPointsTooltip"
+              />
             </label>
             <label className="flex items-center text-sm gap-1">
               <Input
@@ -118,13 +133,27 @@ function CreateProjectModal(props: Readonly<CreateProjectModalProps>) {
                 checked={estimationMethod === EstimationMethod.TSHIRT_SIZES}
                 className="accent-ap-lavender-900"
               />
-              T-shirt sizes
+              <div>
+                T-shirt sizes
+              </div>
+              <Tooltip
+                text="T-shirt sizes (S, M, L...) are a simple way<br />to estimate work. <br />Easier to use, but offer less precision."
+                id="tshirtTooltip"
+              />
             </label>
           </div>
         </div>
         <div>
           <div className="text-ap-onyx-200 w-full flex justify-between">
-            Description <span className="italic text-sm">Optional</span>
+            <div className="flex items-center gap-1">
+              Description 
+              <Tooltip
+                text="A clear description helps your team understand<br />the purpose, scope, and context of the task —<br />it saves questions later."
+                id="descriptionTooltip"
+              />
+            </div>
+            
+            <span className="italic text-sm">Optional</span>
           </div>
           <TextArea
             placeholder="Description"

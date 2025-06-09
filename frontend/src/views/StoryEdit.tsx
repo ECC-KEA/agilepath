@@ -18,6 +18,7 @@ import useCurrentProject from "../hooks/projects/useCurrentProject";
 import { EstimationMethod } from "../types/project.types";
 import { useApi } from "../hooks/utils/useApi";
 import { createdAtSortPredicate } from "../helpers/timeHelpers";
+import {Tooltip as ReactTooltip} from "react-tooltip";
 
 function StoryEdit() {
   const { loadAssistant } = useAssistant();
@@ -74,18 +75,25 @@ function StoryEdit() {
       <div className="flex flex-col w-full h-full">
         <div className="flex flex-col gap-4 p-4 min-w-1/2 border-r border-ap-onyx-50/50">
           <div className="sticky top-0 bg-white border-b border-ap-onyx-50 pb-4 flex flex-col gap-4">
-            <div className="text-ap-onyx-400 text-sm">{story.id}</div>
             <div className="flex gap-2">
               <StatusLabel
                 status={story.status as Status}
                 className="w-fit h-fit"
               />
-              <div className="text-ap-onyx-800 font-bold">{story.title}</div>
+              <div className="text-ap-onyx-800 text-2xl font-bold">{story.title}</div>
             </div>
+            <div className="text-ap-onyx-400 text-sm">{story.id}</div>
           </div>
           <ShowIf if={!!story.description && story.description !== ""}>
             <div className="text-ap-onyx-800 border-b pb-2 border-ap-onyx-50  whitespace-pre-line">
+              <div className="text-ap-onyx-400">Description</div>
               {story.description}
+            </div>
+          </ShowIf>
+          <ShowIf if={!!story.acceptanceCriteria && story.acceptanceCriteria !== ""}>
+            <div className="text-ap-onyx-800 border-b pb-2 border-ap-onyx-50  whitespace-pre-line">
+              <div className="text-ap-onyx-400">Acceptance Criteria</div>
+              {story.acceptanceCriteria}
             </div>
           </ShowIf>
           <div className="flex flex-row gap-4">
@@ -108,12 +116,14 @@ function StoryEdit() {
                   </span>
                 }
                 className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                title="Click to get AI help for Story breakdown"
+                data-tooltip-id="storyHelperTooltip"
+                data-tooltip-html="Click to get AI help for story breakdown"
                 onClick={() => {
                   handleBreakdown("story_helper");
                   setHelperAsked(true);
                 }}
               />
+              <ReactTooltip id="storyHelperTooltip" />
             </ShowIf>
             <ShowIf if={helperAsked}>
               <Button
@@ -124,11 +134,13 @@ function StoryEdit() {
                   </span>
                 }
                 className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                title="Click to ask AI to break down the story into concrete tasks"
+                data-tooltip-id="storyBreakTheGlassTooltip"
+                data-tooltip-html="Click to ask AI to break down the story into concrete tasks"
                 onClick={() => {
                   handleBreakdown("story_break_the_glass");
                 }}
               />
+              <ReactTooltip id="storyBreakTheGlassTooltip" />
             </ShowIf>
           </div>
           <div>

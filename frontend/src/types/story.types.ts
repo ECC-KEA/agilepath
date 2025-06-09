@@ -5,6 +5,7 @@ export interface IStory {
   projectId: string;
   title: string;
   description: string;
+  acceptanceCriteria?: string;
   status: string;
   priority: number;
   comments: IComment[];
@@ -110,6 +111,7 @@ export interface INewStory {
   title: string;
   description?: string;
   status: string;
+  acceptanceCriteria?: string;
   priority: number;
 }
 

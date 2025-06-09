@@ -19,6 +19,8 @@ import useCurrentProject from "../hooks/projects/useCurrentProject";
 import { ITaskRequest, PointEstimate, TshirtEstimate } from "../types/story.types";
 import { EstimationMethod } from "../types/project.types";
 import { notifyError } from "../helpers/notify";
+import Tooltip from "../components/generic/tooltips/Tooltip";
+import {Tooltip as ReactTooltip} from "react-tooltip";
 
 function TaskEdit() {
   const { loadAssistant } = useAssistant();
@@ -160,7 +162,14 @@ function TaskEdit() {
               <div className="text-ap-onyx-800 font-bold truncate">{task.title}</div>
               <ShowIf if={project?.estimationMethod === EstimationMethod.TSHIRT_SIZES}>
                 <label>
-                  <span className="text-xs">Estimate</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs">Estimate (T-shirt size)</span>
+                    <Tooltip
+                      text="Use larger sizes for tasks that seem bigger or more complex. XS means small effort, while XL suggests much more work or uncertainty."
+                      className="ml-1"
+                      id="tshirtEstimateTooltip"
+                    />
+                  </div>
                   <CustomSelect
                     options={tshirtEstimateOptions}
                     value={
@@ -177,7 +186,14 @@ function TaskEdit() {
               </ShowIf>
               <ShowIf if={project?.estimationMethod === EstimationMethod.STORY_POINTS}>
                 <label>
-                  <span className="text-xs">Estimate (Story points)</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs">Estimate (Story points)</span>
+                    <Tooltip
+                      text="Story points reflect relative effort using the Fibonacci sequence. Higher numbers mean more work, complexity, or uncertainty."
+                      className="ml-1"
+                      id="storyPointEstimateTooltip"
+                    />
+                  </div>
                   <CustomSelect
                     options={storyPointEstimateOptions}
                     value={
@@ -224,12 +240,14 @@ function TaskEdit() {
                     </span>
                   }
                   className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                  title="Click to get AI help for Story breakdown"
+                  data-tooltip-id="taskHelperTooltip"
+                  data-tooltip-content="Click to get AI help for task breakdown"
                   onClick={() => {
                     handleBreakdown("task_helper");
                     setHelperAsked(true);
                   }}
                 />
+                <ReactTooltip id="taskHelperTooltip" />
               </ShowIf>
               <ShowIf if={helperAsked}>
                 <Button
@@ -240,11 +258,13 @@ function TaskEdit() {
                     </span>
                   }
                   className="bg-gradient-to-br to-ap-lavender-900 from-ap-cyan-900 text-white px-10"
-                  title="Click to ask AI to break down the task into concrete subtasks"
+                  data-tooltip-id="taskBreakTheGlassTooltip"
+                  data-tooltip-content="Click to ask AI to break down the task into concrete subtasks"
                   onClick={() => {
                     handleBreakdown("task_break_the_glass");
                   }}
                 />
+                <ReactTooltip id="taskBreakTheGlassTooltip" />
               </ShowIf>
             </div>
             <div className="flex gap-2">

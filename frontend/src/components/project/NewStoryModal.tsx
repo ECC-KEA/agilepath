@@ -6,6 +6,7 @@ import Modal from "../generic/Modal";
 import { notifyError, notifySuccess } from "../../helpers/notify";
 import Input from "../generic/inputs/Input";
 import TextArea from "../generic/inputs/CustomTextArea";
+import Tooltip from "../generic/tooltips/Tooltip";
 
 interface NewStoryModalProps {
   show: boolean;
@@ -16,6 +17,7 @@ function NewStoryModal(props: Readonly<NewStoryModalProps>) {
   const { createStory } = useStory();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState<string>("");
 
   const handleCreate = () => {
     if (!project) return;
@@ -24,7 +26,8 @@ function NewStoryModal(props: Readonly<NewStoryModalProps>) {
       status: Status.TODO,
       priority: 0,
       title: title,
-      description: description
+      description: description,
+      acceptanceCriteria: acceptanceCriteria
     };
     void createStory(tmp)
       .then(() => notifySuccess("Successfully created story"))
@@ -52,12 +55,40 @@ function NewStoryModal(props: Readonly<NewStoryModalProps>) {
         </div>
         <div>
           <div className="text-ap-onyx-400 flex justify-between">
-            Description<div className="italic">Optional</div>
+
+            <div className="flex items-center gap-1">
+              Description
+              <Tooltip
+                text="A short description gives context<br />and helps others understand the<br />purpose and scope of the story."
+                className="ml-1"
+                id="storyDescriptionTooltip"
+              />
+            </div>
+            <div className="italic">Optional</div>
           </div>
           <TextArea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Story description"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <div className="text-ap-onyx-400 flex justify-between">
+            <div className="flex items-center gap-1">
+              Acceptance Criteria
+              <Tooltip
+                text="Define clear acceptance criteria to ensure<br /> the story meets the requirements and expectations."
+                className="ml-1"
+                id="storyAcceptanceCriteriaTooltip"
+              />
+            </div>
+            <div className="italic">Optional</div>
+          </div>
+          <TextArea
+            value={acceptanceCriteria}
+            onChange={(e) => setAcceptanceCriteria(e.target.value)}
+            placeholder="Story acceptance criteria"
             className="w-full"
           />
         </div>

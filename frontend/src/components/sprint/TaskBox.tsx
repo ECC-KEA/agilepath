@@ -42,7 +42,7 @@ function TaskBox(props: Readonly<TaskBoxProps>) {
       className={`
         ${props.isDragOverlay ? "absolute backdrop-blur-2xl" : ""} 
         ${isDragging ? "opacity-50" : ""}
-        p-2  rounded shadow w-80 bg-ap-onyx-50/20
+        p-2  rounded shadow w-80 bg-ap-onyx-50/20 cursor-pointer
       `}
       ref={setNodeRef}
       onClick={handleClick}
