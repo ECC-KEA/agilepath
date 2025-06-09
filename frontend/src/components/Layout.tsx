@@ -1,9 +1,10 @@
-import { PropsWithChildren } from "react";
+import {PropsWithChildren} from "react";
 import Nav from "./navigation/Nav";
-import { Toaster } from "react-hot-toast";
-import { useLoading } from "../hooks/utils/loading/useLoading";
-import { LoadingOverlay } from "./generic/loading/LoadingOverlay";
+import {Toaster} from "react-hot-toast";
+import {useLoading} from "../hooks/utils/loading/useLoading";
+import {LoadingOverlay} from "./generic/loading/LoadingOverlay";
 import ShowIf from "./generic/ShowIf";
+import AgileCeremoniesGuide from "./generic/guide/CeremoniesGuide.tsx";
 
 function Layout({ children }: Readonly<PropsWithChildren>) {
   const loader = useLoading();
@@ -18,6 +19,7 @@ function Layout({ children }: Readonly<PropsWithChildren>) {
           text={loader.text}
         />
       </ShowIf>
+        <AgileCeremoniesGuide/>
       <Toaster
         toastOptions={{
           success: {
